@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Content Security Policy Generator | UnboundCompute</title>
+<meta name="description" content="Declare what your site loads and build a strict, copyable Content-Security-Policy header. Favours nonces and strict-dynamic, warns on unsafe-inline and wildcards, and supports report only rollout. Runs fully in your browser." />
+<meta name="keywords" content="csp generator, content security policy generator, csp builder, strict csp, nonce csp, strict-dynamic, content security policy header, csp report only" />
+<meta name="robots" content="index, follow" />
+<meta name="author" content="UnboundCompute" />
+<meta name="theme-color" content="#0a0a0b" />
+<link rel="canonical" href="https://unboundcompute.com/tools/csp-generator.html" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a0a0b'/%3E%3Cline x1='16' y1='4' x2='16' y2='28' stroke='%23fb5b46' stroke-width='2' stroke-dasharray='3 3'/%3E%3Ccircle cx='16' cy='16' r='3.4' fill='%23fb5b46'/%3E%3C/svg%3E" />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="UnboundCompute" />
+<meta property="og:title" content="Content Security Policy Generator" />
+<meta property="og:description" content="Build a strict, copyable Content-Security-Policy header from what your site loads. Runs fully in your browser, nothing is sent to any server." />
+<meta property="og:url" content="https://unboundcompute.com/tools/csp-generator.html" />
+<meta property="og:image" content="https://unboundcompute.com/og.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Content Security Policy Generator" />
+<meta name="twitter:description" content="Build a strict, copyable Content-Security-Policy header from what your site loads. Runs fully in your browser." />
+<meta name="twitter:image" content="https://unboundcompute.com/og.png" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "Content Security Policy Generator",
+      "applicationCategory": "SecurityApplication",
+      "operatingSystem": "Web",
+      "browserRequirements": "Requires JavaScript. Runs entirely client side.",
+      "url": "https://unboundcompute.com/tools/csp-generator.html",
+      "description": "A free tool that turns a description of what your site loads into a strict, copyable Content-Security-Policy header. It favours nonce based scripts with strict-dynamic, locks down object-src, base-uri, frame-ancestors, and form-action, and warns on unsafe-inline, wildcards, and plain http origins. It also emits a meta tag form and a report only variant. All generation happens in the browser.",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "publisher": { "@type": "Organization", "name": "UnboundCompute", "url": "https://unboundcompute.com/" }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is a Content Security Policy?",
+          "acceptedAnswer": { "@type": "Answer", "text": "A Content Security Policy is a response header that tells the browser which sources of script, style, images, fonts, and other content it is allowed to load and run on a page. It is delivered as the Content-Security-Policy header or an equivalent meta tag. Its main job is to limit cross site scripting: even if an attacker injects markup into your page, a strict policy stops the browser from executing script the policy did not authorise." }
+        },
+        {
+          "@type": "Question",
+          "name": "What does a strong Content Security Policy look like?",
+          "acceptedAnswer": { "@type": "Answer", "text": "A strong policy authorises script by a per response nonce or a hash rather than by a list of origins, and adds strict-dynamic so scripts the page trusts can load their own dependencies without widening the allowlist. It avoids unsafe-inline and unsafe-eval, avoids wildcard sources, and sets object-src none, base-uri self, and frame-ancestors self. The aim is that an injected script tag has no nonce and no hash, so the browser refuses to run it." }
+        },
+        {
+          "@type": "Question",
+          "name": "Does this Content Security Policy generator send my data anywhere?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. The policy is assembled entirely in your browser with JavaScript from the choices you make in the form. Nothing you type, including any origins or report endpoint you enter, is uploaded, logged, or sent to any server. You can build and copy a policy without anything leaving your machine." }
+        },
+        {
+          "@type": "Question",
+          "name": "What is Content-Security-Policy-Report-Only?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Report only mode uses the Content-Security-Policy-Report-Only header instead of the enforcing one. The browser checks every request against the policy and reports anything that would be blocked, but it does not actually block. It lets you roll out a strict policy on a live site, watch the violation reports for things you forgot to allow, and tighten the policy until it is clean, then switch to the enforcing header without breaking the page." }
+        }
+      ]
+    }
+  ]
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600&family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0a0b; --bg-2:#070708; --panel:#0e0e10; --panel-2:#131315;
+    --ink:#f4f2ec; --ink-hi:#fbf9f3; --ink-soft:#9b988f; --ink-faint:#5e5b54;
+    --line:rgba(244,242,236,.13); --line-2:rgba(244,242,236,.07);
+    --accent:#fb5b46; --accent-2:#ff7d6b; --accent-wash:rgba(251,91,70,.12); --on-accent:#1a0c09; --accent-line:rgba(251,91,70,.42);
+    --pass:#5fd6a4; --pass-wash:rgba(95,214,164,.1); --warn:#e8b04b; --warn-wash:rgba(232,176,75,.1); --fail:#fb5b46; --fail-wash:rgba(251,91,70,.1); --info:#7c93ff; --info-wash:rgba(124,147,255,.1);
+    --serif:'Newsreader',Georgia,serif; --mono:'JetBrains Mono',ui-monospace,monospace; --sans:'Inter',system-ui,sans-serif;
+    --maxw:920px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;line-height:1.6}
+  ::selection{background:var(--accent);color:var(--on-accent)}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+
+  nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);background:rgba(10,10,11,.72);border-bottom:1px solid var(--line-2)}
+  nav .wrap{height:64px;display:flex;align-items:center;justify-content:space-between}
+  nav a.brand{display:flex;align-items:center;gap:11px;font-family:var(--mono);font-weight:600;font-size:15px;color:var(--ink);letter-spacing:-.01em}
+  nav a.brand:hover{text-decoration:none}
+  nav .badge{width:27px;height:27px;border-radius:7px;border:1px solid var(--accent-line);display:grid;place-items:center}
+  nav a.cta{font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:9px 16px;border-radius:8px;background:var(--accent);color:var(--on-accent)}
+  nav a.cta:hover{filter:brightness(1.08);text-decoration:none}
+
+  header.hero{padding:64px 0 28px}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:18px}
+  h1{font-family:var(--serif);font-weight:400;font-size:clamp(32px,5vw,52px);line-height:1.08;letter-spacing:-.015em;color:var(--ink-hi)}
+  .lede{margin-top:18px;font-size:18px;color:var(--ink-soft);max-width:660px}
+  .privacy{margin-top:18px;display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);border:1px solid var(--line);border-radius:8px;padding:8px 13px;background:var(--panel)}
+  .privacy svg{width:14px;height:14px;flex:none}
+
+  .tool{margin:30px 0 12px;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px}
+  label.fld{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:10px}
+  textarea{width:100%;min-height:150px;resize:vertical;background:var(--bg-2);border:1px solid var(--line);border-radius:11px;padding:15px;color:var(--ink);font-family:var(--mono);font-size:13.5px;line-height:1.55;outline:none;transition:border-color .2s,box-shadow .2s;word-break:break-all}
+  textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-wash)}
+  textarea::placeholder{color:var(--ink-faint)}
+  .row{display:flex;gap:11px;flex-wrap:wrap;margin-top:14px;align-items:center}
+  button{font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;padding:13px 22px;border-radius:9px;cursor:pointer;border:1px solid var(--line);background:transparent;color:var(--ink);transition:filter .15s,border-color .15s,background .15s}
+  button.primary{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+  button.primary:hover{filter:brightness(1.08)}
+  button.ghost:hover{border-color:var(--accent-line);color:var(--ink-hi)}
+  .hint{font-family:var(--mono);font-size:12px;color:var(--ink-faint);margin-left:auto}
+
+  /* Form controls for the generator, in the same visual language */
+  .group{border:1px solid var(--line);border-radius:13px;padding:16px 18px;margin-bottom:14px;background:var(--panel)}
+  .group > .glabel{font-family:var(--mono);font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--accent);margin-bottom:12px;display:block}
+  .opt{display:flex;align-items:flex-start;gap:10px;margin-bottom:9px;font-size:14px;color:var(--ink);cursor:pointer}
+  .opt:last-child{margin-bottom:0}
+  .opt input[type=radio],.opt input[type=checkbox]{appearance:none;-webkit-appearance:none;width:17px;height:17px;flex:none;margin-top:2px;border:1px solid var(--line);background:var(--bg-2);cursor:pointer;display:grid;place-items:center;transition:border-color .15s,background .15s}
+  .opt input[type=radio]{border-radius:50%}
+  .opt input[type=checkbox]{border-radius:5px}
+  .opt input:checked{border-color:var(--accent);background:var(--accent)}
+  .opt input[type=radio]:checked::after{content:"";width:7px;height:7px;border-radius:50%;background:var(--on-accent)}
+  .opt input[type=checkbox]:checked::after{content:"\2713";font-family:var(--mono);font-size:12px;font-weight:700;color:var(--on-accent)}
+  .opt .otext{flex:1;min-width:0}
+  .opt .otext .osub{display:block;font-size:12.5px;color:var(--ink-soft);margin-top:2px}
+  .opt code,.osub code,.prose code,.note code,.fix code{font-family:var(--mono);font-size:.92em;background:var(--panel-2);border:1px solid var(--line-2);border-radius:5px;padding:1px 5px;color:var(--ink)}
+  input.txt{width:100%;background:var(--bg-2);border:1px solid var(--line);border-radius:9px;padding:10px 12px;color:var(--ink);font-family:var(--mono);font-size:13px;outline:none;transition:border-color .2s,box-shadow .2s;margin-top:8px}
+  input.txt:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-wash)}
+  input.txt::placeholder{color:var(--ink-faint)}
+  .field{margin-bottom:12px}
+  .field:last-child{margin-bottom:0}
+  .field > label{display:block;font-family:var(--mono);font-size:12px;color:var(--ink-soft);letter-spacing:.02em}
+  .field > label .lh{display:block;font-size:11.5px;color:var(--ink-faint);margin-top:2px;text-transform:none;letter-spacing:0}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .toggles{display:grid;grid-template-columns:1fr 1fr;gap:9px 16px}
+
+  #out{margin-top:8px}
+  .seg{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:16px 18px;margin-bottom:14px;min-width:0}
+  .seg h3{font-family:var(--mono);font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--accent);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .seg pre{font-family:var(--mono);font-size:13px;line-height:1.6;color:var(--ink);white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere}
+  .seg .cap{font-family:var(--mono);font-size:11.5px;color:var(--ink-faint);margin-top:9px;text-transform:none;letter-spacing:0}
+  button.copy{font-size:11px;padding:6px 12px;letter-spacing:.05em}
+  button.copy:hover{border-color:var(--accent-line);color:var(--ink-hi)}
+
+  .checks{display:flex;flex-direction:column;gap:11px;margin-top:14px}
+  .check{border:1px solid var(--line);border-radius:13px;padding:16px 18px;background:var(--panel)}
+  .check .top{display:flex;align-items:flex-start;gap:13px}
+  .dot{width:20px;height:20px;border-radius:6px;flex:none;display:grid;place-items:center;font-size:13px;font-weight:700;margin-top:1px}
+  .dot.pass{background:var(--pass-wash);color:var(--pass)}
+  .dot.warn{background:var(--warn-wash);color:var(--warn)}
+  .dot.fail{background:var(--fail-wash);color:var(--fail)}
+  .dot.info{background:var(--info-wash);color:var(--info)}
+  .check h3{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--ink-hi);letter-spacing:-.01em}
+  .check .finding{margin-top:5px;font-size:14.5px;color:var(--ink)}
+  .check .why{margin-top:9px;font-size:13.5px;color:var(--ink-soft)}
+  .check .fix{margin-top:9px;font-size:13px;color:var(--ink-soft);font-family:var(--mono);background:var(--bg-2);border:1px solid var(--line-2);border-radius:8px;padding:9px 11px;white-space:pre-wrap;word-break:break-word}
+  .empty{color:var(--ink-faint);font-family:var(--mono);font-size:13px;text-align:center;padding:30px}
+  .note{margin-top:14px;border:1px solid var(--line);border-left:3px solid var(--accent-line);border-radius:11px;padding:15px 17px;background:var(--panel);font-size:14px;color:var(--ink-soft)}
+  .note b{color:var(--ink)}
+
+  .prose{padding:44px 0 20px}
+  .prose h2{font-family:var(--serif);font-weight:400;font-size:30px;color:var(--ink-hi);margin:36px 0 14px;letter-spacing:-.01em}
+  .prose h3{font-family:var(--mono);font-size:15px;color:var(--ink-hi);margin:24px 0 8px}
+  .prose p{color:var(--ink-soft);margin-bottom:14px;font-size:16px}
+  .prose ul{color:var(--ink-soft);margin:0 0 14px 20px;font-size:16px}
+  .prose li{margin-bottom:7px}
+  .prose code{font-family:var(--mono);font-size:13.5px;background:var(--panel-2);border:1px solid var(--line-2);border-radius:5px;padding:1px 6px;color:var(--ink)}
+  .related{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:8px}
+  .related a{display:block;border:1px solid var(--line);border-radius:11px;padding:14px 16px;color:var(--ink);font-size:14.5px;background:var(--panel)}
+  .related a:hover{border-color:var(--accent-line);text-decoration:none}
+  .related a span{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:5px}
+
+  footer{border-top:1px solid var(--line-2);margin-top:40px;padding:30px 0;color:var(--ink-faint);font-family:var(--mono);font-size:12.5px}
+  footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px}
+  footer a{color:var(--ink-soft)}
+  @media (max-width:560px){
+    .related{grid-template-columns:1fr}
+    .grid2,.toggles{grid-template-columns:1fr}
+    .hint{margin-left:0;width:100%}
+  }
+</style>
+</head>
+<body>
+
+<nav><div class="wrap">
+  <a class="brand" href="https://unboundcompute.com/">
+    <span class="badge"><svg viewBox="0 0 24 24" fill="none" style="width:15px;height:15px"><line x1="12" y1="3" x2="12" y2="21" stroke="var(--accent)" stroke-width="1.8" stroke-dasharray="2.6 2.6"/><circle cx="12" cy="12" r="3" fill="var(--accent)"/></svg></span>
+    UnboundCompute
+  </a>
+  <a class="cta" href="https://unboundcompute.com/#cta">Request access</a>
+</div></nav>
+
+<header class="hero"><div class="wrap">
+  <div class="eyebrow">Free tool</div>
+  <h1>Content Security Policy Generator</h1>
+  <p class="lede">Declare what your site actually loads and this tool builds a strict, copyable Content-Security-Policy header. It favours nonces and <code>strict-dynamic</code> over origin allowlists, locks down the directives attackers reach for, and flags risky choices like <code>unsafe-inline</code> and wildcards as you make them.</p>
+  <div class="privacy">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6l8-4z" stroke="var(--accent)" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Everything runs in your browser. Nothing you type is sent to any server.
+  </div>
+</div></header>
+
+<div class="wrap">
+  <div class="tool">
+
+    <div class="group">
+      <span class="glabel">Scripts</span>
+      <label class="opt"><input type="radio" name="scriptmode" value="nonce" checked><span class="otext">Nonce based (recommended)<span class="osub">Emits <code>script-src 'nonce-{RANDOM}' 'strict-dynamic'</code>. Your server must generate a fresh random nonce per response and stamp it onto every trusted script tag.</span></span></label>
+      <label class="opt"><input type="radio" name="scriptmode" value="self"><span class="otext">Self hosted only<span class="osub">Emits <code>script-src 'self'</code>. Only scripts served from your own origin run.</span></span></label>
+      <label class="opt"><input type="radio" name="scriptmode" value="origins"><span class="otext">Allow specific origins<span class="osub">An allowlist of script origins. Weaker than nonces: every listed host becomes trusted to serve script.</span></span></label>
+      <input class="txt" id="scriptOrigins" placeholder="https://cdn.acme.example, https://js.acme.example">
+      <label class="opt" style="margin-top:10px"><input type="checkbox" id="scriptUnsafeInline"><span class="otext">I still need <code>unsafe-inline</code> for scripts<span class="osub">Allows inline script and event handlers. This is the usual way a policy is defeated. Avoid it unless you have no other path.</span></span></label>
+    </div>
+
+    <div class="group">
+      <span class="glabel">Styles</span>
+      <div class="field">
+        <label>Extra style origins<span class="lh">Comma separated. <code>'self'</code> is always included.</span></label>
+        <input class="txt" id="styleOrigins" placeholder="https://fonts.googleapis.com">
+      </div>
+      <label class="opt"><input type="checkbox" id="styleUnsafeInline"><span class="otext">Allow <code>unsafe-inline</code> for styles<span class="osub">Inline styles are lower risk than inline scripts, but they still widen the policy. Prefer hashes or nonces where you can.</span></span></label>
+    </div>
+
+    <div class="group">
+      <span class="glabel">Other content origins</span>
+      <p style="font-size:12.5px;color:var(--ink-faint);margin-bottom:12px">Comma separated extra origins. Each directive defaults to <code>'self'</code> if left blank.</p>
+      <div class="grid2">
+        <div class="field"><label>Images (<code>img-src</code>)</label><input class="txt" id="imgOrigins" placeholder="https://img.acme.example data:"></div>
+        <div class="field"><label>Fonts (<code>font-src</code>)</label><input class="txt" id="fontOrigins" placeholder="https://fonts.gstatic.com"></div>
+        <div class="field"><label>Connect (<code>connect-src</code>)<span class="lh">XHR, fetch, websocket</span></label><input class="txt" id="connectOrigins" placeholder="https://api.acme.example wss://live.acme.example"></div>
+        <div class="field"><label>Media (<code>media-src</code>)</label><input class="txt" id="mediaOrigins" placeholder="https://media.acme.example"></div>
+        <div class="field"><label>Frames (<code>frame-src</code>)<span class="lh">What you may embed</span></label><input class="txt" id="frameOrigins" placeholder="https://embed.acme.example"></div>
+      </div>
+    </div>
+
+    <div class="group">
+      <span class="glabel">Hardening directives</span>
+      <div class="toggles">
+        <label class="opt"><input type="checkbox" id="tObject" checked><span class="otext"><code>object-src 'none'</code><span class="osub">Blocks plugins and embeds.</span></span></label>
+        <label class="opt"><input type="checkbox" id="tBase" checked><span class="otext"><code>base-uri 'self'</code><span class="osub">Stops base tag hijacking.</span></span></label>
+        <label class="opt"><input type="checkbox" id="tAncestors" checked><span class="otext"><code>frame-ancestors 'self'</code><span class="osub">Anti clickjacking: controls who may frame you.</span></span></label>
+        <label class="opt"><input type="checkbox" id="tForm" checked><span class="otext"><code>form-action 'self'</code><span class="osub">Restricts where forms submit.</span></span></label>
+        <label class="opt"><input type="checkbox" id="tUpgrade"><span class="otext"><code>upgrade-insecure-requests</code><span class="osub">Rewrites http subresources to https.</span></span></label>
+        <label class="opt"><input type="checkbox" id="tMixed"><span class="otext"><code>block-all-mixed-content</code><span class="osub">Blocks any remaining mixed content.</span></span></label>
+      </div>
+    </div>
+
+    <div class="group">
+      <span class="glabel">Rollout</span>
+      <label class="opt"><input type="checkbox" id="reportOnly"><span class="otext">Report only<span class="osub">Outputs the header as <code>Content-Security-Policy-Report-Only</code> so the browser reports violations without blocking. The safe way to roll out a new policy.</span></span></label>
+      <div class="field" style="margin-top:8px">
+        <label>Report endpoint (optional)<span class="lh">Adds a <code>report-uri</code> directive so violations are posted here.</span></label>
+        <input class="txt" id="reportUri" placeholder="https://csp.acme.example/report">
+      </div>
+    </div>
+
+    <div class="row">
+      <button class="primary" id="build">Build policy</button>
+      <button class="ghost" id="reset">Reset</button>
+      <span class="hint" id="hint">No data leaves this page</span>
+    </div>
+  </div>
+
+  <div id="out"><div class="empty">Your generated policy will appear here.</div></div>
+</div>
+
+<div class="wrap prose">
+  <h2>What a Content Security Policy does</h2>
+  <p>A Content Security Policy is a response header that tells the browser which sources it may load and run on a page. Each directive covers a content type, like <code>script-src</code> for JavaScript or <code>img-src</code> for images, and lists the origins or keywords the browser should trust. The point is to contain cross site scripting: if an attacker manages to inject markup into your page, a strict policy refuses to execute script the policy never authorised, drawing on the source list rules in the <a href="https://www.w3.org/TR/CSP3/" rel="noopener" target="_blank">CSP Level 3 specification</a>. A policy is a defence in depth layer, not a replacement for escaping output. For how the underlying flaw works, see <a href="https://security.unboundcompute.com/what-is-xss-and-how-does-it-work/" rel="noopener">what XSS is and how it works</a>.</p>
+
+  <h3>Nonces and hashes versus origin allowlists</h3>
+  <p>The weak way to allow script is a list of origins: <code>script-src 'self' https://cdn.acme.example</code>. The trouble is that any script those hosts serve becomes trusted, and a popular CDN often hosts old or attacker friendly files that turn the allowlist into a bypass. The strong way is to authorise a specific script rather than a whole host. A nonce is a random value your server generates fresh for every response and puts both in the header, as <code>'nonce-r4nd0m'</code>, and on each trusted script tag as <code>nonce="r4nd0m"</code>. An injected script tag has no matching nonce, so the browser refuses it. A hash, written like <code>'sha256-...'</code>, does the same for a known inline script by pinning its exact contents.</p>
+
+  <h3>Why strict-dynamic matters</h3>
+  <p>Real pages load script that loads more script, and listing every transitive origin by hand is fragile. The <code>strict-dynamic</code> keyword says: trust any script that a script I already trusted chose to load, and ignore the host allowlist entirely. So a single nonce on your entry point script propagates trust to its dependencies without you allowlisting their origins. This is what makes a nonce based policy practical for a modern app, and it is the shape of policy this generator emits when you pick nonce mode.</p>
+
+  <h3>Why unsafe-inline is the usual way a policy is defeated</h3>
+  <p>When a policy includes <code>unsafe-inline</code> in <code>script-src</code>, the browser will run any inline script and any inline event handler on the page, including ones an attacker injected. That is precisely the thing a Content Security Policy exists to stop, so a policy with <code>unsafe-inline</code> on scripts gives almost no cross site scripting protection no matter how careful the rest of it looks. Modern browsers ignore <code>unsafe-inline</code> when a nonce or hash is present, which is another reason to move to nonces. Inline styles via <code>unsafe-inline</code> in <code>style-src</code> are a milder concern, but they can still be abused, so this tool warns on both and pushes you toward nonce based scripts. The same readable, runnable surface drives <a href="https://security.unboundcompute.com/what-is-dom-based-xss/" rel="noopener">DOM based XSS</a> too.</p>
+
+  <h3>Rolling out in report only mode</h3>
+  <p>A new policy almost always blocks something you forgot you load. Shipping it straight to enforcement breaks the page for real users. Report only mode solves this: the <code>Content-Security-Policy-Report-Only</code> header makes the browser check every request against your policy and report what would have been blocked, while letting it through. You watch the violation reports on a live site, add the legitimate sources you missed, and tighten until the reports are clean, then switch to the enforcing <code>Content-Security-Policy</code> header. Add a <code>report-uri</code> or <code>report-to</code> endpoint so those reports go somewhere you can read them.</p>
+
+  <h2>Test it before you trust it</h2>
+  <p>A generated policy is a strong starting point, not a finished one, because a correct policy depends on exactly what your pages load. Always deploy it in report only mode first, collect violations, and adjust. When you have a candidate, paste it into the <a href="https://unboundcompute.com/tools/security-headers-analyzer.html">Security Headers and CSP Analyzer</a> to grade it and surface weaknesses. Reasoning about whether a policy genuinely closes the gaps on a given app, rather than pattern matching one string, is the kind of judgement an <a href="https://security.unboundcompute.com/ai-security-testing/" rel="noopener">AI security testing</a> approach is built for. For the broader category of injection flaws a policy helps contain, see the <a href="https://security.unboundcompute.com/category/injection-and-input/" rel="noopener">injection and input</a> writing.</p>
+
+  <h2>Related reading</h2>
+  <div class="related">
+    <a href="https://security.unboundcompute.com/what-is-xss-and-how-does-it-work/"><span>Deep dive</span>What is XSS and how does it work</a>
+    <a href="https://security.unboundcompute.com/what-is-dom-based-xss/"><span>Deep dive</span>What is DOM based XSS</a>
+    <a href="https://security.unboundcompute.com/what-is-web-application-security/"><span>Guide</span>What is web application security</a>
+    <a href="https://security.unboundcompute.com/web-security-glossary/"><span>Reference</span>Web security glossary</a>
+  </div>
+
+  <h2>More free tools</h2>
+  <div class="related">
+    <a href="https://unboundcompute.com/tools/security-headers-analyzer.html"><span>Tool</span>Security Headers and CSP Analyzer</a>
+    <a href="https://unboundcompute.com/tools/sri-hash-generator.html"><span>Tool</span>Subresource Integrity Hash Generator</a>
+    <a href="https://unboundcompute.com/tools/jwt-security-inspector.html"><span>Tool</span>JWT Security Inspector</a>
+      <a href="https://unboundcompute.com/tools/"><span>All tools</span>Free security tools hub</a>
+  </div>
+</div>
+
+<footer><div class="wrap">
+  <div>Built by <a href="https://unboundcompute.com/">UnboundCompute</a>, autonomous security research for web apps and APIs.</div>
+  <div><a href="https://unboundcompute.com/#cta">Request access</a></div>
+</div></footer>
+
+<script>
+(function(){
+  "use strict";
+  var $ = function(s){ return document.querySelector(s); };
+  function esc(s){ return String(s).replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];}); }
+
+  // Sample nonce for display only. This is NOT a production nonce. A real
+  // server must generate a fresh, unpredictable nonce per response. We use
+  // crypto.getRandomValues where available so the sample is not Math.random,
+  // but it is still only a sample baked into a static page.
+  function sampleNonce(){
+    var bytes = new Uint8Array(16);
+    if (typeof crypto !== "undefined" && crypto.getRandomValues){ crypto.getRandomValues(bytes); }
+    else { for (var i=0;i<16;i++) bytes[i] = (Date.now()*(i+7)) & 255; } // fallback, sample only
+    var b = "";
+    for (var j=0;j<bytes.length;j++) b += String.fromCharCode(bytes[j]);
+    return btoa(b).replace(/=+$/,"").replace(/\+/g,"-").replace(/\//g,"_");
+  }
+
+  // Split a comma or whitespace separated origin list into clean tokens.
+  function splitOrigins(raw){
+    if (!raw) return [];
+    return raw.split(/[\s,]+/).map(function(t){ return t.trim(); }).filter(Boolean);
+  }
+
+  // Read every control into a plain state object. Kept separate so the
+  // headless test can stub the DOM and still exercise buildPolicy.
+  function readState(){
+    var mode = "nonce";
+    var radios = document.querySelectorAll('input[name="scriptmode"]');
+    for (var i=0;i<radios.length;i++){ if (radios[i].checked){ mode = radios[i].value; break; } }
+    return {
+      scriptMode: mode,
+      scriptOrigins: splitOrigins($("#scriptOrigins").value),
+      scriptUnsafeInline: $("#scriptUnsafeInline").checked,
+      styleOrigins: splitOrigins($("#styleOrigins").value),
+      styleUnsafeInline: $("#styleUnsafeInline").checked,
+      imgOrigins: splitOrigins($("#imgOrigins").value),
+      fontOrigins: splitOrigins($("#fontOrigins").value),
+      connectOrigins: splitOrigins($("#connectOrigins").value),
+      mediaOrigins: splitOrigins($("#mediaOrigins").value),
+      frameOrigins: splitOrigins($("#frameOrigins").value),
+      object: $("#tObject").checked,
+      base: $("#tBase").checked,
+      ancestors: $("#tAncestors").checked,
+      form: $("#tForm").checked,
+      upgrade: $("#tUpgrade").checked,
+      mixed: $("#tMixed").checked,
+      reportOnly: $("#reportOnly").checked,
+      reportUri: ($("#reportUri").value || "").trim(),
+      nonce: sampleNonce()
+    };
+  }
+
+  // Core generator. Pure function of state, returns directives, the assembled
+  // policy body, header name, and a list of warnings. No DOM access here.
+  function buildPolicy(st){
+    var warnings = [];
+    var directives = [];
+
+    function pushWarn(s, h, f, why){ warnings.push({ s:s, h:h, f:f, why:why }); }
+
+    function checkOrigins(list, where){
+      list.forEach(function(o){
+        if (o === "*"){ pushWarn("fail","Wildcard origin in "+where,"You listed a bare wildcard "+o+" in "+where+", which allows every origin and effectively turns that directive off.","Replace the wildcard with the exact origins you load from. A wildcard source negates the protection the directive was meant to give."); }
+        else if (/^https?:\/\/[^/]*\*/.test(o) || /^\*\./.test(o)){ pushWarn("warn","Wildcard host in "+where,"The source "+o+" in "+where+" uses a wildcard host. Any subdomain it matches becomes trusted.","Prefer exact hostnames. A wildcard host trusts anything an attacker can stand up under that domain."); }
+        else if (/^http:\/\//i.test(o)){ pushWarn("warn","Plain http origin in "+where,"The source "+o+" in "+where+" is plain http, which can be tampered with in transit.","Serve subresources over https. A plain http source can be swapped by anyone on the network path."); }
+      });
+    }
+
+    // script-src
+    var script = [];
+    if (st.scriptMode === "nonce"){
+      script.push("'nonce-" + st.nonce + "'");
+      script.push("'strict-dynamic'");
+    } else if (st.scriptMode === "self"){
+      script.push("'self'");
+    } else { // origins
+      script.push("'self'");
+      if (st.scriptOrigins.length){ script = script.concat(st.scriptOrigins); }
+      else { pushWarn("info","No script origins listed","You chose the allowlist mode but did not list any script origins, so only 'self' is allowed.","List the exact origins you load script from, or switch to nonce based scripts for stronger protection."); }
+      checkOrigins(st.scriptOrigins, "script-src");
+      pushWarn("info","Origin allowlist for scripts","script-src uses an origin allowlist. Every listed host is trusted to serve any script.","Nonce based scripts with strict-dynamic are stronger: they trust a specific script, not a whole host.");
+    }
+    if (st.scriptUnsafeInline){
+      script.push("'unsafe-inline'");
+      pushWarn("fail","unsafe-inline on scripts","You enabled 'unsafe-inline' in script-src. The browser will run any inline script, including one an attacker injects, which defeats most of the policy.","Remove 'unsafe-inline' and move to nonce based or hash based scripts. With a nonce present, modern browsers ignore 'unsafe-inline' anyway.");
+    }
+    if (st.scriptMode === "nonce"){
+      checkOrigins([], "script-src");
+    } else {
+      checkOrigins(st.scriptOrigins, "script-src");
+    }
+    directives.push({ name:"script-src", values:script });
+
+    // style-src
+    var style = ["'self'"];
+    if (st.styleOrigins.length) style = style.concat(st.styleOrigins);
+    if (st.styleUnsafeInline){
+      style.push("'unsafe-inline'");
+      pushWarn("warn","unsafe-inline on styles","You enabled 'unsafe-inline' in style-src. Inline styles are lower risk than inline scripts, but this still widens the policy.","Where you can, move to nonce based or hash based styles, or extract inline styles into a stylesheet served from 'self'.");
+    }
+    checkOrigins(st.styleOrigins, "style-src");
+    directives.push({ name:"style-src", values:style });
+
+    // simple origin directives, default 'self'
+    [
+      ["img-src", st.imgOrigins],
+      ["font-src", st.fontOrigins],
+      ["connect-src", st.connectOrigins],
+      ["media-src", st.mediaOrigins],
+      ["frame-src", st.frameOrigins]
+    ].forEach(function(d){
+      var vals = ["'self'"].concat(d[1]);
+      checkOrigins(d[1], d[0]);
+      directives.push({ name:d[0], values:vals });
+    });
+
+    // default-src as a backstop
+    directives.unshift({ name:"default-src", values:["'self'"] });
+
+    // hardening directives
+    if (st.object) directives.push({ name:"object-src", values:["'none'"] });
+    else pushWarn("warn","object-src not set","You turned off object-src 'none'. Plugin and embed content is then governed by default-src only.","Keep object-src 'none' unless you genuinely embed plugin content. It is a cheap, high value lockdown.");
+    if (st.base) directives.push({ name:"base-uri", values:["'self'"] });
+    else pushWarn("warn","base-uri not set","base-uri is not restricted. An injected base tag can rewrite where relative script URLs resolve.","Set base-uri 'self' so an attacker cannot redirect relative resource loads with an injected base tag.");
+    if (st.ancestors) directives.push({ name:"frame-ancestors", values:["'self'"] });
+    else pushWarn("warn","frame-ancestors not set","frame-ancestors is not set, so other sites may be able to frame your pages.","Set frame-ancestors 'self' to limit clickjacking by controlling who may embed your pages in a frame.");
+    if (st.form) directives.push({ name:"form-action", values:["'self'"] });
+    if (st.upgrade) directives.push({ name:"upgrade-insecure-requests", values:[] });
+    if (st.mixed) directives.push({ name:"block-all-mixed-content", values:[] });
+
+    // report endpoint
+    if (st.reportUri){ directives.push({ name:"report-uri", values:[st.reportUri] }); }
+    else if (st.reportOnly){ pushWarn("info","Report only without an endpoint","You enabled report only mode but gave no report endpoint, so violations are only visible in the browser console.","Add a report-uri endpoint to collect violation reports from real users during rollout."); }
+
+    var body = directives.map(function(d){
+      return d.values.length ? (d.name + " " + d.values.join(" ")) : d.name;
+    }).join("; ");
+
+    var headerName = st.reportOnly ? "Content-Security-Policy-Report-Only" : "Content-Security-Policy";
+
+    return { directives:directives, body:body, headerName:headerName, warnings:warnings };
+  }
+
+  // ---- rendering (DOM) ----
+  function copyBtn(id){ return '<button class="copy ghost" data-copy="'+id+'">Copy</button>'; }
+
+  function render(st, res){
+    var headerLine = res.headerName + ": " + res.body;
+    var metaContent = res.body; // meta tag never carries report-only or frame-ancestors meaning
+    var html = "";
+
+    html += '<div class="seg"><h3>HTTP header'+copyBtn("c-header")+'</h3>';
+    html += '<pre id="c-header">'+esc(headerLine)+'</pre>';
+    if (st.reportOnly) html += '<div class="cap">Report only header: the browser reports violations but does not block. Switch to Content-Security-Policy to enforce.</div>';
+    if (st.scriptMode === "nonce") html += '<div class="cap">The value shown after \'nonce-\' is a sample generated in your browser. Your server must emit a fresh random nonce per response and put the same value on every trusted script tag.</div>';
+    html += '</div>';
+
+    html += '<div class="seg"><h3>Meta tag'+copyBtn("c-meta")+'</h3>';
+    html += '<pre id="c-meta">'+esc('<meta http-equiv="Content-Security-Policy" content="'+metaContent+'">')+'</pre>';
+    html += '<div class="cap">A meta tag is a fallback when you cannot set headers. Note that frame-ancestors, report-uri, and report only mode only work as a real response header, not in a meta tag.</div>';
+    html += '</div>';
+
+    html += '<div class="seg"><h3>Server config hint'+copyBtn("c-srv")+'</h3>';
+    var nginx = 'add_header '+res.headerName+' "'+res.body+'" always;';
+    var apache = 'Header always set '+res.headerName+' "'+res.body+'"';
+    html += '<pre id="c-srv">'+esc("# nginx\n"+nginx+"\n\n# Apache .htaccess\n"+apache)+'</pre>';
+    html += '</div>';
+
+    // warnings
+    if (res.warnings.length){
+      html += '<div class="checks">';
+      res.warnings.forEach(function(w){
+        var sym = w.s==="pass"?"&#10003;":w.s==="warn"?"!":w.s==="fail"?"&#10007;":"i";
+        html += '<div class="check"><div class="top"><span class="dot '+w.s+'">'+sym+'</span><div style="flex:1">';
+        html += '<h3>'+esc(w.h)+'</h3>';
+        html += '<div class="finding">'+esc(w.f)+'</div>';
+        if (w.why) html += '<div class="fix">'+esc(w.why)+'</div>';
+        html += '</div></div></div>';
+      });
+      html += '</div>';
+    } else {
+      html += '<div class="checks"><div class="check"><div class="top"><span class="dot pass">&#10003;</span><div style="flex:1"><h3>No risky choices flagged</h3><div class="finding">This policy avoids unsafe-inline, wildcards, and plain http sources, and keeps the hardening directives on. Still test it in report only mode before enforcing.</div></div></div></div></div>';
+    }
+
+    html += '<div class="note"><b>Test before you trust it.</b> This is a strong starting point, not a finished policy, because a correct policy depends on exactly what your pages load. Roll it out in report only mode first, watch for violations, and adjust. Then paste it into the <a href="https://unboundcompute.com/tools/security-headers-analyzer.html">Security Headers and CSP Analyzer</a> to grade it.</div>';
+
+    return html;
+  }
+
+  function run(){
+    var st = readState();
+    var res = buildPolicy(st);
+    $("#out").innerHTML = render(st, res);
+    bindCopy();
+  }
+
+  function bindCopy(){
+    var btns = document.querySelectorAll("button[data-copy]");
+    for (var i=0;i<btns.length;i++){
+      btns[i].addEventListener("click", function(){
+        var btn = this;
+        var el = document.getElementById(btn.getAttribute("data-copy"));
+        if (!el) return;
+        var text = el.textContent;
+        var done = function(){ var old = btn.textContent; btn.textContent = "Copied"; setTimeout(function(){ btn.textContent = old; }, 1400); };
+        if (navigator.clipboard && navigator.clipboard.writeText){
+          navigator.clipboard.writeText(text).then(done, function(){ legacyCopy(text, done); });
+        } else { legacyCopy(text, done); }
+      });
+    }
+  }
+
+  function legacyCopy(text, done){
+    try {
+      var ta = document.createElement("textarea");
+      ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.focus(); ta.select();
+      document.execCommand("copy"); document.body.removeChild(ta); done();
+    } catch(e){ /* clipboard unavailable, leave the text selectable */ }
+  }
+
+  function resetForm(){
+    document.querySelectorAll('input[name="scriptmode"]').forEach(function(r){ r.checked = (r.value === "nonce"); });
+    ["scriptOrigins","styleOrigins","imgOrigins","fontOrigins","connectOrigins","mediaOrigins","frameOrigins","reportUri"].forEach(function(id){ $("#"+id).value = ""; });
+    $("#scriptUnsafeInline").checked = false;
+    $("#styleUnsafeInline").checked = false;
+    $("#tObject").checked = true; $("#tBase").checked = true; $("#tAncestors").checked = true; $("#tForm").checked = true;
+    $("#tUpgrade").checked = false; $("#tMixed").checked = false;
+    $("#reportOnly").checked = false;
+    run();
+  }
+
+  // Expose for the headless test harness.
+  if (typeof window !== "undefined"){ window.__csp = { buildPolicy: buildPolicy, readState: readState, splitOrigins: splitOrigins }; }
+
+  $("#build").addEventListener("click", run);
+  $("#reset").addEventListener("click", resetForm);
+  // Live update on any control change so the box is never stale.
+  document.querySelectorAll(".tool input").forEach(function(el){ el.addEventListener("change", run); el.addEventListener("input", run); });
+
+  // Generate a sensible default policy on first load.
+  run();
+})();
+</script>
+</body>
+</html>

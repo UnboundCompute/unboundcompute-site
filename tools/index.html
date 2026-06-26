@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Free Security Tools | UnboundCompute</title>
+<meta name="description" content="A growing set of free, fully client-side security tools. Analyze HTTP headers and CSP, inspect JWTs, normalize SSRF payloads, lint prompt templates, scan for secrets, strip EXIF metadata, decode certificates, triage files, and more. Everything runs in your browser." />
+<meta name="keywords" content="free security tools, security headers checker, csp evaluator, jwt decoder, ssrf normalizer, prompt injection linter, mcp security, ioc defanger, secret scanner, exif scrubber, x509 decoder, redos checker, cipher solver, forensic timestamp converter" />
+<meta name="robots" content="index, follow" />
+<meta name="author" content="UnboundCompute" />
+<meta name="theme-color" content="#0a0a0b" />
+<link rel="canonical" href="https://unboundcompute.com/tools/" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a0a0b'/%3E%3Cline x1='16' y1='4' x2='16' y2='28' stroke='%23fb5b46' stroke-width='2' stroke-dasharray='3 3'/%3E%3Ccircle cx='16' cy='16' r='3.4' fill='%23fb5b46'/%3E%3C/svg%3E" />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="UnboundCompute" />
+<meta property="og:title" content="Free Security Tools" />
+<meta property="og:description" content="A growing set of free, fully client-side security tools across web, AI, forensics, and crypto. Everything runs in your browser, nothing is sent to any server." />
+<meta property="og:url" content="https://unboundcompute.com/tools/" />
+<meta property="og:image" content="https://unboundcompute.com/og.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Free Security Tools" />
+<meta name="twitter:description" content="Free, fully client-side security tools across web, AI, forensics, and crypto. Everything runs in your browser." />
+<meta name="twitter:image" content="https://unboundcompute.com/og.png" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "CollectionPage",
+      "name": "Free Security Tools",
+      "url": "https://unboundcompute.com/tools/",
+      "description": "A collection of free, fully client side security tools from UnboundCompute across web application security, AI and LLM security, digital forensics, and cryptography. Every tool runs entirely in the browser.",
+      "publisher": { "@type": "Organization", "name": "UnboundCompute", "url": "https://unboundcompute.com/" }
+    },
+    {
+      "@type": "ItemList",
+      "itemListOrder": "https://schema.org/ItemListUnordered",
+      "numberOfItems": 26,
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Security Headers and CSP Analyzer", "url": "https://unboundcompute.com/tools/security-headers-analyzer.html" },
+        { "@type": "ListItem", "position": 2, "name": "Content Security Policy Generator", "url": "https://unboundcompute.com/tools/csp-generator.html" },
+        { "@type": "ListItem", "position": 3, "name": "CSP Evaluator", "url": "https://unboundcompute.com/tools/csp-evaluator.html" },
+        { "@type": "ListItem", "position": 4, "name": "Permissions Policy Builder", "url": "https://unboundcompute.com/tools/permissions-policy-builder.html" },
+        { "@type": "ListItem", "position": 5, "name": "Cookie Security Auditor", "url": "https://unboundcompute.com/tools/cookie-security-auditor.html" },
+        { "@type": "ListItem", "position": 6, "name": "CORS Misconfiguration Checker", "url": "https://unboundcompute.com/tools/cors-misconfiguration-checker.html" },
+        { "@type": "ListItem", "position": 7, "name": "JWT Security Inspector", "url": "https://unboundcompute.com/tools/jwt-security-inspector.html" },
+        { "@type": "ListItem", "position": 8, "name": "SSRF IP and URL Normalizer", "url": "https://unboundcompute.com/tools/ssrf-ip-url-normalizer.html" },
+        { "@type": "ListItem", "position": 9, "name": "URL Parser Confusion Analyzer", "url": "https://unboundcompute.com/tools/url-parser-confusion-analyzer.html" },
+        { "@type": "ListItem", "position": 10, "name": "MIME Sniffing Checker", "url": "https://unboundcompute.com/tools/mime-sniffing-checker.html" },
+        { "@type": "ListItem", "position": 11, "name": "ReDoS Regex Analyzer", "url": "https://unboundcompute.com/tools/redos-regex-analyzer.html" },
+        { "@type": "ListItem", "position": 12, "name": "Subresource Integrity Hash Generator", "url": "https://unboundcompute.com/tools/sri-hash-generator.html" },
+        { "@type": "ListItem", "position": 13, "name": "security.txt Generator and Validator", "url": "https://unboundcompute.com/tools/security-txt-generator-validator.html" },
+        { "@type": "ListItem", "position": 14, "name": "Subdomain Takeover Fingerprint Checker", "url": "https://unboundcompute.com/tools/subdomain-takeover-checker.html" },
+        { "@type": "ListItem", "position": 15, "name": "Prompt Template Injection Linter", "url": "https://unboundcompute.com/tools/prompt-template-injection-linter.html" },
+        { "@type": "ListItem", "position": 16, "name": "MCP Server Security Auditor", "url": "https://unboundcompute.com/tools/mcp-server-security-auditor.html" },
+        { "@type": "ListItem", "position": 17, "name": "OWASP LLM Top 10 Scorecard", "url": "https://unboundcompute.com/tools/owasp-llm-top10-scorecard.html" },
+        { "@type": "ListItem", "position": 18, "name": "IOC Extractor and Defanger", "url": "https://unboundcompute.com/tools/ioc-defanger-extractor.html" },
+        { "@type": "ListItem", "position": 19, "name": "Encoded Payload Deobfuscator", "url": "https://unboundcompute.com/tools/encoded-payload-deobfuscator.html" },
+        { "@type": "ListItem", "position": 20, "name": "File Entropy and Magic Byte Analyzer", "url": "https://unboundcompute.com/tools/file-entropy-magic-analyzer.html" },
+        { "@type": "ListItem", "position": 21, "name": "Forensic Timestamp Converter", "url": "https://unboundcompute.com/tools/forensic-timestamp-converter.html" },
+        { "@type": "ListItem", "position": 22, "name": "X.509 Certificate Decoder", "url": "https://unboundcompute.com/tools/x509-certificate-decoder.html" },
+        { "@type": "ListItem", "position": 23, "name": "Classical Cipher Solver", "url": "https://unboundcompute.com/tools/classical-cipher-solver.html" },
+        { "@type": "ListItem", "position": 24, "name": "EXIF Metadata Viewer and Scrubber", "url": "https://unboundcompute.com/tools/exif-metadata-viewer-scrubber.html" },
+        { "@type": "ListItem", "position": 25, "name": "Hardcoded Secret Scanner", "url": "https://unboundcompute.com/tools/secret-scanner.html" },
+        { "@type": "ListItem", "position": 26, "name": "Password Strength and Entropy Analyzer", "url": "https://unboundcompute.com/tools/password-strength-analyzer.html" }
+      ]
+    }
+  ]
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600&family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0a0b; --bg-2:#070708; --panel:#0e0e10; --panel-2:#131315;
+    --ink:#f4f2ec; --ink-hi:#fbf9f3; --ink-soft:#9b988f; --ink-faint:#5e5b54;
+    --line:rgba(244,242,236,.13); --line-2:rgba(244,242,236,.07);
+    --accent:#fb5b46; --accent-2:#ff7d6b; --accent-wash:rgba(251,91,70,.12); --on-accent:#1a0c09; --accent-line:rgba(251,91,70,.42);
+    --serif:'Newsreader',Georgia,serif; --mono:'JetBrains Mono',ui-monospace,monospace; --sans:'Inter',system-ui,sans-serif;
+    --maxw:920px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;line-height:1.6}
+  ::selection{background:var(--accent);color:var(--on-accent)}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+
+  nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);background:rgba(10,10,11,.72);border-bottom:1px solid var(--line-2)}
+  nav .wrap{height:64px;display:flex;align-items:center;justify-content:space-between}
+  nav a.brand{display:flex;align-items:center;gap:11px;font-family:var(--mono);font-weight:600;font-size:15px;color:var(--ink);letter-spacing:-.01em}
+  nav a.brand:hover{text-decoration:none}
+  nav .badge{width:27px;height:27px;border-radius:7px;border:1px solid var(--accent-line);display:grid;place-items:center}
+  nav a.cta{font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:9px 16px;border-radius:8px;background:var(--accent);color:var(--on-accent)}
+  nav a.cta:hover{filter:brightness(1.08);text-decoration:none}
+
+  header.hero{padding:64px 0 28px}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:18px}
+  h1{font-family:var(--serif);font-weight:400;font-size:clamp(32px,5vw,52px);line-height:1.08;letter-spacing:-.015em;color:var(--ink-hi)}
+  .lede{margin-top:18px;font-size:18px;color:var(--ink-soft);max-width:680px}
+  .privacy{margin-top:18px;display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);border:1px solid var(--line);border-radius:8px;padding:8px 13px;background:var(--panel)}
+  .privacy svg{width:14px;height:14px;flex:none}
+
+  .section{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);margin:34px 0 0;padding-top:10px;border-top:1px solid var(--line-2)}
+  .section .count{color:var(--ink-faint)}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:14px 0 12px}
+  a.card{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:14px;padding:20px;background:var(--panel);color:var(--ink);transition:border-color .15s,transform .15s,background .15s}
+  a.card:hover{border-color:var(--accent-line);background:var(--panel-2);text-decoration:none;transform:translateY(-2px)}
+  a.card .tag{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:9px}
+  a.card h2{font-family:var(--serif);font-weight:400;font-size:21px;color:var(--ink-hi);letter-spacing:-.01em;margin-bottom:7px}
+  a.card p{font-size:14.5px;color:var(--ink-soft);flex:1}
+  a.card .open{margin-top:13px;font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--accent)}
+
+  .prose{padding:30px 0 20px}
+  .prose h2{font-family:var(--serif);font-weight:400;font-size:28px;color:var(--ink-hi);margin:24px 0 12px;letter-spacing:-.01em}
+  .prose p{color:var(--ink-soft);margin-bottom:14px;font-size:16px}
+  .prose a{color:var(--accent)}
+
+  footer{border-top:1px solid var(--line-2);margin-top:40px;padding:30px 0;color:var(--ink-faint);font-family:var(--mono);font-size:12.5px}
+  footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px}
+  footer a{color:var(--ink-soft)}
+  @media (max-width:560px){ .grid{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+
+<nav><div class="wrap">
+  <a class="brand" href="https://unboundcompute.com/">
+    <span class="badge"><svg viewBox="0 0 24 24" fill="none" style="width:15px;height:15px"><line x1="12" y1="3" x2="12" y2="21" stroke="var(--accent)" stroke-width="1.8" stroke-dasharray="2.6 2.6"/><circle cx="12" cy="12" r="3" fill="var(--accent)"/></svg></span>
+    UnboundCompute
+  </a>
+  <a class="cta" href="https://unboundcompute.com/#cta">Request access</a>
+</div></nav>
+
+<header class="hero"><div class="wrap">
+  <div class="eyebrow">Free tools</div>
+  <h1>Free security tools</h1>
+  <p class="lede">A growing set of focused security tools for engineers and researchers, spanning web application security, AI and LLM security, digital forensics, and cryptography. Each one does a single job well, explains what it finds in plain language, and runs entirely in your browser.</p>
+  <div class="privacy">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6l8-4z" stroke="var(--accent)" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Every tool runs entirely in your browser. Nothing is sent to any server.
+  </div>
+</div></header>
+
+<div class="wrap">
+
+  <div class="section">Web and application security <span class="count">/ 14</span></div>
+  <div class="grid">
+    <a class="card" href="https://unboundcompute.com/tools/security-headers-analyzer.html">
+      <div class="tag">Headers</div>
+      <h2>Security Headers and CSP Analyzer</h2>
+      <p>Paste your HTTP response headers and get a graded report on HSTS, Content Security Policy, X-Frame-Options, cookies, and more.</p>
+      <div class="open">Open tool &rarr;</div>
+    </a>
+    <a class="card" href="https://unboundcompute.com/tools/csp-generator.html">
+      <div class="tag">CSP</div>
+      <h2>Content Security Policy Generator</h2>
+      <p>Build a strict nonce based policy from what your site actually loads, then copy it straight into your server or meta tag.</p>
+      <div class="open">Open tool &rarr;</div>
+    </a>
+    <a class="card" href="https://unboundcompute.com/tools/csp-evaluator.html">
+      <div class="tag">CSP</div>
+      <h2>CSP Evaluator</h2>
+      <p>Paste a Content Security Policy and surface its weaknesses, including the known allowlist bypass gadgets that quietly let script run.</p>
+      <div class="open">Open tool &rarr;</div>
+    </a>
+    <a class="card" href="https://unboundcompute.com/tools/permissions-policy-builder.html">
+      <div class="tag">Headers</div>
+      <h2>Permissions Policy Builder</h2>
+      <p>Choose which browser features a page may use and generate a locked down Permissions Policy header with ready server snippets.</p>
+      <div class="open">Open tool &rarr;</div>
+    </a>
+    <a class="card" href="https://unboundcompute.com/tools/cookie-security-auditor.html">
+      <div class="tag">Cookies</div>
+      <h2>Cookie Security Auditor</h2>
+      <p>Grade your Set-Cookie headers on Secure, HttpOnly, SameSite, the host and secure prefixes, and how widely the domain is scoped.</p>
+      <div class="open">Open tool &rarr;</div>
+    </a>
+    <a class="card" href="https://unboundcompute.com/tools/cors-misconfiguration-checker.html">
+      <div class="tag">CORS</div>
+      <h2>CORS Misconfiguration Checker</h2>
+      <p>Spot the dangerous combinations in your CORS headers, like reflecting the request Origin while also allowing credentials.</p>
+      <div class="open">Open tool &rarr;</div>
+    </a>
+    <a class="card" href="https://unboundcompute.com/tools/jwt-security-inspector.html">
+      <div class="tag">Tokens</div>
+      <h2>JWT Security Inspector</h2>
+      <p>Decode a JSON Web Token and grade its security: the alg none trap, key confusion, expiry, and secrets left in the payload.</p>
+      <div class="open">Open tool &rarr;</div>
+    </a>
+    <a class="card" href="https://unboundcompute.com/tools/ssrf-ip-url-normalizer.html">
+      <div class="tag">SSRF</div>
+      <h2>SSRF IP and URL Normalizer</h2>
+      <p>Expand every encoding of an address and classify it against private, loopback, and cloud metadata ranges that filters miss.</p>
+      <div class="open">Open tool &rarr;</div>
+    </a>
+    <a class="card" href="https://unboundcompute.com/tools/url-parser-confusion-analyzer.html">
+      <div class="tag">Parsing</div>
+      <h2>URL Parser Confusion Analyzer</h2>
+      <p>See how different parsers read the same URL and spot the host disagreements that defeat allowlists and enable open redirect and SSRF.</p>
+      <div class="open">Open tool &rarr;</div>
+    </a>
+    <a class="card" href="https://unboundcompute.com/tools/mime-sniffing-checker.html">
+      <div class="tag">Uploads</div>
+      <h2>MIME Sniffing Checker</h2>
+      <p>Check whether a file served as one type can be sniffed to HTML and run script, the root of many file upload bugs.</p>
+      <div class="open">Open tool &rarr;</div>
+    </a>
+    <a class="card" href="https://unboundcompute.com/tools/redos-regex-analyzer.html">
+      <div class="tag">Regex</div>
+      <h2>ReDoS Regex Analyzer</h2>
+      <p>Analyze a regular expression for catastrophic backtracking and see a sample input that would make it hang.</p>
+      <div class="open">Open tool &rarr;</div>
+    </a>
+    <a class="card" href="https://unboundcompute.com/tools/sri-hash-generator.html">
+      <div class="tag">Supply chain</div>
+      <h2>Subresource Integrity Hash Generator</h2>
+      <p>Produce the integrity attribute that pins a third party script or stylesheet to one exact file, hashed locally with Web Crypto.</p>
+      <div class="open">Open tool &rarr;</div>
+    </a>
+    <a class="card" href="https://unboundcompute.com/tools/security-txt-generator-validator.html">
+      <div class="tag">Disclosure</div>
+      <h2>security.txt Generator and Validator</h2>
+      <p>Build a valid RFC 9116 security.txt or check an existing one, including whether it has already expired.</p>
+      <div class="open">Open tool &rarr;</div>
+    </a>
+    <a class="card" href="https://unboundcompute.com/tools/subdomain-takeover-checker.html">
+      <div class="tag">DNS</div>
+      <h2>Subdomain Takeover Fingerprint Checker</h2>
+      <p>Match a CNAME target and the error page it serves against a database of known claimable service fingerprints.</p>
+      <div class="open">Open tool &rarr;</div>
+    </a>
+  </div>
+
+  <div class="section">AI and LLM security <span class="count">/ 3</span></div>
+  <div class="grid">
+    <a class="card" href="https://unboundcompute.com/tools/prompt-template-injection-linter.html">
+      <div class="tag">AI security</div>
+      <h2>Prompt Template Injection Linter</h2>
+      <p>Lint a prompt template for the spots where untrusted input becomes instructions, mapped to the OWASP Top 10 for LLM applications.</p>
+      <div class="open">Open tool &rarr;</div>
+    </a>
+    <a class="card" href="https://unboundcompute.com/tools/mcp-server-security-auditor.html">
+      <div class="tag">AI security</div>
+      <h2>MCP Server Security Auditor</h2>
+      <p>Statically audit a Model Context Protocol server manifest for tool poisoning, over broad scopes, and command injection.</p>
+      <div class="open">Open tool &rarr;</div>
+    </a>
+    <a class="card" href="https://unboundcompute.com/tools/owasp-llm-top10-scorecard.html">
+      <div class="tag">AI security</div>
+      <h2>OWASP LLM Top 10 Scorecard</h2>
+      <p>Walk the OWASP Top 10 for LLM applications and produce a scored, exportable readiness report for your AI system.</p>
+      <div class="open">Open tool &rarr;</div>
+    </a>
+  </div>
+
+  <div class="section">Forensics and incident response <span class="count">/ 4</span></div>
+  <div class="grid">
+    <a class="card" href="https://unboundcompute.com/tools/ioc-defanger-extractor.html">
+      <div class="tag">Threat intel</div>
+      <h2>IOC Extractor and Defanger</h2>
+      <p>Pull indicators of compromise out of a report and defang them for safe sharing, or refang them back.</p>
+      <div class="open">Open tool &rarr;</div>
+    </a>
+    <a class="card" href="https://unboundcompute.com/tools/encoded-payload-deobfuscator.html">
+      <div class="tag">Malware triage</div>
+      <h2>Encoded Payload Deobfuscator</h2>
+      <p>Peel base64, gzip, hex, and PowerShell EncodedCommand layers to reveal what a blob actually contains, without running it.</p>
+      <div class="open">Open tool &rarr;</div>
+    </a>
+    <a class="card" href="https://unboundcompute.com/tools/file-entropy-magic-analyzer.html">
+      <div class="tag">Malware triage</div>
+      <h2>File Entropy and Magic Byte Analyzer</h2>
+      <p>Drop a file to see its entropy graph, its real type from magic bytes, a hexdump, and any appended or embedded payloads.</p>
+      <div class="open">Open tool &rarr;</div>
+    </a>
+    <a class="card" href="https://unboundcompute.com/tools/forensic-timestamp-converter.html">
+      <div class="tag">Forensics</div>
+      <h2>Forensic Timestamp Converter</h2>
+      <p>Convert Windows FILETIME, Chrome WebKit, Cocoa, and Unix timestamps, and auto detect which format a raw value is.</p>
+      <div class="open">Open tool &rarr;</div>
+    </a>
+  </div>
+
+  <div class="section">Cryptography and certificates <span class="count">/ 2</span></div>
+  <div class="grid">
+    <a class="card" href="https://unboundcompute.com/tools/x509-certificate-decoder.html">
+      <div class="tag">Certificates</div>
+      <h2>X.509 Certificate Decoder</h2>
+      <p>Decode a PEM certificate to read its subject, alternative names, validity, and key, and flag weak signatures and expiry.</p>
+      <div class="open">Open tool &rarr;</div>
+    </a>
+    <a class="card" href="https://unboundcompute.com/tools/classical-cipher-solver.html">
+      <div class="tag">CTF crypto</div>
+      <h2>Classical Cipher Solver</h2>
+      <p>Auto identify and decode Caesar, Vigenere, XOR, and the common base encodings, ranked by how much the result reads as English.</p>
+      <div class="open">Open tool &rarr;</div>
+    </a>
+  </div>
+
+  <div class="section">Privacy and credentials <span class="count">/ 3</span></div>
+  <div class="grid">
+    <a class="card" href="https://unboundcompute.com/tools/exif-metadata-viewer-scrubber.html">
+      <div class="tag">Privacy</div>
+      <h2>EXIF Metadata Viewer and Scrubber</h2>
+      <p>See the GPS location and camera data hidden in a photo, then download a clean copy with the metadata stripped out.</p>
+      <div class="open">Open tool &rarr;</div>
+    </a>
+    <a class="card" href="https://unboundcompute.com/tools/secret-scanner.html">
+      <div class="tag">Secrets</div>
+      <h2>Hardcoded Secret Scanner</h2>
+      <p>Scan code or config for leaked API keys, tokens, and private keys before they reach a commit, all in the browser.</p>
+      <div class="open">Open tool &rarr;</div>
+    </a>
+    <a class="card" href="https://unboundcompute.com/tools/password-strength-analyzer.html">
+      <div class="tag">Credentials</div>
+      <h2>Password Strength and Entropy Analyzer</h2>
+      <p>Estimate entropy and surface the patterns that make a password fall fast under real guessing. The password never leaves the page.</p>
+      <div class="open">Open tool &rarr;</div>
+    </a>
+  </div>
+
+</div>
+
+<div class="wrap prose">
+  <h2>Why these run in your browser</h2>
+  <p>Security tools often ask you to paste sensitive material: production response headers, a live session token, a cookie, a password, a malware sample, a photo with your location in it. Sending any of that to a server you do not control is its own risk. Every tool here is fully client side, which means the data you drop in is analyzed by JavaScript on this page and is never uploaded, logged, or stored. You can use them on internal systems and real evidence without the input ever leaving your machine.</p>
+  <p>They are built by <a href="https://unboundcompute.com/">UnboundCompute</a>, where we work on autonomous security research for web apps and APIs. If you want to understand the ideas behind the tools, the <a href="https://security.unboundcompute.com/">security blog</a> goes deep on the underlying attacks and defenses.</p>
+</div>
+
+<footer><div class="wrap">
+  <div>Built by <a href="https://unboundcompute.com/">UnboundCompute</a>, autonomous security research for web apps and APIs.</div>
+  <div><a href="https://unboundcompute.com/#cta">Request access</a></div>
+</div></footer>
+
+</body>
+</html>

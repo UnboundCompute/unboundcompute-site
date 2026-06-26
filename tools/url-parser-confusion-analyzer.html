@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>URL Parser Confusion Analyzer | UnboundCompute</title>
+<meta name="description" content="Paste a URL and see how different parsers read the host. Flags userinfo @ tricks, backslash authority, protocol relative URLs, punycode homographs, and control characters that bypass an allowlist and enable SSRF and open redirect. Runs fully in your browser." />
+<meta name="keywords" content="url parser confusion, url parsing, ssrf, open redirect, allowlist bypass, whatwg url, host confusion, punycode homograph, url validation, userinfo bypass" />
+<meta name="robots" content="index, follow" />
+<meta name="author" content="UnboundCompute" />
+<meta name="theme-color" content="#0a0a0b" />
+<link rel="canonical" href="https://unboundcompute.com/tools/url-parser-confusion-analyzer.html" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a0a0b'/%3E%3Cline x1='16' y1='4' x2='16' y2='28' stroke='%23fb5b46' stroke-width='2' stroke-dasharray='3 3'/%3E%3Ccircle cx='16' cy='16' r='3.4' fill='%23fb5b46'/%3E%3C/svg%3E" />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="UnboundCompute" />
+<meta property="og:title" content="URL Parser Confusion Analyzer" />
+<meta property="og:description" content="See how different parsers read the host of a URL, and catch the disagreements that bypass an allowlist and enable SSRF and open redirect. Runs fully in your browser, nothing is sent to any server." />
+<meta property="og:url" content="https://unboundcompute.com/tools/url-parser-confusion-analyzer.html" />
+<meta property="og:image" content="https://unboundcompute.com/og.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="URL Parser Confusion Analyzer" />
+<meta name="twitter:description" content="See how different parsers read the host of a URL and catch the disagreements that bypass an allowlist." />
+<meta name="twitter:image" content="https://unboundcompute.com/og.png" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "URL Parser Confusion Analyzer",
+      "applicationCategory": "SecurityApplication",
+      "operatingSystem": "Web",
+      "browserRequirements": "Requires JavaScript. Runs entirely client side.",
+      "url": "https://unboundcompute.com/tools/url-parser-confusion-analyzer.html",
+      "description": "A free tool that shows how different parsers interpret a URL and highlights the host each one extracts. It names the confusion primitives present in the input, such as userinfo @ tricks, backslash authority, protocol relative references, punycode homographs, and control characters, and calls out host disagreements that bypass an allowlist and enable server side request forgery and open redirect. All analysis happens in the browser.",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "publisher": { "@type": "Organization", "name": "UnboundCompute", "url": "https://unboundcompute.com/" }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is URL parser confusion?",
+          "acceptedAnswer": { "@type": "Answer", "text": "URL parser confusion is when two pieces of code read the same URL and disagree about which host it points to. A validation layer might use a quick string check to decide a URL is in scope, while the library that actually sends the request follows the full WHATWG rules. When those two see different hosts, the check passes for a host the request never visits, and the request goes somewhere else. That gap is the root of many server side request forgery and open redirect bugs." }
+        },
+        {
+          "@type": "Question",
+          "name": "Does this tool send my URL anywhere?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. The parsing and every check run entirely in your browser with JavaScript. The URL you paste is never uploaded, logged, or sent to any server. There are no network requests at all, so you can safely test internal links and real production URLs without them leaving your machine." }
+        },
+        {
+          "@type": "Question",
+          "name": "Why does the host before the at sign not count?",
+          "acceptedAnswer": { "@type": "Answer", "text": "In a URL, everything between the scheme and the at sign is userinfo, the optional username and password. The real host is what comes after the at sign. So in https://acme.example@evil.example the host is evil.example, and acme.example is just a username. A naive check that looks for a trusted name anywhere in the string is fooled, because the trusted name sits in the credential slot while the request goes to the attacker host." }
+        },
+        {
+          "@type": "Question",
+          "name": "Why do browsers treat a backslash like a slash?",
+          "acceptedAnswer": { "@type": "Answer", "text": "The WHATWG URL standard, which browsers and fetch follow for the common schemes, treats a backslash in the authority as if it were a forward slash. So a backslash can end the authority early and move the real host somewhere a naive parser does not expect. A check written with a simple split on the forward slash does not apply that rule, so the two disagree on where the host ends." }
+        },
+        {
+          "@type": "Question",
+          "name": "Is the WHATWG result always the one that matters?",
+          "acceptedAnswer": { "@type": "Answer", "text": "It is what a browser and the fetch API use, so for client side requests it is usually the host that actually gets contacted. On a server the answer depends on the language and library doing the request, and several of them follow older rules or their own logic. The safe approach is to parse the URL once with a strict parser, validate the host it returns, and pass that same parsed result to whatever makes the request, so no second parser can disagree." }
+        }
+      ]
+    }
+  ]
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600&family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0a0b; --bg-2:#070708; --panel:#0e0e10; --panel-2:#131315;
+    --ink:#f4f2ec; --ink-hi:#fbf9f3; --ink-soft:#9b988f; --ink-faint:#5e5b54;
+    --line:rgba(244,242,236,.13); --line-2:rgba(244,242,236,.07);
+    --accent:#fb5b46; --accent-2:#ff7d6b; --accent-wash:rgba(251,91,70,.12); --on-accent:#1a0c09; --accent-line:rgba(251,91,70,.42);
+    --pass:#5fd6a4; --pass-wash:rgba(95,214,164,.1); --warn:#e8b04b; --warn-wash:rgba(232,176,75,.1); --fail:#fb5b46; --fail-wash:rgba(251,91,70,.1); --info:#7c93ff; --info-wash:rgba(124,147,255,.1);
+    --serif:'Newsreader',Georgia,serif; --mono:'JetBrains Mono',ui-monospace,monospace; --sans:'Inter',system-ui,sans-serif;
+    --maxw:920px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;line-height:1.6}
+  ::selection{background:var(--accent);color:var(--on-accent)}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+
+  nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);background:rgba(10,10,11,.72);border-bottom:1px solid var(--line-2)}
+  nav .wrap{height:64px;display:flex;align-items:center;justify-content:space-between}
+  nav a.brand{display:flex;align-items:center;gap:11px;font-family:var(--mono);font-weight:600;font-size:15px;color:var(--ink);letter-spacing:-.01em}
+  nav a.brand:hover{text-decoration:none}
+  nav .badge{width:27px;height:27px;border-radius:7px;border:1px solid var(--accent-line);display:grid;place-items:center}
+  nav a.cta{font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:9px 16px;border-radius:8px;background:var(--accent);color:var(--on-accent)}
+  nav a.cta:hover{filter:brightness(1.08);text-decoration:none}
+
+  header.hero{padding:64px 0 28px}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:18px}
+  h1{font-family:var(--serif);font-weight:400;font-size:clamp(32px,5vw,52px);line-height:1.08;letter-spacing:-.015em;color:var(--ink-hi)}
+  .lede{margin-top:18px;font-size:18px;color:var(--ink-soft);max-width:660px}
+  .privacy{margin-top:18px;display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);border:1px solid var(--line);border-radius:8px;padding:8px 13px;background:var(--panel)}
+  .privacy svg{width:14px;height:14px;flex:none}
+
+  .tool{margin:30px 0 12px;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px}
+  label.fld{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:10px}
+  textarea{width:100%;min-height:96px;resize:vertical;background:var(--bg-2);border:1px solid var(--line);border-radius:11px;padding:15px;color:var(--ink);font-family:var(--mono);font-size:13.5px;line-height:1.55;outline:none;transition:border-color .2s,box-shadow .2s;word-break:break-all}
+  textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-wash)}
+  textarea::placeholder{color:var(--ink-faint)}
+  .row{display:flex;gap:11px;flex-wrap:wrap;margin-top:14px;align-items:center}
+  button{font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;padding:13px 22px;border-radius:9px;cursor:pointer;border:1px solid var(--line);background:transparent;color:var(--ink);transition:filter .15s,border-color .15s,background .15s}
+  button.primary{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+  button.primary:hover{filter:brightness(1.08)}
+  button.ghost:hover{border-color:var(--accent-line);color:var(--ink-hi)}
+  .hint{font-family:var(--mono);font-size:12px;color:var(--ink-faint);margin-left:auto}
+  .examples{margin-top:16px;display:flex;flex-direction:column;gap:8px}
+  .examples .lbl{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint)}
+  .ex-row{display:flex;gap:9px;flex-wrap:wrap}
+  button.ex{padding:9px 13px;font-size:11.5px;text-transform:none;letter-spacing:0;font-weight:500;color:var(--ink-soft);word-break:break-all;text-align:left}
+  button.ex:hover{border-color:var(--accent-line);color:var(--ink-hi)}
+
+  #results{margin-top:8px}
+
+  .verdict{display:flex;align-items:flex-start;gap:18px;border:1px solid var(--line);border-radius:16px;padding:20px 22px;margin:20px 0}
+  .verdict.bad{border-color:var(--fail);background:var(--fail-wash)}
+  .verdict.ok{border-color:var(--pass);background:var(--pass-wash)}
+  .verdict .mark{font-family:var(--serif);font-size:40px;line-height:1;width:64px;height:64px;border-radius:16px;display:grid;place-items:center;flex:none;border:1.5px solid}
+  .verdict.bad .mark{color:var(--fail);border-color:var(--fail)}
+  .verdict.ok .mark{color:var(--pass);border-color:var(--pass)}
+  .verdict h2{font-family:var(--serif);font-weight:400;font-size:23px;color:var(--ink-hi);margin-bottom:5px}
+  .verdict p{color:var(--ink-soft);font-size:14.5px}
+  .verdict code{font-family:var(--mono);font-size:13px;background:var(--bg-2);border:1px solid var(--line-2);border-radius:5px;padding:1px 6px;color:var(--ink-hi);word-break:break-all}
+
+  .parsers{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0}
+  .seg{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:16px 18px;min-width:0}
+  .seg h3{font-family:var(--mono);font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--accent);margin-bottom:4px}
+  .seg .tagline{font-size:12.5px;color:var(--ink-faint);margin-bottom:12px;line-height:1.45}
+  .seg .host{font-family:var(--mono);font-size:15px;color:var(--ink-hi);background:var(--bg-2);border:1px solid var(--line-2);border-radius:8px;padding:9px 11px;word-break:break-all;margin-bottom:11px}
+  .seg .host b{color:var(--accent-2)}
+  .seg .host.none{color:var(--ink-faint)}
+  .seg .fields{display:flex;flex-direction:column;gap:5px}
+  .seg .fields div{font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);word-break:break-all}
+  .seg .fields b{color:var(--ink)}
+  .seg .fields .k{display:inline-block;min-width:78px;color:var(--ink-faint)}
+  .seg .err{color:var(--fail);font-family:var(--mono);font-size:13px}
+
+  .checks{display:flex;flex-direction:column;gap:11px}
+  .check{border:1px solid var(--line);border-radius:13px;padding:16px 18px;background:var(--panel)}
+  .check .top{display:flex;align-items:flex-start;gap:13px}
+  .dot{width:20px;height:20px;border-radius:6px;flex:none;display:grid;place-items:center;font-size:13px;font-weight:700;margin-top:1px}
+  .dot.pass{background:var(--pass-wash);color:var(--pass)}
+  .dot.warn{background:var(--warn-wash);color:var(--warn)}
+  .dot.fail{background:var(--fail-wash);color:var(--fail)}
+  .dot.info{background:var(--info-wash);color:var(--info)}
+  .check h3{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--ink-hi);letter-spacing:-.01em}
+  .check .finding{margin-top:5px;font-size:14.5px;color:var(--ink)}
+  .check .finding code{font-family:var(--mono);font-size:12.5px;background:var(--bg-2);border:1px solid var(--line-2);border-radius:5px;padding:1px 5px;color:var(--ink-hi);word-break:break-all}
+  .check .why{margin-top:9px;font-size:13.5px;color:var(--ink-soft)}
+  .check .more{margin-top:9px;font-size:13px}
+  .empty{color:var(--ink-faint);font-family:var(--mono);font-size:13px;text-align:center;padding:30px}
+  .section-label{font-family:var(--mono);font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-faint);margin:22px 0 11px}
+
+  .prose{padding:44px 0 20px}
+  .prose h2{font-family:var(--serif);font-weight:400;font-size:30px;color:var(--ink-hi);margin:36px 0 14px;letter-spacing:-.01em}
+  .prose h3{font-family:var(--mono);font-size:15px;color:var(--ink-hi);margin:24px 0 8px}
+  .prose p{color:var(--ink-soft);margin-bottom:14px;font-size:16px}
+  .prose ul{color:var(--ink-soft);margin:0 0 14px 20px;font-size:16px}
+  .prose li{margin-bottom:7px}
+  .prose code{font-family:var(--mono);font-size:13.5px;background:var(--panel-2);border:1px solid var(--line-2);border-radius:5px;padding:1px 6px;color:var(--ink)}
+  .related{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:8px}
+  .related a{display:block;border:1px solid var(--line);border-radius:11px;padding:14px 16px;color:var(--ink);font-size:14.5px;background:var(--panel)}
+  .related a:hover{border-color:var(--accent-line);text-decoration:none}
+  .related a span{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:5px}
+
+  footer{border-top:1px solid var(--line-2);margin-top:40px;padding:30px 0;color:var(--ink-faint);font-family:var(--mono);font-size:12.5px}
+  footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px}
+  footer a{color:var(--ink-soft)}
+  @media (max-width:560px){
+    .related{grid-template-columns:1fr}
+    .parsers{grid-template-columns:1fr}
+    .verdict{flex-direction:column;align-items:flex-start;gap:14px}
+    .hint{margin-left:0;width:100%}
+  }
+</style>
+</head>
+<body>
+
+<nav><div class="wrap">
+  <a class="brand" href="https://unboundcompute.com/">
+    <span class="badge"><svg viewBox="0 0 24 24" fill="none" style="width:15px;height:15px"><line x1="12" y1="3" x2="12" y2="21" stroke="var(--accent)" stroke-width="1.8" stroke-dasharray="2.6 2.6"/><circle cx="12" cy="12" r="3" fill="var(--accent)"/></svg></span>
+    UnboundCompute
+  </a>
+  <a class="cta" href="https://unboundcompute.com/#cta">Request access</a>
+</div></nav>
+
+<header class="hero"><div class="wrap">
+  <div class="eyebrow">Free tool</div>
+  <h1>URL Parser Confusion Analyzer</h1>
+  <p class="lede">Paste a URL and see how different parsers read it side by side, with the host each one extracts highlighted. The bug class is parsers disagreeing on the host, which defeats an allowlist or denylist check and opens the door to server side request forgery and open redirect.</p>
+  <div class="privacy">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6l8-4z" stroke="var(--accent)" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    The URL stays here. Everything runs in your browser. Nothing is sent to any server.
+  </div>
+</div></header>
+
+<div class="wrap">
+  <div class="tool">
+    <label class="fld" for="url">Paste a single URL</label>
+    <textarea id="url" spellcheck="false" placeholder="https://acme.example@evil.example/path&#10;&#10;The URL is parsed locally and never sent anywhere."></textarea>
+    <div class="row">
+      <button class="primary" id="analyze">Analyze</button>
+      <button class="ghost" id="clear">Clear</button>
+      <span class="hint" id="hint">No data leaves this page</span>
+    </div>
+    <div class="examples">
+      <div class="lbl">Confusion examples (invented hosts, evil.example is the attacker)</div>
+      <div class="ex-row" id="ex-row"></div>
+    </div>
+  </div>
+  <div id="results"><div class="empty">The parser views, the named confusion primitives, and the host verdict will appear here.</div></div>
+</div>
+
+<div class="wrap prose">
+  <h2>Why parsers disagree on the host</h2>
+  <p>A URL looks simple, but the rules for splitting it into a scheme, an authority, a path, and the rest are full of edge cases. The authority is the dangerous part, because that is where the host lives, and the host is what every allowlist and denylist check is really trying to pin down. When one piece of code reads the host one way and the code that sends the request reads it another way, an attacker lives in that gap. This tool shows the same URL through more than one parser so the disagreement is visible. The behavior shown for the browser native view follows the <a href="https://url.spec.whatwg.org/" rel="noopener" target="_blank">WHATWG URL standard</a>, and the userinfo and authority rules referenced below come from <a href="https://datatracker.ietf.org/doc/html/rfc3986" rel="noopener" target="_blank">RFC 3986</a>.</p>
+
+  <h3>The WHATWG view is what the browser uses</h3>
+  <p>The first parser is the browser native <code>new URL()</code>. This is the same logic the fetch API uses to decide where a request goes, so for anything that runs in a browser it is usually the host that actually gets contacted. It applies the full standard, which means it treats a backslash like a forward slash for the common schemes, strips some control characters, and converts an international host into its punycode form. The other views exist to show how a less careful parser drifts away from this one.</p>
+
+  <h3>The naive split is what a careless check does</h3>
+  <p>The second parser is a deliberately simple one. It does what a quick validation routine often does: take the text after the scheme and before the first slash and call that the host. It does not know about userinfo, it does not fold a backslash into a slash, and it does not apply punycode. That is the point. When this naive host and the WHATWG host differ, the URL passes a check aimed at the naive host while the request goes to the WHATWG host. That single disagreement is the engine behind a large share of <a href="https://security.unboundcompute.com/what-is-ssrf/" rel="noopener">server side request forgery</a> and open redirect findings.</p>
+
+  <h3>The confusion primitives</h3>
+  <p>The tool names each trick it spots in the input and explains what it does:</p>
+  <ul>
+    <li>The userinfo at sign, where everything before <code>@</code> is a username and password and the real host is what follows. A trusted name in the credential slot fools a check that searches the whole string.</li>
+    <li>A backslash in the authority, which a browser folds into a forward slash but a naive split does not, so it can move where the host ends.</li>
+    <li>A protocol relative reference that starts with <code>//</code> and inherits the current scheme, which often turns a same site redirect into an off site one.</li>
+    <li>Control characters, tabs, newlines, or stray whitespace inside the authority, some of which a browser strips while a check sees them and reads a different host.</li>
+    <li>An international or punycode host, shown in its <code>xn--</code> form so a confusable lookalike is easier to catch.</li>
+    <li>A missing or unusual scheme, an embedded port, or a trailing dot on the host, each of which can change which parser believes what.</li>
+  </ul>
+
+  <h2>How to read the verdict</h2>
+  <p>The headline result is whether the WHATWG host and the naive host agree. When they disagree, the tool says so plainly and shows both, because that is the bypassable case: a check that trusts one host while the request reaches the other. When they agree the input is not automatically safe, it just means these two parsers line up on this string. The durable fix is to parse a URL once with a strict parser, validate the host it returns, and then pass that same parsed result to whatever makes the request, so no second parser ever gets a chance to disagree. Reasoning about which parser wins in a real stack is the kind of context an <a href="https://security.unboundcompute.com/ai-security-testing/" rel="noopener">AI security testing</a> approach works through rather than matching one string. For the wider set of trust boundaries attackers probe, see the <a href="https://security.unboundcompute.com/category/access-control/" rel="noopener">access control</a> writing.</p>
+
+  <h2>Related reading</h2>
+  <div class="related">
+    <a href="https://security.unboundcompute.com/what-is-ssrf/"><span>Deep dive</span>What is SSRF</a>
+    <a href="https://security.unboundcompute.com/what-is-web-application-security/"><span>Guide</span>What is web application security</a>
+    <a href="https://security.unboundcompute.com/ai-security-testing/"><span>Guide</span>AI security testing</a>
+    <a href="https://security.unboundcompute.com/web-security-glossary/"><span>Reference</span>Web security glossary</a>
+  </div>
+
+  <h2>More free tools</h2>
+  <div class="related">
+    <a href="https://unboundcompute.com/tools/ssrf-ip-url-normalizer.html"><span>Free tool</span>SSRF IP and URL Normalizer</a>
+    <a href="https://unboundcompute.com/tools/cors-misconfiguration-checker.html"><span>Free tool</span>CORS Misconfiguration Checker</a>
+    <a href="https://unboundcompute.com/tools/security-headers-analyzer.html"><span>Free tool</span>Security Headers and CSP Analyzer</a>
+    <a href="https://unboundcompute.com/tools/"><span>Free tools</span>All free security tools</a>
+  </div>
+</div>
+
+<footer><div class="wrap">
+  <div>Built by <a href="https://unboundcompute.com/">UnboundCompute</a>, autonomous security research for web apps and APIs.</div>
+  <div><a href="https://unboundcompute.com/#cta">Request access</a></div>
+</div></footer>
+
+<script>
+(function(){
+  "use strict";
+  var $ = function(s){ return document.querySelector(s); };
+
+  function esc(s){ return String(s).replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];}); }
+
+  // Invented examples. evil.example is always the attacker, acme.example the trusted host.
+  var EXAMPLES = [
+    { label: "Userinfo @ bypass", url: "https://acme.example@evil.example/path" },
+    { label: "Backslash authority", url: "https://evil.example\\@acme.example/path" },
+    { label: "Encoded slash in userinfo", url: "https://acme.example%2f@evil.example/" },
+    { label: "Multiple @ signs", url: "https://acme.example@trusted.example@evil.example/" },
+    { label: "Protocol relative", url: "//evil.example/login" },
+    { label: "Tab inside host", url: "https://acme.example\t.evil.example/" },
+    { label: "Punycode confusable", url: "https://xn--80ak6aa92e.example/login" }
+  ];
+
+  // The naive parser: what a careless allowlist does. Take the text after the
+  // scheme delimiter "://" (or after a leading "//"), then cut at the first "/",
+  // "?" or "#". It does NOT understand userinfo, does NOT fold backslash into
+  // slash, and does NOT apply punycode. That is the whole point.
+  function naiveParse(raw){
+    var s = String(raw).trim();
+    var rest, scheme = null;
+    var m = s.match(/^([a-zA-Z][a-zA-Z0-9+.\-]*):\/\//);
+    if (m){ scheme = m[1]; rest = s.slice(m[0].length); }
+    else if (s.indexOf("//") === 0){ rest = s.slice(2); }       // protocol relative
+    else { rest = s.replace(/^[a-zA-Z][a-zA-Z0-9+.\-]*:/, ""); } // best effort, no authority marker
+    // authority ends at the first forward slash, question mark or hash (NOT backslash).
+    var authEnd = rest.length;
+    for (var i=0;i<rest.length;i++){
+      var c = rest[i];
+      if (c === "/" || c === "?" || c === "#"){ authEnd = i; break; }
+    }
+    var authority = rest.slice(0, authEnd);
+    // a naive check often keeps the whole authority, userinfo and all, as the host.
+    return { scheme: scheme, authority: authority, host: authority };
+  }
+
+  function whatwgParse(raw){
+    try {
+      var u = new URL(String(raw).trim());
+      return { ok:true, url:u };
+    } catch(e){
+      return { ok:false, err:"new URL() rejected this input. The browser does not consider it an absolute URL." };
+    }
+  }
+
+  // RFC 3986 userinfo view: the authority is userinfo "@" host [":" port].
+  // Everything before the LAST "@" in the authority is userinfo; the host is
+  // what follows. We surface this to make the userinfo split explicit.
+  function rfcAuthorityView(raw){
+    var n = naiveParse(raw);
+    var auth = n.authority || "";
+    var at = auth.lastIndexOf("@");
+    var userinfo = at >= 0 ? auth.slice(0, at) : "";
+    var hostport = at >= 0 ? auth.slice(at+1) : auth;
+    var host = hostport, port = "";
+    var ci = hostport.lastIndexOf(":");
+    if (ci >= 0 && /^[0-9]*$/.test(hostport.slice(ci+1))){ host = hostport.slice(0,ci); port = hostport.slice(ci+1); }
+    return { userinfo: userinfo, host: host, port: port };
+  }
+
+  function hostsDiffer(a, b){
+    if (a == null || b == null) return false;
+    return a.toLowerCase() !== b.toLowerCase();
+  }
+
+  // Detect and name the confusion primitives present in the raw input.
+  function detectPrimitives(raw, whatwg){
+    var s = String(raw);
+    var n = naiveParse(raw);
+    var auth = n.authority || "";
+    var out = [];
+
+    // userinfo @ (single)
+    var atCount = (auth.match(/@/g) || []).length;
+    if (atCount === 1){
+      out.push({ s:"fail", h:"Userinfo at sign", f:"The authority contains an <code>@</code>. Everything before it is a username and password, and the real host is what comes after. A trusted name placed before the <code>@</code> sits in the credential slot, not the host slot.", why:"A check that looks for a trusted host anywhere in the string is fooled: the trusted name is just a username while the request goes to the host after the <code>@</code>." });
+    } else if (atCount > 1){
+      out.push({ s:"fail", h:"Multiple at signs", f:"The authority contains more than one <code>@</code>. Different parsers split on the first or the last one, so they can land on different hosts. The standard host is the part after the final <code>@</code>.", why:"Two parsers that pick a different <code>@</code> as the userinfo boundary will believe different hosts from the same string, which is a classic bypass." });
+    }
+
+    // backslash in authority
+    if (/\\/.test(auth) || /\\/.test(s.split(/[?#]/)[0])){
+      out.push({ s:"fail", h:"Backslash in authority", f:"The input contains a backslash <code>\\</code> in or near the authority. A browser folds a backslash into a forward slash for the common schemes, so it can end the authority early and move the host. A naive split on the forward slash does not.", why:"This is one of the cleanest ways to make a browser and a naive parser disagree on where the host ends." });
+    }
+
+    // protocol relative
+    if (/^\s*\/\//.test(s) && !/^\s*[a-zA-Z][a-zA-Z0-9+.\-]*:\/\//.test(s)){
+      out.push({ s:"warn", h:"Protocol relative reference", f:"The input starts with <code>//</code> and no scheme, so it inherits the current scheme of the page that uses it. The host is whatever follows the <code>//</code>.", why:"In a redirect, a value like this turns what looks like a same site path into a jump to an off site host, which is the heart of an open redirect." });
+    }
+
+    // missing or unusual scheme
+    if (whatwg.ok){
+      var proto = whatwg.url.protocol.replace(/:$/,"");
+      if (!/^(https?|ftp|ws|wss)$/i.test(proto)){
+        out.push({ s:"warn", h:"Unusual scheme", f:"The scheme is <code>"+esc(proto)+"</code>. Schemes outside the common web set can reach a different handler, and some, like a data or file scheme, do not have a network host at all.", why:"A check that assumes an http style URL can be slipped past with a scheme it never considered." });
+      }
+    } else if (!/^\s*[a-zA-Z][a-zA-Z0-9+.\-]*:/.test(s) && !/^\s*\/\//.test(s)){
+      out.push({ s:"warn", h:"Missing scheme", f:"There is no scheme on this input, so <code>new URL()</code> alone cannot resolve it. How it is read depends entirely on the base URL it is joined to.", why:"A relative reference is resolved against a base, and the host you end up with is decided by that base, not by the string on its own." });
+    }
+
+    // control characters, tabs, newlines, whitespace inside authority
+    if (/[ - ]/.test(auth)){
+      var kinds = [];
+      if (/\t/.test(auth)) kinds.push("a tab");
+      if (/\n/.test(auth)) kinds.push("a newline");
+      if (/\r/.test(auth)) kinds.push("a carriage return");
+      if (/ /.test(auth)) kinds.push("a space");
+      if (/[ --]/.test(auth)) kinds.push("a control character");
+      out.push({ s:"fail", h:"Whitespace or control character in authority", f:"The authority contains "+(kinds.length?kinds.join(", "):"a control character")+". A browser strips some of these before parsing, so it reads a different host than a check that sees the raw bytes.", why:"When the browser silently removes a tab or newline and a check does not, the two end up with different hosts from the same input." });
+    }
+
+    // IDN / punycode host + homograph note
+    if (whatwg.ok){
+      var hn = whatwg.url.hostname;
+      if (/(^|\.)xn--/i.test(hn)){
+        out.push({ s:"warn", h:"Punycode host", f:"The host resolves to its punycode form <code>"+esc(hn)+"</code>. This is how an international host is encoded for the network. A confusable lookalike can render like a trusted name while encoding to a different host.", why:"Two hosts that look the same to a human can be different punycode strings, so always compare the <code>xn--</code> form, not the rendered glyphs." });
+      } else if (/[^ -]/.test(String(raw))){
+        out.push({ s:"info", h:"Non ASCII characters", f:"The input contains non ASCII characters. If any sit in the host, compare the punycode the parser produces rather than the characters you see, since lookalikes encode differently.", why:"Confusable characters are a homograph risk: the rendered host can imitate a trusted name while pointing elsewhere." });
+      }
+
+      // trailing dot
+      if (/\.$/.test(hn)){
+        out.push({ s:"info", h:"Trailing dot on host", f:"The host ends in a dot: <code>"+esc(hn)+"</code>. A trailing dot is the fully qualified form and resolves the same, but a string compare against the dotless name fails to match it.", why:"An exact string allowlist that lists the host without the trailing dot can be slipped by adding one." });
+      }
+
+      // embedded / unusual port
+      if (whatwg.url.port){
+        out.push({ s:"info", h:"Explicit port", f:"The URL carries an explicit port <code>"+esc(whatwg.url.port)+"</code>. A host plus port check that only looks at the host name ignores where the request actually lands.", why:"Two URLs with the same host and different ports reach different services, so the port belongs in the check too." });
+      }
+    }
+
+    return out;
+  }
+
+  function fieldRow(k, v){
+    var val = (v === "" || v == null) ? '<span style="color:var(--ink-faint)">(empty)</span>' : esc(v);
+    return '<div><span class="k">'+esc(k)+'</span> <b>'+val+'</b></div>';
+  }
+
+  function whatwgFields(u){
+    var html = '<div class="fields">';
+    html += fieldRow("protocol", u.protocol);
+    html += fieldRow("username", u.username);
+    html += fieldRow("password", u.password ? "(set)" : "");
+    html += fieldRow("hostname", u.hostname);
+    html += fieldRow("port", u.port);
+    html += fieldRow("pathname", u.pathname);
+    html += fieldRow("search", u.search);
+    html += fieldRow("hash", u.hash);
+    html += '</div>';
+    return html;
+  }
+
+  function hostBox(host, label){
+    if (host == null || host === ""){
+      return '<div class="host none">'+esc(label||"no host extracted")+'</div>';
+    }
+    return '<div class="host">host &rarr; <b>'+esc(host)+'</b></div>';
+  }
+
+  function render(raw){
+    var whatwg = whatwgParse(raw);
+    var naive = naiveParse(raw);
+    var rfc = rfcAuthorityView(raw);
+
+    var whatwgHost = whatwg.ok ? whatwg.url.hostname : null;
+    var naiveHost = naive.host || "";
+
+    var html = "";
+
+    // Verdict: do parser 1 (WHATWG) and parser 2 (naive) agree on the host?
+    if (whatwg.ok && hostsDiffer(whatwgHost, naiveHost)){
+      html += '<div class="verdict bad"><div class="mark">&#10007;</div><div>';
+      html += '<h2>Host disagreement: this is bypassable</h2>';
+      html += '<p>The browser native parser reaches <code>'+esc(whatwgHost || "(none)")+'</code>, but a naive allowlist reading the same string sees <code>'+esc(naiveHost || "(none)")+'</code>. A check that trusts the naive host passes while the request goes to the WHATWG host.</p>';
+      html += '</div></div>';
+    } else if (whatwg.ok){
+      html += '<div class="verdict ok"><div class="mark">&#10003;</div><div>';
+      html += '<h2>The two parsers agree on the host</h2>';
+      html += '<p>Both the browser native parser and the naive split read the host as <code>'+esc(whatwgHost || "(none)")+'</code> on this input. That is a good sign for this string, but it does not prove the URL is safe in every parser. Validate the host from one strict parse and reuse that result.</p>';
+      html += '</div></div>';
+    } else {
+      html += '<div class="verdict bad"><div class="mark">!</div><div>';
+      html += '<h2>The browser native parser rejected this URL</h2>';
+      html += '<p>'+esc(whatwg.err)+' A naive parser may still pull a host out of it, which is its own kind of disagreement. The naive reading is <code>'+esc(naiveHost || "(none)")+'</code>.</p>';
+      html += '</div></div>';
+    }
+
+    // Parser views side by side
+    html += '<div class="section-label">How each parser reads it</div>';
+    html += '<div class="parsers">';
+
+    // 1. WHATWG
+    html += '<div class="seg"><h3>1. WHATWG URL (browser native)</h3>';
+    html += '<div class="tagline">new URL(), the same logic fetch and the browser use to send the request.</div>';
+    if (whatwg.ok){
+      html += hostBox(whatwgHost);
+      html += whatwgFields(whatwg.url);
+    } else {
+      html += '<div class="err">'+esc(whatwg.err)+'</div>';
+    }
+    html += '</div>';
+
+    // 2. Naive split
+    html += '<div class="seg"><h3>2. Naive split (careless allowlist)</h3>';
+    html += '<div class="tagline">Text after :// up to the first slash, with no userinfo, backslash or punycode rules.</div>';
+    html += hostBox(naiveHost, "no host extracted");
+    html += '<div class="fields">';
+    html += fieldRow("scheme", naive.scheme || "");
+    html += fieldRow("authority", naive.authority);
+    html += fieldRow("believes host", naive.host);
+    html += '</div>';
+    html += '</div>';
+
+    html += '</div>'; // .parsers
+
+    // 3. RFC 3986 userinfo view (full width row, reuse seg)
+    html += '<div class="section-label">RFC 3986 userinfo split of the authority</div>';
+    html += '<div class="seg"><h3>3. Authority by the userinfo rule</h3>';
+    html += '<div class="tagline">Everything before the final @ is userinfo (credentials); the host is what follows.</div>';
+    html += hostBox(rfc.host, "no host after the userinfo split");
+    html += '<div class="fields">';
+    html += fieldRow("userinfo", rfc.userinfo);
+    html += fieldRow("host", rfc.host);
+    html += fieldRow("port", rfc.port);
+    html += '</div>';
+    html += '</div>';
+
+    // Named confusion primitives
+    var prims = detectPrimitives(raw, whatwg);
+    html += '<div class="section-label">Confusion primitives found</div>';
+    if (!prims.length){
+      html += '<div class="check"><div class="top"><span class="dot pass">&#10003;</span><div style="flex:1">';
+      html += '<h3>No confusion primitives spotted</h3>';
+      html += '<div class="finding">None of the known host confusion tricks were found in this input. That is not a clean bill of health, only that these specific patterns are absent.</div>';
+      html += '</div></div></div>';
+    } else {
+      html += '<div class="checks">';
+      prims.forEach(function(p){
+        var sym = p.s==="pass"?"&#10003;":p.s==="warn"?"!":p.s==="fail"?"&#10007;":"i";
+        html += '<div class="check"><div class="top"><span class="dot '+p.s+'">'+sym+'</span><div style="flex:1">';
+        html += '<h3>'+esc(p.h)+'</h3>';
+        html += '<div class="finding">'+p.f+'</div>';   // f contains pre escaped <code> markup
+        if (p.why) html += '<div class="why">'+p.why+'</div>';
+        html += '</div></div></div>';
+      });
+      html += '</div>';
+    }
+
+    return html;
+  }
+
+  function run(){
+    var text = $("#url").value;
+    if (!text.trim()){ $("#results").innerHTML = '<div class="empty">Paste a URL first.</div>'; return; }
+    $("#results").innerHTML = render(text);
+    $("#results").scrollIntoView({ behavior:"smooth", block:"start" });
+  }
+
+  // wire up example buttons
+  (function(){
+    var row = $("#ex-row");
+    EXAMPLES.forEach(function(ex){
+      var b = document.createElement("button");
+      b.className = "ghost ex";
+      b.type = "button";
+      b.textContent = ex.label;
+      b.title = ex.url;
+      b.addEventListener("click", function(){ $("#url").value = ex.url; run(); });
+      row.appendChild(b);
+    });
+  })();
+
+  $("#analyze").addEventListener("click", run);
+  $("#clear").addEventListener("click", function(){ $("#url").value=""; $("#results").innerHTML='<div class="empty">The parser views, the named confusion primitives, and the host verdict will appear here.</div>'; $("#url").focus(); });
+  $("#url").addEventListener("keydown", function(e){ if ((e.metaKey||e.ctrlKey) && e.key==="Enter") run(); });
+})();
+</script>
+</body>
+</html>

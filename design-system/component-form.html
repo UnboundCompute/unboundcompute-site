@@ -1,0 +1,31 @@
+<!-- @dsCard group="Components" -->
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+<title>Access form + finding chip</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@450;600&family=JetBrains+Mono:wght@600&family=Newsreader:ital,wght@1,400&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0a0b;--panel:#0e0e10;--ink:#f4f2ec;--ink-hi:#fbf9f3;--ink-soft:#9b988f;--ink-faint:#5e5b54;--line:rgba(244,242,236,.13);--accent:#fb5b46;--ok:#58cf8b;}
+  *{margin:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;padding:60px}
+  .kick{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+  h1{font-weight:600;font-size:22px;letter-spacing:-.02em;margin-bottom:40px}
+  .lab{font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-faint);margin:30px 0 16px}
+  .form{display:flex;gap:10px;max-width:460px}
+  .form input{flex:1;background:rgba(244,242,236,.04);border:1px solid var(--line);border-radius:9px;padding:14px 16px;color:var(--ink);font-size:15px;font-family:inherit;outline:none}
+  .form input::placeholder{color:var(--ink-faint)}
+  .btn{font-family:'JetBrains Mono',monospace;font-size:12.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:14px 20px;border-radius:9px;border:none;background:var(--accent);color:#160a08;cursor:pointer}
+  .chip{display:inline-flex;align-items:center;gap:10px;padding:11px 15px;border:1px solid rgba(251,91,70,.42);border-radius:9px;background:rgba(251,91,70,.08);font-size:13px}
+  .chip .vf{font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);border:1px solid rgba(251,91,70,.45);border-radius:5px;padding:2px 7px}
+  .pill{display:inline-flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--ok)}
+  .pill::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 8px var(--ok)}
+</style></head>
+<body>
+  <p class="kick">Components</p>
+  <h1>Access form &amp; status</h1>
+  <p class="lab">Email capture</p>
+  <form class="form" onsubmit="return false"><input type="email" placeholder="you@company.com"><button class="btn">Request access</button></form>
+  <p class="lab">Finding chip</p>
+  <span class="chip">Broken access control <span class="vf">verified</span></span>
+  <p class="lab">Live status pill</p>
+  <span class="pill">crossed</span>
+</body></html>

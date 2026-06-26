@@ -1,0 +1,25 @@
+<!-- @dsCard group="Components" -->
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+<title>Section header</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@450&family=JetBrains+Mono:wght@600&family=Newsreader:ital,opsz,wght@0,6..72,400;1,6..72,400&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0a0b;--ink:#f4f2ec;--ink-hi:#fbf9f3;--ink-soft:#9b988f;--ink-faint:#5e5b54;--accent:#fb5b46;}
+  *{margin:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;padding:64px}
+  .kick{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+  .docnote{font-weight:600;font-size:15px;margin-bottom:48px}
+  .eyebrow{display:inline-flex;align-items:center;gap:12px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent);letter-spacing:.12em;text-transform:uppercase;font-weight:600;margin-bottom:26px}
+  .eyebrow .ix{color:var(--ink-faint)}
+  .eyebrow::before{content:"";width:30px;height:1px;background:var(--accent)}
+  .title{font-family:'Newsreader',serif;font-weight:400;font-size:clamp(34px,5vw,56px);letter-spacing:-.024em;line-height:1.02;max-width:18ch;color:var(--ink-hi)}
+  .title em{font-style:italic;color:var(--accent)}
+  .sub{color:var(--ink-soft);font-size:18.5px;line-height:1.62;max-width:60ch;margin-top:26px}
+</style></head>
+<body>
+  <p class="kick">Components</p>
+  <p class="docnote">Section header — the page's repeating rhythm</p>
+  <p class="eyebrow"><span class="ix">&sect; 01</span> The difference</p>
+  <h2 class="title">Scanners fire payloads. UnboundCompute finds the <em>line.</em></h2>
+  <p class="sub">Every application draws boundaries it assumes will hold: who owns what, who may act, where one tenant ends and another begins. UnboundCompute looks for them first, then tests the ones that should never give.</p>
+</body></html>

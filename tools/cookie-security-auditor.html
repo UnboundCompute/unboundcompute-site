@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Cookie Security Auditor | UnboundCompute</title>
+<meta name="description" content="Paste one or more raw Set-Cookie header lines and get a security graded report. Audits Secure, HttpOnly, SameSite, Domain scope, the __Host- and __Secure- prefixes, and lifetime. Runs fully in your browser." />
+<meta name="keywords" content="cookie security, set-cookie auditor, samesite checker, httponly, secure cookie flag, __host- prefix, __secure- prefix, cookie scanner, cookie analyzer" />
+<meta name="robots" content="index, follow" />
+<meta name="author" content="UnboundCompute" />
+<meta name="theme-color" content="#0a0a0b" />
+<link rel="canonical" href="https://unboundcompute.com/tools/cookie-security-auditor.html" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a0a0b'/%3E%3Cline x1='16' y1='4' x2='16' y2='28' stroke='%23fb5b46' stroke-width='2' stroke-dasharray='3 3'/%3E%3Ccircle cx='16' cy='16' r='3.4' fill='%23fb5b46'/%3E%3C/svg%3E" />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="UnboundCompute" />
+<meta property="og:title" content="Cookie Security Auditor" />
+<meta property="og:description" content="Audit raw Set-Cookie headers and get a security graded report. Runs fully in your browser, nothing is sent to any server." />
+<meta property="og:url" content="https://unboundcompute.com/tools/cookie-security-auditor.html" />
+<meta property="og:image" content="https://unboundcompute.com/og.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Cookie Security Auditor" />
+<meta name="twitter:description" content="Audit raw Set-Cookie headers and get a security graded report. Runs fully in your browser." />
+<meta name="twitter:image" content="https://unboundcompute.com/og.png" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "Cookie Security Auditor",
+      "applicationCategory": "SecurityApplication",
+      "operatingSystem": "Web",
+      "browserRequirements": "Requires JavaScript. Runs entirely client side.",
+      "url": "https://unboundcompute.com/tools/cookie-security-auditor.html",
+      "description": "A free tool that parses raw Set-Cookie header lines and grades their security. Audits the Secure and HttpOnly flags, the SameSite attribute, Domain scope, the __Host- and __Secure- name prefixes, and cookie lifetime. All analysis happens in the browser.",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "publisher": { "@type": "Organization", "name": "UnboundCompute", "url": "https://unboundcompute.com/" }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Which cookie flags actually matter for security?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Three carry most of the weight. Secure stops a cookie from being sent over plain HTTP where it could be intercepted. HttpOnly hides the cookie from JavaScript, so a cross site scripting bug cannot read it. SameSite controls whether the browser attaches the cookie to requests that another site triggered, which is the main lever against cross site request forgery. Beyond those, the Domain attribute decides how widely the cookie is shared across subdomains, and a short lifetime limits the damage if the cookie leaks." }
+        },
+        {
+          "@type": "Question",
+          "name": "Does this auditor send my cookies anywhere?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. The parsing and the security checks run entirely in your browser with JavaScript. The Set-Cookie lines you paste are never uploaded, logged, or sent to any server. A session cookie is a live credential, so you can paste a real one here without it leaving your machine. The tool also shows only a short masked preview of the value, never the whole secret." }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the SameSite attribute?",
+          "acceptedAnswer": { "@type": "Answer", "text": "SameSite tells the browser when to attach a cookie to a request that started from another site. Strict never sends it on a cross site request. Lax sends it only on top level navigations, which is a sensible default for session cookies. None sends it on every cross site request and is only valid when the cookie is also marked Secure, so it must be a deliberate choice. Setting SameSite explicitly is a core defense against cross site request forgery." }
+        },
+        {
+          "@type": "Question",
+          "name": "What do the __Host- and __Secure- prefixes do?",
+          "acceptedAnswer": { "@type": "Answer", "text": "They are name prefixes the browser enforces. A cookie named with __Secure- is only accepted when it is set with the Secure flag over HTTPS. A cookie named with __Host- is stricter still: it must be Secure, must have Path set to slash, and must have no Domain attribute, which binds it to the exact host that set it and blocks a subdomain from overwriting it. The __Host- prefix gives the strongest binding for a session cookie." }
+        }
+      ]
+    }
+  ]
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600&family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0a0b; --bg-2:#070708; --panel:#0e0e10; --panel-2:#131315;
+    --ink:#f4f2ec; --ink-hi:#fbf9f3; --ink-soft:#9b988f; --ink-faint:#5e5b54;
+    --line:rgba(244,242,236,.13); --line-2:rgba(244,242,236,.07);
+    --accent:#fb5b46; --accent-2:#ff7d6b; --accent-wash:rgba(251,91,70,.12); --on-accent:#1a0c09; --accent-line:rgba(251,91,70,.42);
+    --pass:#5fd6a4; --pass-wash:rgba(95,214,164,.1); --warn:#e8b04b; --warn-wash:rgba(232,176,75,.1); --fail:#fb5b46; --fail-wash:rgba(251,91,70,.1); --info:#7c93ff; --info-wash:rgba(124,147,255,.1);
+    --serif:'Newsreader',Georgia,serif; --mono:'JetBrains Mono',ui-monospace,monospace; --sans:'Inter',system-ui,sans-serif;
+    --maxw:920px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;line-height:1.6}
+  ::selection{background:var(--accent);color:var(--on-accent)}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+
+  nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);background:rgba(10,10,11,.72);border-bottom:1px solid var(--line-2)}
+  nav .wrap{height:64px;display:flex;align-items:center;justify-content:space-between}
+  nav a.brand{display:flex;align-items:center;gap:11px;font-family:var(--mono);font-weight:600;font-size:15px;color:var(--ink);letter-spacing:-.01em}
+  nav a.brand:hover{text-decoration:none}
+  nav .badge{width:27px;height:27px;border-radius:7px;border:1px solid var(--accent-line);display:grid;place-items:center}
+  nav a.cta{font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:9px 16px;border-radius:8px;background:var(--accent);color:var(--on-accent)}
+  nav a.cta:hover{filter:brightness(1.08);text-decoration:none}
+
+  header.hero{padding:64px 0 28px}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:18px}
+  h1{font-family:var(--serif);font-weight:400;font-size:clamp(32px,5vw,52px);line-height:1.08;letter-spacing:-.015em;color:var(--ink-hi)}
+  .lede{margin-top:18px;font-size:18px;color:var(--ink-soft);max-width:660px}
+  .privacy{margin-top:18px;display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);border:1px solid var(--line);border-radius:8px;padding:8px 13px;background:var(--panel)}
+  .privacy svg{width:14px;height:14px;flex:none}
+
+  .tool{margin:30px 0 12px;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px}
+  label.fld{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:10px}
+  textarea{width:100%;min-height:150px;resize:vertical;background:var(--bg-2);border:1px solid var(--line);border-radius:11px;padding:15px;color:var(--ink);font-family:var(--mono);font-size:13.5px;line-height:1.55;outline:none;transition:border-color .2s,box-shadow .2s;word-break:break-all}
+  textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-wash)}
+  textarea::placeholder{color:var(--ink-faint)}
+  .row{display:flex;gap:11px;flex-wrap:wrap;margin-top:14px;align-items:center}
+  button{font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;padding:13px 22px;border-radius:9px;cursor:pointer;border:1px solid var(--line);background:transparent;color:var(--ink);transition:filter .15s,border-color .15s,background .15s}
+  button.primary{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+  button.primary:hover{filter:brightness(1.08)}
+  button.ghost:hover{border-color:var(--accent-line);color:var(--ink-hi)}
+  .hint{font-family:var(--mono);font-size:12px;color:var(--ink-faint);margin-left:auto}
+
+  #results{margin-top:8px}
+  .decoded{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0}
+  .seg{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:16px 18px;min-width:0}
+  .seg h3{font-family:var(--mono);font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+  .seg pre{font-family:var(--mono);font-size:13px;line-height:1.55;color:var(--ink);white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere}
+  .seg .claims{margin-top:11px;border-top:1px solid var(--line-2);padding-top:10px;display:flex;flex-direction:column;gap:5px}
+  .seg .claims div{font-family:var(--mono);font-size:12px;color:var(--ink-soft)}
+  .seg .claims b{color:var(--ink)}
+  .seg .err{color:var(--fail);font-family:var(--mono);font-size:13px}
+
+  .cookie-block{margin:26px 0}
+  .cookie-head{font-family:var(--mono);font-size:13px;color:var(--ink-soft);margin:0 2px 10px;display:flex;flex-wrap:wrap;gap:8px;align-items:baseline}
+  .cookie-head b{color:var(--ink-hi);font-size:15px}
+  .cookie-head .val{color:var(--ink-faint)}
+
+  .grade-card{display:flex;align-items:center;gap:22px;background:var(--panel-2);border:1px solid var(--line);border-radius:16px;padding:22px 24px;margin:20px 0}
+  .grade{font-family:var(--serif);font-size:62px;line-height:1;width:96px;height:96px;border-radius:18px;display:grid;place-items:center;flex:none;border:1.5px solid}
+  .grade.g-A,.grade.g-B{color:var(--pass);border-color:var(--pass);background:var(--pass-wash)}
+  .grade.g-C{color:var(--warn);border-color:var(--warn);background:var(--warn-wash)}
+  .grade.g-D,.grade.g-F{color:var(--fail);border-color:var(--fail);background:var(--fail-wash)}
+  .grade-meta h2{font-family:var(--serif);font-weight:400;font-size:24px;color:var(--ink-hi);margin-bottom:4px}
+  .grade-meta p{color:var(--ink-soft);font-size:14.5px}
+  .score-bar{height:7px;border-radius:99px;background:var(--line-2);margin-top:12px;overflow:hidden;max-width:340px}
+  .score-bar > i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--accent-2))}
+
+  .summary{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:16px 18px;margin:20px 0;font-size:14.5px;color:var(--ink-soft)}
+  .summary b{color:var(--ink-hi)}
+
+  .checks{display:flex;flex-direction:column;gap:11px}
+  .check{border:1px solid var(--line);border-radius:13px;padding:16px 18px;background:var(--panel)}
+  .check .top{display:flex;align-items:flex-start;gap:13px}
+  .dot{width:20px;height:20px;border-radius:6px;flex:none;display:grid;place-items:center;font-size:13px;font-weight:700;margin-top:1px}
+  .dot.pass{background:var(--pass-wash);color:var(--pass)}
+  .dot.warn{background:var(--warn-wash);color:var(--warn)}
+  .dot.fail{background:var(--fail-wash);color:var(--fail)}
+  .dot.info{background:var(--info-wash);color:var(--info)}
+  .check h3{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--ink-hi);letter-spacing:-.01em}
+  .check .finding{margin-top:5px;font-size:14.5px;color:var(--ink)}
+  .check .why{margin-top:9px;font-size:13.5px;color:var(--ink-soft)}
+  .check .fix{margin-top:9px;font-size:13px;color:var(--ink-soft);font-family:var(--mono);background:var(--bg-2);border:1px solid var(--line-2);border-radius:8px;padding:9px 11px;white-space:pre-wrap;word-break:break-word}
+  .check .more{margin-top:9px;font-size:13px}
+  .sub{margin-top:11px;padding-left:15px;border-left:2px solid var(--line);display:flex;flex-direction:column;gap:7px}
+  .sub div{font-size:13.5px;color:var(--ink-soft)}
+  .sub b{color:var(--ink)}
+  .empty{color:var(--ink-faint);font-family:var(--mono);font-size:13px;text-align:center;padding:30px}
+
+  .prose{padding:44px 0 20px}
+  .prose h2{font-family:var(--serif);font-weight:400;font-size:30px;color:var(--ink-hi);margin:36px 0 14px;letter-spacing:-.01em}
+  .prose h3{font-family:var(--mono);font-size:15px;color:var(--ink-hi);margin:24px 0 8px}
+  .prose p{color:var(--ink-soft);margin-bottom:14px;font-size:16px}
+  .prose ul{color:var(--ink-soft);margin:0 0 14px 20px;font-size:16px}
+  .prose li{margin-bottom:7px}
+  .prose code{font-family:var(--mono);font-size:13.5px;background:var(--panel-2);border:1px solid var(--line-2);border-radius:5px;padding:1px 6px;color:var(--ink)}
+  .related{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:8px}
+  .related a{display:block;border:1px solid var(--line);border-radius:11px;padding:14px 16px;color:var(--ink);font-size:14.5px;background:var(--panel)}
+  .related a:hover{border-color:var(--accent-line);text-decoration:none}
+  .related a span{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:5px}
+
+  footer{border-top:1px solid var(--line-2);margin-top:40px;padding:30px 0;color:var(--ink-faint);font-family:var(--mono);font-size:12.5px}
+  footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px}
+  footer a{color:var(--ink-soft)}
+  @media (max-width:560px){
+    .related{grid-template-columns:1fr}
+    .decoded{grid-template-columns:1fr}
+    .grade-card{flex-direction:column;align-items:flex-start;gap:16px}
+    .hint{margin-left:0;width:100%}
+  }
+</style>
+</head>
+<body>
+
+<nav><div class="wrap">
+  <a class="brand" href="https://unboundcompute.com/">
+    <span class="badge"><svg viewBox="0 0 24 24" fill="none" style="width:15px;height:15px"><line x1="12" y1="3" x2="12" y2="21" stroke="var(--accent)" stroke-width="1.8" stroke-dasharray="2.6 2.6"/><circle cx="12" cy="12" r="3" fill="var(--accent)"/></svg></span>
+    UnboundCompute
+  </a>
+  <a class="cta" href="https://unboundcompute.com/#cta">Request access</a>
+</div></nav>
+
+<header class="hero"><div class="wrap">
+  <div class="eyebrow">Free tool</div>
+  <h1>Cookie Security Auditor</h1>
+  <p class="lede">Paste one or more raw Set-Cookie header lines to get a graded security report for each cookie. It audits the Secure and HttpOnly flags, the SameSite setting, how wide the Domain scope is, the __Host- and __Secure- name prefixes, and how long the cookie lives. It reads attributes only, so it explains the tradeoffs instead of guessing your app's intent.</p>
+  <div class="privacy">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6l8-4z" stroke="var(--accent)" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    A session cookie is a secret. Everything runs in your browser. Nothing is sent to any server.
+  </div>
+</div></header>
+
+<div class="wrap">
+  <div class="tool">
+    <label class="fld" for="cookies">Paste raw Set-Cookie header lines (one per line)</label>
+    <textarea id="cookies" spellcheck="false" placeholder="Set-Cookie: sessionid=abc123; Path=/&#10;Set-Cookie: __Host-session=eyJ...; Secure; HttpOnly; SameSite=Lax; Path=/&#10;&#10;The leading Set-Cookie: prefix is optional. Values are masked and everything is parsed locally, never sent anywhere."></textarea>
+    <div class="row">
+      <button class="primary" id="analyze">Audit cookies</button>
+      <button class="ghost" id="example">Load example</button>
+      <button class="ghost" id="clear">Clear</button>
+      <span class="hint" id="hint">No data leaves this page</span>
+    </div>
+  </div>
+  <div id="results"><div class="empty">Your per cookie graded report will appear here.</div></div>
+</div>
+
+<div class="wrap prose">
+  <h2>What this cookie auditor checks</h2>
+  <p>A Set-Cookie header looks simple, but the attributes after the name and value decide whether the cookie is a safe session credential or an easy target. The browser only honors the attributes you actually set, so a missing flag is a silent default, not a no op. This tool parses each cookie and audits the attributes that matter, drawing on the cookie handling rules in <a href="https://datatracker.ietf.org/doc/html/rfc6265" rel="noopener" target="_blank">RFC 6265</a> and the prefix and SameSite work in the <a href="https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-rfc6265bis" rel="noopener" target="_blank">6265bis draft</a>. It reads attributes only and cannot know your application's intent, so it explains the tradeoff for each setting rather than handing down an absolute verdict.</p>
+
+  <h3>The Secure flag</h3>
+  <p>The <code>Secure</code> attribute tells the browser to send the cookie only over HTTPS. Without it, the cookie can ride along on a plain HTTP request, where anyone on the network path can read it. For a session cookie that is the whole credential in the clear. Setting <code>Secure</code> is the baseline, and a missing one is treated as a failing check.</p>
+
+  <h3>The HttpOnly flag</h3>
+  <p>The <code>HttpOnly</code> attribute hides the cookie from JavaScript, so <code>document.cookie</code> cannot read it. That matters because a cross site scripting bug can run script in your page, and a script that can read the session cookie can hand it to an attacker. Session cookies should be <code>HttpOnly</code>. The exception is a cookie the front end must read on purpose, so the tool raises this as something to confirm rather than an outright failure. For the bug class this defends against, see <a href="https://security.unboundcompute.com/what-is-xss-and-how-does-it-work/" rel="noopener">what cross site scripting is and how it works</a>.</p>
+
+  <h3>The SameSite attribute</h3>
+  <p>The <code>SameSite</code> attribute controls whether the browser attaches the cookie to a request that another site started. <code>Strict</code> never does, <code>Lax</code> sends it only on top level navigations, and <code>None</code> sends it on every cross site request. A cookie set to <code>SameSite=None</code> must also be <code>Secure</code>, and modern browsers reject it otherwise. When the attribute is missing, modern browsers fall back to <code>Lax</code>, but older ones do not, so the tool recommends setting it explicitly. This is the main lever against <a href="https://security.unboundcompute.com/what-is-csrf/" rel="noopener">cross site request forgery</a>.</p>
+
+  <h3>Domain scope and subdomains</h3>
+  <p>If a cookie sets a <code>Domain</code> attribute pointing at a parent or registrable domain, the browser shares it with every subdomain of that domain. That widens the blast radius: any one vulnerable subdomain can read or set the cookie. A cookie with no <code>Domain</code> attribute is host only, bound to the exact host that set it, which is the safer default. The risk of a wide scope is tied directly to <a href="https://security.unboundcompute.com/what-is-subdomain-takeover/" rel="noopener">subdomain takeover</a>, where an attacker who controls a forgotten subdomain inherits any cookie scoped to the parent.</p>
+
+  <h3>The __Host- and __Secure- name prefixes</h3>
+  <p>The browser enforces two name prefixes. A cookie named with <code>__Secure-</code> is only accepted when it carries the <code>Secure</code> flag. A cookie named with <code>__Host-</code> is stricter: it must be <code>Secure</code>, must have <code>Path</code> set to slash, and must have no <code>Domain</code> attribute, which locks it to the exact host that set it and stops a subdomain from overwriting it. The <code>__Host-</code> prefix gives the strongest binding for a session cookie. If a prefixed cookie breaks its own rules, the browser silently drops it, so the tool flags that mismatch.</p>
+
+  <h3>Lifetime</h3>
+  <p>A cookie with no <code>Max-Age</code> or <code>Expires</code> is a session cookie that disappears when the browser closes. Adding a far future <code>Expires</code> or a very large <code>Max-Age</code> turns it into a persistent credential that keeps working for a long time. For a sensitive cookie, a long lifetime is a long lived liability if it leaks, so the tool raises it for review.</p>
+
+  <h2>How to read the grade</h2>
+  <p>Each cookie is graded on its own. Every graded check contributes a weighted share of a score out of one hundred. A pass earns its full weight, a weak setting earns part of it, and a dangerous one earns none, while purely advisory notes do not move the score. The grade is a fast signal about the cookie as it was set, not a verdict on the whole application. Because the tool reads attributes only, it cannot tell whether a cookie is meant to be read by the front end or shared across subdomains on purpose, so judging real safety still means understanding how your app uses each cookie, which is the kind of context an <a href="https://security.unboundcompute.com/ai-security-testing/" rel="noopener">AI security testing</a> approach reasons about rather than pattern matching one header. For the wider set of session and access boundaries attackers probe, see the <a href="https://security.unboundcompute.com/category/access-control/" rel="noopener">access control</a> writing.</p>
+
+  <h2>Related reading</h2>
+  <div class="related">
+    <a href="https://security.unboundcompute.com/what-is-csrf/"><span>SameSite</span>What is CSRF</a>
+    <a href="https://security.unboundcompute.com/what-is-subdomain-takeover/"><span>Domain scope</span>What is subdomain takeover</a>
+    <a href="https://security.unboundcompute.com/what-is-xss-and-how-does-it-work/"><span>HttpOnly</span>What is XSS and how does it work</a>
+    <a href="https://security.unboundcompute.com/web-security-glossary/"><span>Reference</span>Web security glossary</a>
+  </div>
+
+  <h2>More free tools</h2>
+  <div class="related">
+    <a href="https://unboundcompute.com/tools/security-headers-analyzer.html"><span>Free tool</span>Security Headers and CSP Analyzer</a>
+    <a href="https://unboundcompute.com/tools/jwt-security-inspector.html"><span>Free tool</span>JWT Security Inspector</a>
+    <a href="https://unboundcompute.com/tools/cors-misconfiguration-checker.html"><span>Free tool</span>CORS Misconfiguration Checker</a>
+      <a href="https://unboundcompute.com/tools/"><span>All tools</span>Free security tools hub</a>
+  </div>
+</div>
+
+<footer><div class="wrap">
+  <div>Built by <a href="https://unboundcompute.com/">UnboundCompute</a>, autonomous security research for web apps and APIs.</div>
+  <div><a href="https://unboundcompute.com/#cta">Request access</a></div>
+</div></footer>
+
+<script>
+(function(){
+  "use strict";
+  var $ = function(s){ return document.querySelector(s); };
+
+  // Two cookies: a weak one with no flags, and a strong __Host- cookie.
+  var EXAMPLE = [
+    "Set-Cookie: sessionid=abc123; Path=/",
+    "Set-Cookie: __Host-session=eyJhbGciOiJIUzI1NiJ9.payload.sig; Secure; HttpOnly; SameSite=Lax; Path=/"
+  ].join("\n");
+
+  function esc(s){ return String(s).replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];}); }
+
+  function maskValue(v){
+    if (v === undefined || v === null) return "";
+    v = String(v);
+    if (v.length <= 6) return v.charAt(0) + "*".repeat(Math.max(0, v.length-1));
+    return v.slice(0,3) + "*".repeat(8) + " (" + v.length + " chars)";
+  }
+
+  // Parse one raw Set-Cookie line into name, value, and attributes.
+  function parseCookie(line){
+    var raw = String(line).trim().replace(/^set-cookie\s*:\s*/i, "");
+    var c = { raw: raw, name: "", value: "", attrs: {}, err: null };
+    if (!raw){ c.err = "Empty line."; return c; }
+    var parts = raw.split(";");
+    var nv = parts.shift();
+    var eq = nv.indexOf("=");
+    if (eq === -1){ c.err = "This line has no name=value pair. A Set-Cookie header starts with name=value."; c.name = nv.trim(); return c; }
+    c.name = nv.slice(0, eq).trim();
+    c.value = nv.slice(eq+1).trim();
+    if (!c.name){ c.err = "The cookie name is empty."; return c; }
+    parts.forEach(function(p){
+      p = p.trim();
+      if (!p) return;
+      var e = p.indexOf("=");
+      var k, v;
+      if (e === -1){ k = p; v = true; }
+      else { k = p.slice(0,e).trim(); v = p.slice(e+1).trim(); }
+      c.attrs[k.toLowerCase()] = v;
+    });
+    return c;
+  }
+
+  function hasAttr(c, k){ return Object.prototype.hasOwnProperty.call(c.attrs, k); }
+
+  // Treat any explicit Domain value as a broadened (parent) scope. We cannot
+  // know the real public suffix client side, so we describe rather than assert.
+  function looksLikeSessionCookie(name){
+    return /sess|sid|auth|token|login|jwt|id$/i.test(name);
+  }
+
+  // status: pass | warn | fail | info. weight 0 => advisory (not graded).
+  function buildChecks(c){
+    var checks = [];
+    var attrs = c.attrs;
+    var name = c.name || "";
+    var lname = name.toLowerCase();
+    var isHostPrefix = /^__host-/i.test(name);
+    var isSecurePrefix = /^__secure-/i.test(name);
+    var hasSecure = hasAttr(c, "secure");
+    var hasHttpOnly = hasAttr(c, "httponly");
+    var sameSite = hasAttr(c, "samesite") ? String(attrs.samesite) : null;
+    var ssLower = sameSite ? sameSite.toLowerCase() : null;
+    var domain = hasAttr(c, "domain") ? String(attrs.domain) : null;
+    var path = hasAttr(c, "path") ? String(attrs.path) : null;
+    var maxAge = hasAttr(c, "max-age") ? attrs["max-age"] : null;
+    var expires = hasAttr(c, "expires") ? String(attrs.expires) : null;
+
+    // 1. Secure (weight 22)
+    (function(){
+      var w = 22;
+      if (hasSecure){ checks.push({w:w,s:"pass",h:"Secure flag",f:"The cookie is marked Secure, so the browser sends it only over HTTPS.",why:"Secure keeps the cookie off plain HTTP, where anyone on the network path could read it."}); return; }
+      checks.push({w:w,s:"fail",h:"Secure flag",f:"No Secure flag. This cookie can be sent over plain HTTP and intercepted on the network path.",fix:"Add the Secure attribute so the cookie is sent only over HTTPS.",why:"Without Secure, a single plain HTTP request leaks the cookie in the clear.",link:"https://security.unboundcompute.com/what-is-web-application-security/",linkText:"Why transport matters"}); return;
+    })();
+
+    // 2. HttpOnly (weight 20)
+    (function(){
+      var w = 20;
+      if (hasHttpOnly){ checks.push({w:w,s:"pass",h:"HttpOnly flag",f:"The cookie is marked HttpOnly, so JavaScript cannot read it through document.cookie.",why:"HttpOnly puts the cookie out of reach of a cross site scripting payload."}); return; }
+      checks.push({w:w,s:"warn",h:"HttpOnly flag",f:"No HttpOnly flag, so this cookie is readable by JavaScript and a cross site scripting bug could steal it. It is required for session cookies and optional only for cookies the front end must read.",fix:"Add HttpOnly unless the front end genuinely needs to read this cookie.",why:"If script can read the cookie, an XSS bug can exfiltrate the session.",link:"https://security.unboundcompute.com/what-is-xss-and-how-does-it-work/",linkText:"How XSS steals cookies"}); return;
+    })();
+
+    // 3. SameSite (weight 18)
+    (function(){
+      var w = 18;
+      if (ssLower === "none"){
+        if (hasSecure){ checks.push({w:w,s:"pass",h:"SameSite attribute",f:"SameSite=None with Secure. The browser accepts it, but None allows the cookie to be sent on cross site requests, so confirm that is intended.",why:"SameSite=None turns off the cross site protection on purpose, which is right for some flows and wrong for a plain session cookie.",link:"https://security.unboundcompute.com/what-is-csrf/",linkText:"Cross site request forgery"}); return; }
+        checks.push({w:w,s:"fail",h:"SameSite attribute",f:"SameSite=None without Secure. Modern browsers reject this combination, so the cookie may be dropped entirely.",fix:"Either add Secure to a SameSite=None cookie, or use SameSite=Lax or Strict if it does not need to cross sites.",why:"The browser requires Secure on any SameSite=None cookie, so this pairing fails to set.",link:"https://security.unboundcompute.com/what-is-csrf/",linkText:"Cross site request forgery"}); return;
+      }
+      if (ssLower === "lax" || ssLower === "strict"){ checks.push({w:w,s:"pass",h:"SameSite attribute",f:"SameSite="+esc(sameSite)+", which limits when the browser sends this cookie on cross site requests.",why:"A SameSite of Lax or Strict is a core defense against cross site request forgery."}); return; }
+      if (sameSite){ checks.push({w:w,s:"warn",h:"SameSite attribute",f:"SameSite is set to an unrecognized value ("+esc(sameSite)+"). The browser will treat it as the default, which may not be what you intended.",fix:"Use one of Strict, Lax, or None (None also needs Secure).",why:"An unknown SameSite value falls back to the browser default rather than your choice."}); return; }
+      checks.push({w:w,s:"warn",h:"SameSite attribute",f:"No SameSite attribute. Modern browsers default to Lax, but older ones do not, so set it explicitly.",fix:"Set SameSite=Lax for a session cookie, or Strict if the cookie never needs to ride a cross site navigation.",why:"Relying on the browser default leaves older browsers sending the cookie cross site.",link:"https://security.unboundcompute.com/what-is-csrf/",linkText:"Cross site request forgery"}); return;
+    })();
+
+    // 4. Name prefix (weight 12)
+    (function(){
+      var w = 12;
+      if (isHostPrefix){
+        var problems = [];
+        if (!hasSecure) problems.push("it is missing the Secure flag");
+        if (path !== "/") problems.push("Path must be / (it is " + (path === null ? "not set" : esc(path)) + ")");
+        if (domain !== null) problems.push("it must have no Domain attribute (Domain is " + esc(domain) + ")");
+        if (problems.length){ checks.push({w:w,s:"fail",h:"__Host- prefix",f:"This cookie uses the __Host- prefix but breaks its rules: " + problems.join("; ") + ". The browser will refuse to store a malformed __Host- cookie.",fix:"For __Host-: set Secure, set Path=/, and do not set Domain.",why:"A __Host- cookie that violates its own rules is silently dropped, so the cookie you think you set never sticks."}); return; }
+        checks.push({w:w,s:"pass",h:"__Host- prefix",f:"The __Host- prefix is satisfied: Secure is set, Path is /, and there is no Domain. This is the strongest binding for a session cookie.",why:"__Host- locks the cookie to the exact host that set it and blocks a subdomain from overwriting it."}); return;
+      }
+      if (isSecurePrefix){
+        if (!hasSecure){ checks.push({w:w,s:"fail",h:"__Secure- prefix",f:"This cookie uses the __Secure- prefix but is missing the Secure flag. The browser will refuse to store it.",fix:"Add the Secure attribute to any __Secure- prefixed cookie.",why:"The browser only accepts a __Secure- cookie when it is set with Secure over HTTPS."}); return; }
+        checks.push({w:w,s:"pass",h:"__Secure- prefix",f:"The __Secure- prefix is satisfied: the Secure flag is present.",why:"__Secure- guarantees the cookie was set securely, though __Host- binds it more tightly."}); return;
+      }
+      if (looksLikeSessionCookie(lname)){ checks.push({w:0,s:"info",h:"Name prefix",f:"This looks like a session cookie with no name prefix. Naming it __Host- (with Secure, Path=/, and no Domain) gives the strongest binding a cookie can have.",why:"The __Host- prefix is browser enforced, so it cannot be weakened by a misconfigured Domain or a missing Secure flag."}); return; }
+      checks.push({w:0,s:"info",h:"Name prefix",f:"No __Host- or __Secure- name prefix. For a sensitive cookie, __Host- is the strongest binding available.",why:"Name prefixes are enforced by the browser itself, so they cannot be silently weakened."}); return;
+    })();
+
+    // 5. Domain scope (weight 14)
+    (function(){
+      var w = 14;
+      if (domain === null){ checks.push({w:w,s:"pass",h:"Domain scope",f:"No Domain attribute, so the cookie is host only and bound to the exact host that set it.",why:"A host only cookie is not shared with subdomains, which keeps the blast radius small."}); return; }
+      var d = domain.replace(/^\./, "");
+      var labels = d.split(".").filter(Boolean);
+      checks.push({w:w,s:"warn",h:"Domain scope",f:"Domain is set to " + esc(domain) + ", which widens the cookie to that domain and every subdomain under it. Any one vulnerable subdomain can then read or set this cookie.",fix:"Drop the Domain attribute to make the cookie host only, unless it genuinely must be shared across subdomains.",why:"A wide Domain scope ties the cookie's safety to your weakest subdomain, which is the heart of the subdomain takeover risk.",link:"https://security.unboundcompute.com/what-is-subdomain-takeover/",linkText:"Subdomain takeover"});
+      if (labels.length < 2){ /* still warn, single label is unusual */ }
+      return;
+    })();
+
+    // 6. Path (weight 6, mostly advisory)
+    (function(){
+      var w = 6;
+      if (path === null){ checks.push({w:w,s:"info",h:"Path scope",f:"No Path attribute, so the browser scopes the cookie to the path of the response that set it. Path=/ is the usual explicit choice.",why:"Path is a coarse scope, not a security boundary, but Path=/ keeps behavior predictable."}); return; }
+      if (path === "/"){ checks.push({w:w,s:"pass",h:"Path scope",f:"Path=/ , which is the normal scope for a site wide cookie.",why:"Path=/ makes the cookie available across the site, which is expected for a session cookie."}); return; }
+      checks.push({w:w,s:"info",h:"Path scope",f:"Path is " + esc(path) + ", which limits the cookie to that path prefix. Confirm that matches where the cookie is needed.",why:"Path is a convenience scope rather than a security control, since a sibling path can still be reached by other means."}); return;
+    })();
+
+    // 7. Lifetime (weight 8)
+    (function(){
+      var w = 8;
+      var sensitive = looksLikeSessionCookie(lname) || isHostPrefix || isSecurePrefix;
+      var maxAgeNum = maxAge !== null ? parseInt(maxAge, 10) : null;
+      var hasLifetime = (maxAge !== null) || (expires !== null);
+      if (!hasLifetime){ checks.push({w:w,s:"pass",h:"Lifetime",f:"No Max-Age or Expires, so this is a session cookie that is cleared when the browser closes.",why:"A session cookie has the shortest natural lifetime, which limits how long a leaked copy stays useful."}); return; }
+      var longByMaxAge = (maxAgeNum !== null && isFinite(maxAgeNum) && maxAgeNum > 86400);
+      var longByExpires = false;
+      if (expires !== null){
+        var t = Date.parse(expires);
+        if (!isNaN(t) && (t - Date.now()) > 86400*1000) longByExpires = true;
+      }
+      if (sensitive && (longByMaxAge || longByExpires)){
+        var detail = longByMaxAge ? ("Max-Age is " + esc(String(maxAge)) + " seconds") : ("Expires is " + esc(expires));
+        checks.push({w:w,s:"warn",h:"Lifetime",f:"This looks like a sensitive cookie with a long lifetime (" + detail + "). A long lived persistent credential is a long lived liability if it leaks.",fix:"Prefer a short lifetime for a sensitive cookie, and renew it server side rather than minting one that lasts for weeks.",why:"The longer a credential cookie lives, the longer a stolen copy keeps working."}); return;
+      }
+      checks.push({w:w,s:"pass",h:"Lifetime",f:"This cookie has an explicit lifetime" + (maxAge !== null ? " (Max-Age " + esc(String(maxAge)) + ")" : (expires !== null ? " (Expires " + esc(expires) + ")" : "")) + ". The duration looks reasonable for a non sensitive cookie.",why:"A bounded lifetime is fine when the cookie is not a long lived credential."}); return;
+    })();
+
+    return checks;
+  }
+
+  function grade(checks){
+    var earned = 0, possible = 0;
+    checks.forEach(function(ch){
+      if (!ch.w) return;
+      possible += ch.w;
+      earned += ch.s === "pass" ? ch.w : ch.s === "warn" ? ch.w*0.5 : ch.s === "info" ? ch.w : 0;
+    });
+    var pct = possible ? Math.round(earned/possible*100) : 0;
+    var letter = pct>=90?"A":pct>=80?"B":pct>=70?"C":pct>=60?"D":"F";
+    return { pct: pct, letter: letter };
+  }
+
+  function renderChecks(checks){
+    var html = '<div class="checks">';
+    checks.forEach(function(c){
+      var sym = c.s==="pass"?"&#10003;":c.s==="warn"?"!":c.s==="fail"?"&#10007;":"i";
+      html += '<div class="check"><div class="top"><span class="dot '+c.s+'">'+sym+'</span><div style="flex:1">';
+      html += '<h3>'+esc(c.h)+'</h3>';
+      html += '<div class="finding">'+esc(c.f)+'</div>';
+      if (c.subs && c.subs.length){
+        html += '<div class="sub">';
+        c.subs.forEach(function(s){ html += '<div>'+s+'</div>'; });   // subs may contain <b>
+        html += '</div>';
+      }
+      if (c.why) html += '<div class="why">'+esc(c.why)+'</div>';
+      if (c.fix && c.s !== "pass") html += '<div class="fix">'+esc(c.fix)+'</div>';
+      if (c.link) html += '<div class="more"><a href="'+c.link+'" rel="noopener">'+esc(c.linkText||"Learn more")+' &rarr;</a></div>';
+      html += '</div></div></div>';
+    });
+    html += '</div>';
+    return html;
+  }
+
+  function renderCookie(c){
+    var html = '<div class="cookie-block">';
+    if (c.err && !c.name){
+      html += '<div class="grade-card"><div class="grade g-F">F</div><div class="grade-meta"><h2>Could not parse</h2><p>'+esc(c.err)+'</p></div></div>';
+      html += '</div>';
+      return { html: html, grade: null };
+    }
+    var checks = buildChecks(c);
+    var g = grade(checks);
+    var sum = { pass:0, warn:0, fail:0 };
+    checks.forEach(function(x){ if (x.w && sum[x.s]!==undefined) sum[x.s]++; });
+
+    html += '<div class="cookie-head"><b>'+esc(c.name)+'</b><span class="val">value '+esc(maskValue(c.value))+'</span></div>';
+    html += '<div class="grade-card">';
+    html += '<div class="grade g-'+g.letter+'">'+g.letter+'</div>';
+    html += '<div class="grade-meta"><h2>Score '+g.pct+' out of 100</h2>';
+    html += '<p>'+sum.pass+' strong, '+sum.warn+' to improve, '+sum.fail+' dangerous. This audits attributes only and cannot know your app, so it explains tradeoffs rather than final verdicts.</p>';
+    html += '<div class="score-bar"><i style="width:'+g.pct+'%"></i></div></div></div>';
+    html += renderChecks(checks);
+    html += '</div>';
+    return { html: html, grade: g };
+  }
+
+  function run(){
+    var text = $("#cookies").value || "";
+    var lines = text.split(/\r?\n/).map(function(l){ return l.trim(); }).filter(function(l){ return l.length; });
+    if (!lines.length){ $("#results").innerHTML = '<div class="empty">Paste at least one Set-Cookie line first.</div>'; return; }
+    var cookies = lines.map(parseCookie);
+    var grades = [];
+    var body = "";
+    cookies.forEach(function(c){
+      var r = renderCookie(c);
+      body += r.html;
+      if (r.grade) grades.push(r.grade);
+    });
+    var summary = "";
+    if (grades.length){
+      var letters = grades.map(function(g){ return g.letter; }).join(", ");
+      var avg = Math.round(grades.reduce(function(a,g){ return a+g.pct; },0) / grades.length);
+      summary = '<div class="summary"><b>'+grades.length+' cookie'+(grades.length===1?"":"s")+' audited.</b> Grades: '+esc(letters)+'. Average score '+avg+' out of 100. Each cookie is graded on its own attributes.</div>';
+    }
+    $("#results").innerHTML = summary + body;
+    $("#results").scrollIntoView({ behavior:"smooth", block:"start" });
+  }
+
+  $("#analyze").addEventListener("click", run);
+  $("#example").addEventListener("click", function(){ $("#cookies").value = EXAMPLE; run(); });
+  $("#clear").addEventListener("click", function(){ $("#cookies").value=""; $("#results").innerHTML='<div class="empty">Your per cookie graded report will appear here.</div>'; $("#cookies").focus(); });
+  $("#cookies").addEventListener("keydown", function(e){ if ((e.metaKey||e.ctrlKey) && e.key==="Enter") run(); });
+})();
+</script>
+</body>
+</html>

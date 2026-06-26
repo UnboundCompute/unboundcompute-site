@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>EXIF Metadata Viewer and Scrubber | UnboundCompute</title>
+<meta name="description" content="See the hidden metadata in your photo, including the GPS location it was taken, then download a cleaned copy with the metadata removed. Runs fully in your browser, your photo is never uploaded." />
+<meta name="keywords" content="exif viewer, remove exif, strip exif data, remove gps from photo, photo metadata, exif scrubber, remove location from photo, photo privacy, exif remover" />
+<meta name="robots" content="index, follow" />
+<meta name="author" content="UnboundCompute" />
+<meta name="theme-color" content="#0a0a0b" />
+<link rel="canonical" href="https://unboundcompute.com/tools/exif-metadata-viewer-scrubber.html" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a0a0b'/%3E%3Cline x1='16' y1='4' x2='16' y2='28' stroke='%23fb5b46' stroke-width='2' stroke-dasharray='3 3'/%3E%3Ccircle cx='16' cy='16' r='3.4' fill='%23fb5b46'/%3E%3C/svg%3E" />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="UnboundCompute" />
+<meta property="og:title" content="EXIF Metadata Viewer and Scrubber" />
+<meta property="og:description" content="See the hidden metadata in your photo, including the GPS location, then download a cleaned copy. Runs fully in your browser, your photo is never uploaded." />
+<meta property="og:url" content="https://unboundcompute.com/tools/exif-metadata-viewer-scrubber.html" />
+<meta property="og:image" content="https://unboundcompute.com/og.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="EXIF Metadata Viewer and Scrubber" />
+<meta name="twitter:description" content="See the hidden metadata in your photo, including the GPS location, then download a cleaned copy. Runs fully in your browser." />
+<meta name="twitter:image" content="https://unboundcompute.com/og.png" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "EXIF Metadata Viewer and Scrubber",
+      "applicationCategory": "SecurityApplication",
+      "operatingSystem": "Web",
+      "browserRequirements": "Requires JavaScript. Runs entirely client side.",
+      "url": "https://unboundcompute.com/tools/exif-metadata-viewer-scrubber.html",
+      "description": "A free tool that reads the hidden EXIF metadata in a photo, including the GPS coordinates that reveal where it was taken, the camera make and model, and the original date and time. It then re encodes the image to strip the metadata and offers a cleaned copy to download. Everything happens in the browser and the photo is never uploaded.",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "publisher": { "@type": "Organization", "name": "UnboundCompute", "url": "https://unboundcompute.com/" }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is EXIF metadata and why does it matter for privacy?",
+          "acceptedAnswer": { "@type": "Answer", "text": "EXIF is a block of hidden data that many cameras and phones embed inside a photo file. It can include the GPS coordinates where the photo was taken, the exact date and time, and the camera or phone make and model. The GPS part is the privacy risk: a photo you share publicly can quietly reveal your home, your workplace, or your child's school to anyone who opens the file." }
+        },
+        {
+          "@type": "Question",
+          "name": "Is my photo uploaded anywhere when I use this tool?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. Your photo is read and processed entirely in your browser with JavaScript. It is never uploaded, logged, or sent to any server. That is the whole point: you can inspect and clean a personal photo without it ever leaving your device." }
+        },
+        {
+          "@type": "Question",
+          "name": "How does the tool remove the metadata?",
+          "acceptedAnswer": { "@type": "Answer", "text": "It draws your image onto an HTML canvas and then exports that canvas to a new image file. The canvas holds only the pixels, so the EXIF block, the GPS coordinates, and other embedded metadata are not carried into the new file. The cleaned copy you download has the visible picture but not the hidden data." }
+        },
+        {
+          "@type": "Question",
+          "name": "Does cleaning the photo change its quality?",
+          "acceptedAnswer": { "@type": "Answer", "text": "A little, and we want to be honest about it. Re encoding through a canvas compresses the pixels again, so a cleaned JPEG can be very slightly softer than the original. It also drops the ICC color profile, which can shift colors a touch on wide gamut displays. For sharing a photo online the difference is usually invisible, but if you need a pixel perfect master, keep the original safely and share only the cleaned copy." }
+        },
+        {
+          "@type": "Question",
+          "name": "Does removing EXIF guarantee my photo is anonymous?",
+          "acceptedAnswer": { "@type": "Answer", "text": "It removes the embedded location and camera data, which is the most common leak. It does not change what is visible in the picture itself. A street sign, a house number, a reflection, or a recognizable background can still reveal a place, so treat metadata removal as one helpful step rather than a complete cloak." }
+        }
+      ]
+    }
+  ]
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600&family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0a0b; --bg-2:#070708; --panel:#0e0e10; --panel-2:#131315;
+    --ink:#f4f2ec; --ink-hi:#fbf9f3; --ink-soft:#9b988f; --ink-faint:#5e5b54;
+    --line:rgba(244,242,236,.13); --line-2:rgba(244,242,236,.07);
+    --accent:#fb5b46; --accent-2:#ff7d6b; --accent-wash:rgba(251,91,70,.12); --on-accent:#1a0c09; --accent-line:rgba(251,91,70,.42);
+    --pass:#5fd6a4; --pass-wash:rgba(95,214,164,.1); --warn:#e8b04b; --warn-wash:rgba(232,176,75,.1); --fail:#fb5b46; --fail-wash:rgba(251,91,70,.1); --info:#7c93ff; --info-wash:rgba(124,147,255,.1);
+    --serif:'Newsreader',Georgia,serif; --mono:'JetBrains Mono',ui-monospace,monospace; --sans:'Inter',system-ui,sans-serif;
+    --maxw:920px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;line-height:1.6}
+  ::selection{background:var(--accent);color:var(--on-accent)}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+
+  nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);background:rgba(10,10,11,.72);border-bottom:1px solid var(--line-2)}
+  nav .wrap{height:64px;display:flex;align-items:center;justify-content:space-between}
+  nav a.brand{display:flex;align-items:center;gap:11px;font-family:var(--mono);font-weight:600;font-size:15px;color:var(--ink);letter-spacing:-.01em}
+  nav a.brand:hover{text-decoration:none}
+  nav .badge{width:27px;height:27px;border-radius:7px;border:1px solid var(--accent-line);display:grid;place-items:center}
+  nav a.cta{font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:9px 16px;border-radius:8px;background:var(--accent);color:var(--on-accent)}
+  nav a.cta:hover{filter:brightness(1.08);text-decoration:none}
+
+  header.hero{padding:64px 0 28px}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:18px}
+  h1{font-family:var(--serif);font-weight:400;font-size:clamp(32px,5vw,52px);line-height:1.08;letter-spacing:-.015em;color:var(--ink-hi)}
+  .lede{margin-top:18px;font-size:18px;color:var(--ink-soft);max-width:660px}
+  .privacy{margin-top:18px;display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);border:1px solid var(--line);border-radius:8px;padding:8px 13px;background:var(--panel)}
+  .privacy svg{width:14px;height:14px;flex:none}
+
+  .tool{margin:30px 0 12px;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px}
+  label.fld{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:10px}
+  .drop{border:1.5px dashed var(--line);border-radius:13px;padding:38px 22px;text-align:center;background:var(--bg-2);cursor:pointer;transition:border-color .2s,background .2s}
+  .drop:hover{border-color:var(--accent-line)}
+  .drop.over{border-color:var(--accent);background:var(--accent-wash)}
+  .drop svg{width:34px;height:34px;opacity:.8;margin-bottom:12px}
+  .drop .big{font-size:16px;color:var(--ink-hi)}
+  .drop .small{font-family:var(--mono);font-size:12px;color:var(--ink-faint);margin-top:7px}
+  .row{display:flex;gap:11px;flex-wrap:wrap;margin-top:14px;align-items:center}
+  button{font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;padding:13px 22px;border-radius:9px;cursor:pointer;border:1px solid var(--line);background:transparent;color:var(--ink);transition:filter .15s,border-color .15s,background .15s}
+  button.primary{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+  button.primary:hover{filter:brightness(1.08)}
+  button.ghost:hover{border-color:var(--accent-line);color:var(--ink-hi)}
+  button:disabled{opacity:.4;cursor:not-allowed}
+  .hint{font-family:var(--mono);font-size:12px;color:var(--ink-faint);margin-left:auto}
+
+  #results{margin-top:8px}
+  .preview-card{display:flex;gap:20px;align-items:flex-start;background:var(--panel-2);border:1px solid var(--line);border-radius:16px;padding:18px;margin:20px 0}
+  .preview-card img{width:140px;height:140px;object-fit:cover;border-radius:11px;border:1px solid var(--line);flex:none;background:var(--bg-2)}
+  .preview-meta{min-width:0}
+  .preview-meta h2{font-family:var(--serif);font-weight:400;font-size:22px;color:var(--ink-hi);margin-bottom:4px;word-break:break-all}
+  .preview-meta p{color:var(--ink-soft);font-size:14px;font-family:var(--mono)}
+
+  .gps-alert{display:flex;align-items:flex-start;gap:14px;border:1px solid var(--fail);border-radius:16px;padding:20px 22px;margin:20px 0;background:var(--fail-wash)}
+  .gps-alert .ic{width:26px;height:26px;flex:none;color:var(--fail);margin-top:2px}
+  .gps-alert h2{font-family:var(--serif);font-weight:400;font-size:23px;color:var(--ink-hi);margin-bottom:6px}
+  .gps-alert p{color:var(--ink);font-size:14.5px;margin-bottom:8px}
+  .gps-alert .coords{font-family:var(--mono);font-size:14px;color:var(--ink-hi);background:var(--bg-2);border:1px solid var(--line);border-radius:9px;padding:10px 13px;display:inline-block;word-break:break-all}
+
+  .decoded{margin:20px 0}
+  .seg{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:16px 18px;min-width:0}
+  .seg h3{font-family:var(--mono);font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+  .tbl{display:flex;flex-direction:column;gap:0}
+  .tbl .r{display:flex;gap:14px;padding:8px 0;border-top:1px solid var(--line-2);font-size:14px}
+  .tbl .r:first-child{border-top:none}
+  .tbl .k{font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);width:180px;flex:none}
+  .tbl .v{color:var(--ink);word-break:break-word;overflow-wrap:anywhere;min-width:0}
+  .seg .none{color:var(--ink-faint);font-family:var(--mono);font-size:13px}
+
+  .scrub-card{border:1px solid var(--line);border-radius:16px;padding:20px 22px;margin:20px 0;background:var(--panel)}
+  .scrub-card h2{font-family:var(--serif);font-weight:400;font-size:23px;color:var(--ink-hi);margin-bottom:6px}
+  .scrub-card p{color:var(--ink-soft);font-size:14.5px;margin-bottom:12px}
+  .scrub-card .note{font-size:13px;color:var(--ink-soft);font-family:var(--mono);background:var(--bg-2);border:1px solid var(--line-2);border-radius:9px;padding:11px 13px;margin-top:12px}
+
+  .empty{color:var(--ink-faint);font-family:var(--mono);font-size:13px;text-align:center;padding:30px}
+  .err{color:var(--fail);font-family:var(--mono);font-size:13.5px;text-align:center;padding:24px}
+
+  .prose{padding:44px 0 20px}
+  .prose h2{font-family:var(--serif);font-weight:400;font-size:30px;color:var(--ink-hi);margin:36px 0 14px;letter-spacing:-.01em}
+  .prose h3{font-family:var(--mono);font-size:15px;color:var(--ink-hi);margin:24px 0 8px}
+  .prose p{color:var(--ink-soft);margin-bottom:14px;font-size:16px}
+  .prose ul{color:var(--ink-soft);margin:0 0 14px 20px;font-size:16px}
+  .prose li{margin-bottom:7px}
+  .prose code{font-family:var(--mono);font-size:13.5px;background:var(--panel-2);border:1px solid var(--line-2);border-radius:5px;padding:1px 6px;color:var(--ink)}
+  .related{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:8px}
+  .related a{display:block;border:1px solid var(--line);border-radius:11px;padding:14px 16px;color:var(--ink);font-size:14.5px;background:var(--panel)}
+  .related a:hover{border-color:var(--accent-line);text-decoration:none}
+  .related a span{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:5px}
+
+  footer{border-top:1px solid var(--line-2);margin-top:40px;padding:30px 0;color:var(--ink-faint);font-family:var(--mono);font-size:12.5px}
+  footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px}
+  footer a{color:var(--ink-soft)}
+  @media (max-width:560px){
+    .related{grid-template-columns:1fr}
+    .preview-card{flex-direction:column}
+    .tbl .r{flex-direction:column;gap:2px}
+    .tbl .k{width:auto}
+    .hint{margin-left:0;width:100%}
+  }
+</style>
+</head>
+<body>
+
+<nav><div class="wrap">
+  <a class="brand" href="https://unboundcompute.com/">
+    <span class="badge"><svg viewBox="0 0 24 24" fill="none" style="width:15px;height:15px"><line x1="12" y1="3" x2="12" y2="21" stroke="var(--accent)" stroke-width="1.8" stroke-dasharray="2.6 2.6"/><circle cx="12" cy="12" r="3" fill="var(--accent)"/></svg></span>
+    UnboundCompute
+  </a>
+  <a class="cta" href="https://unboundcompute.com/#cta">Request access</a>
+</div></nav>
+
+<header class="hero"><div class="wrap">
+  <div class="eyebrow">Free tool</div>
+  <h1>EXIF Metadata Viewer and Scrubber</h1>
+  <p class="lede">Drop in a photo to see the hidden data your camera or phone tucked inside it, including the GPS location where it was taken. Then download a cleaned copy with that metadata removed, ready to share safely.</p>
+  <div class="privacy">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6l8-4z" stroke="var(--accent)" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Your photo stays on your device. Everything runs in your browser. Nothing is uploaded to any server.
+  </div>
+</div></header>
+
+<div class="wrap">
+  <div class="tool">
+    <label class="fld" for="file">Choose or drop a photo</label>
+    <div class="drop" id="drop" role="button" tabindex="0" aria-label="Choose or drop a photo">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M4 16v3a2 2 0 002 2h12a2 2 0 002-2v-3" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round"/><path d="M12 3v12m0-12L8 7m4-4l4 4" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div class="big">Drop a photo here, or click to choose</div>
+      <div class="small">JPEG and PNG read locally. Your photo never leaves this page.</div>
+    </div>
+    <input type="file" id="file" accept="image/jpeg,image/png,image/*" hidden>
+    <div class="row">
+      <button class="ghost" id="clear" disabled>Clear</button>
+      <span class="hint" id="hint">No data leaves this page</span>
+    </div>
+  </div>
+  <div id="results"><div class="empty">Your photo's metadata and a cleaned download will appear here.</div></div>
+</div>
+
+<div class="wrap prose">
+  <h2>What this tool reads from your photo</h2>
+  <p>Most photos taken on a phone or a modern camera carry a hidden block of data called EXIF, short for Exchangeable Image File Format. It rides along inside the file, invisible when you look at the picture, yet readable by anyone who opens the file with the right tool. This page hand reads that block straight from the bytes of your file and shows you what is in it, with the privacy sensitive parts called out first.</p>
+
+  <h3>The GPS location, the part that matters most</h3>
+  <p>Many cameras write the exact <code>GPS</code> coordinates where a photo was taken into the metadata. That single field can quietly reveal your home address, your workplace, or where your children spend their day. When you post a photo with this data intact, you may be sharing far more than the picture. If your photo contains GPS coordinates, this tool shows them as plain text and flags them with a clear warning. We never plot them on a map and never make a network request to look them up, because that would defeat the privacy promise of the page.</p>
+
+  <h3>Camera, software, and timing</h3>
+  <p>Beyond location, the metadata commonly names the camera or phone make and model, the lens, and the editing software that last touched the file. It also records the original date and time the shutter fired through the <code>DateTimeOriginal</code> field, and an orientation flag that tells viewers which way is up. None of this is as sensitive as location, but together it builds a surprisingly detailed picture of who took a photo, when, and with what.</p>
+
+  <h2>How the cleaning works, honestly</h2>
+  <p>To remove the metadata, the tool draws your photo onto an HTML <code>canvas</code> and exports that canvas as a fresh image file. A canvas holds only pixels, so the EXIF block, the GPS coordinates, and the other embedded fields are simply not carried into the new file. Before drawing, it reads the EXIF <code>Orientation</code> flag and rotates the pixels to match, so a cleaned photo is never sideways or upside down once the orientation tag is gone.</p>
+  <p>There is an honest trade off worth stating plainly. Re encoding through a canvas compresses the pixels again, so a cleaned JPEG can be very slightly softer than the original, and the export drops the ICC color profile, which can nudge colors on wide gamut screens. For sharing online the change is usually invisible, but if you need a pixel perfect master, keep the original in a safe place and share only the cleaned copy.</p>
+
+  <h2>Why this runs only in your browser</h2>
+  <p>Photos are personal. The whole reason to check a photo for a hidden home address is that you do not want it leaking, so it would make no sense to upload that photo to a stranger's server to find out. Every step here, reading the bytes, decoding the EXIF, and re encoding the cleaned image, happens with JavaScript on this page. Your photo is never uploaded, logged, or stored. You can run a private family photo through it without the file ever leaving your machine. The same client side principle runs through the rest of the <a href="https://unboundcompute.com/tools/">free tools</a>, built by a team that works on <a href="https://security.unboundcompute.com/what-is-web-application-security/" rel="noopener">web application security</a>.</p>
+
+  <h2>More free tools</h2>
+  <div class="related">
+    <a href="https://unboundcompute.com/tools/secret-scanner.html"><span>Free tool</span>Secret and Credential Scanner</a>
+    <a href="https://unboundcompute.com/tools/password-strength-analyzer.html"><span>Free tool</span>Password Strength and Entropy Analyzer</a>
+    <a href="https://unboundcompute.com/tools/security-headers-analyzer.html"><span>Free tool</span>Security Headers and CSP Analyzer</a>
+    <a href="https://unboundcompute.com/tools/"><span>All tools</span>The full free tools hub</a>
+  </div>
+</div>
+
+<footer><div class="wrap">
+  <div>Built by <a href="https://unboundcompute.com/">UnboundCompute</a>, autonomous security research for web apps and APIs.</div>
+  <div><a href="https://unboundcompute.com/#cta">Request access</a></div>
+</div></footer>
+
+<script>
+(function(){
+  "use strict";
+  var $ = function(s){ return document.querySelector(s); };
+
+  var state = { url:null, file:null, orientation:1 };
+
+  function esc(s){ return String(s).replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];}); }
+
+  function fmtBytes(n){
+    if (n < 1024) return n + " B";
+    if (n < 1048576) return (n/1024).toFixed(1) + " KB";
+    return (n/1048576).toFixed(2) + " MB";
+  }
+
+  // ---- EXIF tag dictionaries (IFD0 / Exif sub IFD / GPS IFD) ----
+  var TAGS = {
+    0x010F:"Make", 0x0110:"Model", 0x0131:"Software", 0x0132:"DateTime",
+    0x011A:"XResolution", 0x011B:"YResolution", 0x0128:"ResolutionUnit",
+    0x0112:"Orientation", 0x013B:"Artist", 0x8298:"Copyright",
+    0x0102:"BitsPerSample", 0x0103:"Compression"
+  };
+  var EXIF_TAGS = {
+    0x9003:"DateTimeOriginal", 0x9004:"DateTimeDigitized", 0x829A:"ExposureTime",
+    0x829D:"FNumber", 0x8827:"ISOSpeedRatings", 0x920A:"FocalLength",
+    0x9207:"MeteringMode", 0x9209:"Flash", 0xA002:"PixelXDimension",
+    0xA003:"PixelYDimension", 0xA433:"LensMake", 0xA434:"LensModel",
+    0xA431:"BodySerialNumber"
+  };
+  var GPS_TAGS = {
+    0x0000:"GPSVersionID", 0x0001:"GPSLatitudeRef", 0x0002:"GPSLatitude",
+    0x0003:"GPSLongitudeRef", 0x0004:"GPSLongitude", 0x0005:"GPSAltitudeRef",
+    0x0006:"GPSAltitude", 0x0007:"GPSTimeStamp", 0x001D:"GPSDateStamp"
+  };
+  var ORIENT_TEXT = {
+    1:"Normal", 2:"Mirrored horizontally", 3:"Rotated 180 degrees",
+    4:"Mirrored vertically", 5:"Mirrored and rotated", 6:"Rotated 90 degrees clockwise",
+    7:"Mirrored and rotated", 8:"Rotated 90 degrees counter clockwise"
+  };
+
+  // Convert a GPS coordinate from degrees, minutes, seconds to decimal degrees.
+  // rationals is an array [deg, min, sec]; ref is "N"/"S"/"E"/"W".
+  function dmsToDecimal(deg, min, sec, ref){
+    var dec = deg + (min/60) + (sec/3600);
+    if (ref === "S" || ref === "W") dec = -dec;
+    return dec;
+  }
+
+  // ---- Minimal EXIF / TIFF parser working on a DataView ----
+  function readEXIF(buffer){
+    var view = new DataView(buffer);
+    if (view.byteLength < 4) return { error:"This file is too small to be a photo." };
+
+    // JPEG starts with 0xFFD8. PNG starts with 0x89504E47.
+    if (view.getUint16(0) === 0xFFD8) return readJPEG(view);
+    if (view.getUint32(0) === 0x89504E47) return readPNG(view);
+    return { error:"Unsupported file type. Please choose a JPEG or PNG photo." };
+  }
+
+  function readJPEG(view){
+    var len = view.byteLength, offset = 2, result = { type:"JPEG", ifd0:{}, exif:{}, gps:{} };
+    while (offset < len){
+      if (view.getUint8(offset) !== 0xFF) break;
+      var marker = view.getUint8(offset + 1);
+      if (marker === 0xD9 || marker === 0xDA) break; // EOI or start of scan
+      var segLen = view.getUint16(offset + 2);
+      // APP1 holds EXIF; check the "Exif\0\0" identifier.
+      if (marker === 0xE1){
+        if (offset + 10 < len &&
+            view.getUint32(offset + 4) === 0x45786966 && view.getUint16(offset + 8) === 0x0000){
+          parseTIFF(view, offset + 10, result);
+        }
+      }
+      offset += 2 + segLen;
+    }
+    return result;
+  }
+
+  function parseTIFF(view, tiffStart, result){
+    // Byte order: 0x4949 little endian, 0x4D4D big endian.
+    var bo = view.getUint16(tiffStart);
+    var little = (bo === 0x4949);
+    if (!little && bo !== 0x4D4D) return;
+
+    function u16(o){ return view.getUint16(o, little); }
+    function u32(o){ return view.getUint32(o, little); }
+    function s32(o){ return view.getInt32(o, little); }
+
+    if (u16(tiffStart + 2) !== 0x002A) return; // TIFF magic
+    var ifd0Off = u32(tiffStart + 4);
+
+    function readValue(entryOff){
+      var type = u16(entryOff + 2);
+      var count = u32(entryOff + 4);
+      var sizes = {1:1,2:1,3:2,4:4,5:8,7:1,9:4,10:8};
+      var sz = sizes[type] || 1;
+      var total = sz * count;
+      var valOff = total <= 4 ? (entryOff + 8) : (tiffStart + u32(entryOff + 8));
+      var i, out = [];
+      if (type === 2){ // ASCII
+        var str = "";
+        for (i = 0; i < count; i++){
+          var ch = view.getUint8(valOff + i);
+          if (ch === 0) break;
+          str += String.fromCharCode(ch);
+        }
+        return str;
+      }
+      for (i = 0; i < count; i++){
+        var o = valOff + i * sz;
+        if (type === 1 || type === 7) out.push(view.getUint8(o));
+        else if (type === 3) out.push(u16(o));
+        else if (type === 4) out.push(u32(o));
+        else if (type === 9) out.push(s32(o));
+        else if (type === 5) out.push(u32(o) / (u32(o + 4) || 1));
+        else if (type === 10) out.push(s32(o) / (s32(o + 4) || 1));
+        else out.push(view.getUint8(o));
+      }
+      return out.length === 1 ? out[0] : out;
+    }
+
+    function readIFD(ifdOff, dict, bucket){
+      if (ifdOff <= 0 || tiffStart + ifdOff + 2 > view.byteLength) return null;
+      var base = tiffStart + ifdOff;
+      var entries = u16(base);
+      var subExif = null, subGps = null;
+      for (var e = 0; e < entries; e++){
+        var entryOff = base + 2 + e * 12;
+        if (entryOff + 12 > view.byteLength) break;
+        var tag = u16(entryOff);
+        var val = readValue(entryOff);
+        if (tag === 0x8769){ subExif = val; continue; } // Exif sub IFD pointer
+        if (tag === 0x8825){ subGps = val; continue; }   // GPS IFD pointer
+        var name = dict[tag];
+        if (name) bucket[name] = val;
+        else bucket["Tag 0x" + tag.toString(16)] = val;
+      }
+      return { subExif:subExif, subGps:subGps };
+    }
+
+    var top = readIFD(ifd0Off, TAGS, result.ifd0);
+    if (top && top.subExif) readIFD(top.subExif, EXIF_TAGS, result.exif);
+    if (top && top.subGps) readIFD(top.subGps, GPS_TAGS, result.gps);
+
+    // Decode GPS into decimal degrees if present.
+    var g = result.gps;
+    if (g.GPSLatitude && g.GPSLongitude){
+      var lat = g.GPSLatitude, lon = g.GPSLongitude;
+      if (Array.isArray(lat) && lat.length === 3 && Array.isArray(lon) && lon.length === 3){
+        result.gpsDecimal = {
+          lat: dmsToDecimal(lat[0], lat[1], lat[2], g.GPSLatitudeRef || "N"),
+          lon: dmsToDecimal(lon[0], lon[1], lon[2], g.GPSLongitudeRef || "E")
+        };
+      }
+    }
+  }
+
+  // PNG: read tEXt / iTXt textual chunks (no EXIF GPS in classic PNG).
+  function readPNG(view){
+    var result = { type:"PNG", ifd0:{}, exif:{}, gps:{}, png:{} };
+    var off = 8, len = view.byteLength; // skip 8 byte signature
+    function str(o, n){ var s = ""; for (var i=0;i<n;i++) s += String.fromCharCode(view.getUint8(o+i)); return s; }
+    while (off + 8 <= len){
+      var clen = view.getUint32(off);
+      var ctype = str(off + 4, 4);
+      var dataOff = off + 8;
+      if (ctype === "tEXt" && dataOff + clen <= len){
+        var raw = str(dataOff, clen);
+        var nul = raw.indexOf(" ");
+        if (nul > -1) result.png[raw.slice(0, nul)] = raw.slice(nul + 1);
+      } else if (ctype === "tIME" && dataOff + 7 <= len){
+        var y = view.getUint16(dataOff);
+        result.png["Modification time"] = y + "-" + view.getUint8(dataOff+2) + "-" + view.getUint8(dataOff+3) +
+          " " + view.getUint8(dataOff+4) + ":" + view.getUint8(dataOff+5) + ":" + view.getUint8(dataOff+6);
+      }
+      if (ctype === "IEND") break;
+      off = dataOff + clen + 4; // data + 4 byte CRC
+    }
+    return result;
+  }
+
+  // ---- Rendering ----
+  function fmtVal(v){
+    if (Array.isArray(v)) return v.map(function(x){ return typeof x === "number" ? round(x) : x; }).join(", ");
+    if (typeof v === "number") return String(round(v));
+    return String(v);
+  }
+  function round(n){ return Math.round(n * 10000) / 10000; }
+
+  function tableRows(obj, labelMap){
+    var rows = "", keys = Object.keys(obj);
+    if (!keys.length) return "";
+    keys.forEach(function(k){
+      var label = (labelMap && labelMap[k]) || k;
+      var v = obj[k];
+      if (k === "Orientation" && ORIENT_TEXT[v]) v = v + " (" + ORIENT_TEXT[v] + ")";
+      rows += '<div class="r"><div class="k">'+esc(label)+'</div><div class="v">'+esc(fmtVal(v))+'</div></div>';
+    });
+    return rows;
+  }
+
+  function render(meta){
+    var html = "";
+
+    // Preview card
+    html += '<div class="preview-card">';
+    html += '<img src="'+state.url+'" alt="Your selected photo">';
+    html += '<div class="preview-meta"><h2>'+esc(state.file.name)+'</h2>';
+    html += '<p>'+esc(state.file.type || meta.type)+' &middot; '+fmtBytes(state.file.size)+'</p></div></div>';
+
+    // GPS alert (most important, shown first)
+    if (meta.gpsDecimal){
+      var d = meta.gpsDecimal;
+      html += '<div class="gps-alert">';
+      html += '<svg class="ic" viewBox="0 0 24 24" fill="none"><path d="M12 21s7-5.5 7-11a7 7 0 10-14 0c0 5.5 7 11 7 11z" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="10" r="2.5" stroke="currentColor" stroke-width="1.6"/></svg>';
+      html += '<div><h2>This photo reveals where it was taken</h2>';
+      html += '<p>The metadata contains GPS coordinates. Shared as is, this photo can point anyone to that exact spot. Use the cleaner below before you post it.</p>';
+      html += '<div class="coords">'+round(d.lat).toFixed(6)+', '+round(d.lon).toFixed(6)+'</div>';
+      html += '</div></div>';
+    }
+
+    var hasExif = Object.keys(meta.ifd0).length || Object.keys(meta.exif).length || Object.keys(meta.gps).length;
+    var hasPng = meta.png && Object.keys(meta.png).length;
+
+    if (!hasExif && !hasPng){
+      html += '<div class="decoded"><div class="seg"><h3>Metadata</h3><div class="none">No EXIF metadata found in this file. That is good for privacy. There is nothing embedded to reveal where or when it was taken.</div></div></div>';
+    } else {
+      if (Object.keys(meta.ifd0).length || Object.keys(meta.exif).length){
+        var combined = {};
+        Object.keys(meta.ifd0).forEach(function(k){ combined[k] = meta.ifd0[k]; });
+        Object.keys(meta.exif).forEach(function(k){ combined[k] = meta.exif[k]; });
+        html += '<div class="decoded"><div class="seg"><h3>Camera and capture metadata</h3><div class="tbl">'+tableRows(combined)+'</div></div></div>';
+      }
+      if (Object.keys(meta.gps).length){
+        html += '<div class="decoded"><div class="seg"><h3>GPS metadata</h3><div class="tbl">'+tableRows(meta.gps)+'</div></div></div>';
+      }
+      if (hasPng){
+        html += '<div class="decoded"><div class="seg"><h3>PNG text metadata</h3><div class="tbl">'+tableRows(meta.png)+'</div></div></div>';
+      }
+    }
+
+    // Scrub card
+    html += '<div class="scrub-card"><h2>Download a cleaned copy</h2>';
+    html += '<p>This re encodes your photo without the EXIF block, GPS coordinates, or other embedded metadata, and applies the orientation so the cleaned image is the right way up. Re encoding recompresses the pixels and drops the ICC color profile, so expect a very slight quality change. The original on your device is left untouched.</p>';
+    html += '<div class="row"><button class="primary" id="scrub">Clean and download</button>';
+    html += '<span class="hint" id="scrubhint">Re encoded in your browser only</span></div>';
+    html += '<div class="note" id="scrubnote" hidden></div></div>';
+
+    $("#results").innerHTML = html;
+    var sb = $("#scrub");
+    if (sb) sb.addEventListener("click", function(){ scrub(meta); });
+  }
+
+  // ---- Scrub: draw to canvas (applying orientation) then toBlob ----
+  function scrub(meta){
+    var note = $("#scrubnote");
+    var orient = (meta.ifd0 && meta.ifd0.Orientation) || 1;
+    if (typeof orient !== "number") orient = 1;
+    var img = new Image();
+    img.onload = function(){
+      var w = img.naturalWidth, h = img.naturalHeight;
+      var canvas = document.createElement("canvas");
+      var swap = (orient >= 5 && orient <= 8);
+      canvas.width = swap ? h : w;
+      canvas.height = swap ? w : h;
+      var ctx = canvas.getContext("2d");
+      switch (orient){
+        case 2: ctx.translate(w, 0); ctx.scale(-1, 1); break;
+        case 3: ctx.translate(w, h); ctx.rotate(Math.PI); break;
+        case 4: ctx.translate(0, h); ctx.scale(1, -1); break;
+        case 5: ctx.rotate(0.5 * Math.PI); ctx.scale(1, -1); break;
+        case 6: ctx.rotate(0.5 * Math.PI); ctx.translate(0, -h); break;
+        case 7: ctx.rotate(0.5 * Math.PI); ctx.translate(w, -h); ctx.scale(-1, 1); break;
+        case 8: ctx.rotate(-0.5 * Math.PI); ctx.translate(-w, 0); break;
+      }
+      ctx.drawImage(img, 0, 0);
+      var isPng = (state.file.type === "image/png" || meta.type === "PNG");
+      var mime = isPng ? "image/png" : "image/jpeg";
+      var ext = isPng ? "png" : "jpg";
+      var quality = isPng ? undefined : 0.92;
+      canvas.toBlob(function(blob){
+        if (!blob){ showNote(note, "Could not re encode this image in your browser. Try a JPEG or PNG."); return; }
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement("a");
+        var base = state.file.name.replace(/\.[^.]+$/, "");
+        a.href = url;
+        a.download = base + "-cleaned." + ext;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
+        showNote(note, "Cleaned copy downloaded as " + a.download + " (" + fmtBytes(blob.size) + "). The metadata and GPS coordinates are gone.");
+      }, mime, quality);
+    };
+    img.onerror = function(){ showNote(note, "Could not load this image for cleaning."); };
+    img.src = state.url;
+  }
+
+  function showNote(el, msg){ if (!el) return; el.textContent = msg; el.hidden = false; }
+
+  // ---- File handling ----
+  function handleFile(file){
+    if (!file){ return; }
+    if (!/^image\//.test(file.type) && !/\.(jpe?g|png)$/i.test(file.name)){
+      $("#results").innerHTML = '<div class="err">That does not look like an image file. Please choose a JPEG or PNG photo.</div>';
+      return;
+    }
+    if (state.url) URL.revokeObjectURL(state.url);
+    state.file = file;
+    state.url = URL.createObjectURL(file);
+    $("#clear").disabled = false;
+
+    var reader = new FileReader();
+    reader.onload = function(ev){
+      var meta;
+      try { meta = readEXIF(ev.target.result); }
+      catch (err){ meta = { error:"Could not parse this file: " + err.message }; }
+      if (meta.error){ $("#results").innerHTML = '<div class="err">'+esc(meta.error)+'</div>'; return; }
+      render(meta);
+      $("#results").scrollIntoView({ behavior:"smooth", block:"start" });
+    };
+    reader.onerror = function(){ $("#results").innerHTML = '<div class="err">Could not read this file.</div>'; };
+    reader.readAsArrayBuffer(file);
+  }
+
+  var drop = $("#drop"), input = $("#file");
+  drop.addEventListener("click", function(){ input.click(); });
+  drop.addEventListener("keydown", function(e){ if (e.key === "Enter" || e.key === " "){ e.preventDefault(); input.click(); } });
+  input.addEventListener("change", function(){ if (input.files && input.files[0]) handleFile(input.files[0]); });
+
+  ["dragenter","dragover"].forEach(function(ev){
+    drop.addEventListener(ev, function(e){ e.preventDefault(); drop.classList.add("over"); });
+  });
+  ["dragleave","drop"].forEach(function(ev){
+    drop.addEventListener(ev, function(e){ e.preventDefault(); drop.classList.remove("over"); });
+  });
+  drop.addEventListener("drop", function(e){
+    var dt = e.dataTransfer;
+    if (dt && dt.files && dt.files[0]) handleFile(dt.files[0]);
+  });
+
+  $("#clear").addEventListener("click", function(){
+    if (state.url) URL.revokeObjectURL(state.url);
+    state.url = null; state.file = null;
+    input.value = "";
+    $("#clear").disabled = true;
+    $("#results").innerHTML = '<div class="empty">Your photo\'s metadata and a cleaned download will appear here.</div>';
+  });
+})();
+</script>
+</body>
+</html>

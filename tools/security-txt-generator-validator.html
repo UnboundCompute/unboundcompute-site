@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>security.txt Generator and Validator (RFC 9116) | UnboundCompute</title>
+<meta name="description" content="Build a well formed security.txt file or validate an existing one against RFC 9116. Checks required Contact and Expires fields, catches an expired file, flags plain http URLs, and notes a missing PGP signature. Runs fully in your browser." />
+<meta name="keywords" content="security.txt generator, security.txt validator, rfc 9116, vulnerability disclosure, well-known security.txt, security contact file, responsible disclosure" />
+<meta name="robots" content="index, follow" />
+<meta name="author" content="UnboundCompute" />
+<meta name="theme-color" content="#0a0a0b" />
+<link rel="canonical" href="https://unboundcompute.com/tools/security-txt-generator-validator.html" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a0a0b'/%3E%3Cline x1='16' y1='4' x2='16' y2='28' stroke='%23fb5b46' stroke-width='2' stroke-dasharray='3 3'/%3E%3Ccircle cx='16' cy='16' r='3.4' fill='%23fb5b46'/%3E%3C/svg%3E" />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="UnboundCompute" />
+<meta property="og:title" content="security.txt Generator and Validator (RFC 9116)" />
+<meta property="og:description" content="Build or validate a security.txt file against RFC 9116. Runs fully in your browser, nothing is sent to any server." />
+<meta property="og:url" content="https://unboundcompute.com/tools/security-txt-generator-validator.html" />
+<meta property="og:image" content="https://unboundcompute.com/og.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="security.txt Generator and Validator (RFC 9116)" />
+<meta name="twitter:description" content="Build or validate a security.txt file against RFC 9116. Runs fully in your browser." />
+<meta name="twitter:image" content="https://unboundcompute.com/og.png" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "security.txt Generator and Validator (RFC 9116)",
+      "applicationCategory": "SecurityApplication",
+      "operatingSystem": "Web",
+      "browserRequirements": "Requires JavaScript. Runs entirely client side.",
+      "url": "https://unboundcompute.com/tools/security-txt-generator-validator.html",
+      "description": "A free tool that generates a well formed security.txt file and validates an existing one against RFC 9116. It enforces the required Contact and Expires fields, flags a file that has already expired, warns on plain http URLs where https is expected, notes unknown field names, and reports whether a PGP signature is present. All processing happens in the browser.",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "publisher": { "@type": "Organization", "name": "UnboundCompute", "url": "https://unboundcompute.com/" }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is a security.txt file?",
+          "acceptedAnswer": { "@type": "Answer", "text": "A security.txt file is a small plain text file that tells security researchers how to report a vulnerability in your site. It lives at the well known path /.well-known/security.txt and lists at minimum a Contact and an Expires field. The format is defined by RFC 9116. The idea is that a researcher who finds a bug can read one predictable file instead of hunting through your site for a way to reach your security team." }
+        },
+        {
+          "@type": "Question",
+          "name": "Does this generator or validator send my file anywhere?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. The file you build or paste is generated and checked entirely in your browser with JavaScript. Nothing you enter is uploaded, logged, or sent to any server. You can prepare or audit a file for an internal or unreleased system without it ever leaving your machine." }
+        },
+        {
+          "@type": "Question",
+          "name": "Why does the Expires field matter so much?",
+          "acceptedAnswer": { "@type": "Answer", "text": "RFC 9116 makes Expires a required field and says a file past its Expires date should not be relied on. An expired file is a common and quiet failure: the contact may be stale, the policy may have moved, and a researcher may assume the whole file is abandoned. This tool calls out an expired file prominently so you catch it before a researcher does. Set Expires to a future date and put a reminder in your calendar to refresh it." }
+        },
+        {
+          "@type": "Question",
+          "name": "Where do I put the security.txt file and how should I serve it?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Serve it over HTTPS at https://your-domain/.well-known/security.txt. A legacy location at the site root is also tolerated, but the well known path is the canonical one. The Canonical field, if you set it, should point at that same HTTPS URL. Where the file lists a Contact or links to a policy, those URLs should also be HTTPS so a researcher is not steered to a plain text page an attacker could tamper with." }
+        },
+        {
+          "@type": "Question",
+          "name": "Should the file be PGP signed?",
+          "acceptedAnswer": { "@type": "Answer", "text": "RFC 9116 recommends signing the file with an OpenPGP cleartext signature so a reader can confirm it was not altered, and linking the signing key with an Encryption field. Signing is advisory, not required, and this tool does not verify a signature because that needs your key and the key never belongs in a web page. The validator only notes whether a signature block appears to be present." }
+        }
+      ]
+    }
+  ]
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600&family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0a0b; --bg-2:#070708; --panel:#0e0e10; --panel-2:#131315;
+    --ink:#f4f2ec; --ink-hi:#fbf9f3; --ink-soft:#9b988f; --ink-faint:#5e5b54;
+    --line:rgba(244,242,236,.13); --line-2:rgba(244,242,236,.07);
+    --accent:#fb5b46; --accent-2:#ff7d6b; --accent-wash:rgba(251,91,70,.12); --on-accent:#1a0c09; --accent-line:rgba(251,91,70,.42);
+    --pass:#5fd6a4; --pass-wash:rgba(95,214,164,.1); --warn:#e8b04b; --warn-wash:rgba(232,176,75,.1); --fail:#fb5b46; --fail-wash:rgba(251,91,70,.1); --info:#7c93ff; --info-wash:rgba(124,147,255,.1);
+    --serif:'Newsreader',Georgia,serif; --mono:'JetBrains Mono',ui-monospace,monospace; --sans:'Inter',system-ui,sans-serif;
+    --maxw:920px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;line-height:1.6}
+  ::selection{background:var(--accent);color:var(--on-accent)}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+
+  nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);background:rgba(10,10,11,.72);border-bottom:1px solid var(--line-2)}
+  nav .wrap{height:64px;display:flex;align-items:center;justify-content:space-between}
+  nav a.brand{display:flex;align-items:center;gap:11px;font-family:var(--mono);font-weight:600;font-size:15px;color:var(--ink);letter-spacing:-.01em}
+  nav a.brand:hover{text-decoration:none}
+  nav .badge{width:27px;height:27px;border-radius:7px;border:1px solid var(--accent-line);display:grid;place-items:center}
+  nav a.cta{font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:9px 16px;border-radius:8px;background:var(--accent);color:var(--on-accent)}
+  nav a.cta:hover{filter:brightness(1.08);text-decoration:none}
+
+  header.hero{padding:64px 0 28px}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:18px}
+  h1{font-family:var(--serif);font-weight:400;font-size:clamp(32px,5vw,52px);line-height:1.08;letter-spacing:-.015em;color:var(--ink-hi)}
+  .lede{margin-top:18px;font-size:18px;color:var(--ink-soft);max-width:680px}
+  .privacy{margin-top:18px;display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);border:1px solid var(--line);border-radius:8px;padding:8px 13px;background:var(--panel)}
+  .privacy svg{width:14px;height:14px;flex:none}
+
+  .modes{display:flex;gap:8px;margin:30px 0 0}
+  .modes button{font-family:var(--mono);font-size:12.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;padding:11px 20px;border-radius:9px 9px 0 0;cursor:pointer;border:1px solid var(--line);border-bottom:none;background:var(--bg-2);color:var(--ink-soft);transition:color .15s,background .15s}
+  .modes button.on{background:var(--panel);color:var(--ink-hi);border-color:var(--line)}
+  .modes button:hover{color:var(--ink-hi)}
+
+  .tool{background:var(--panel);border:1px solid var(--line);border-radius:0 16px 16px 16px;padding:22px}
+  label.fld{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:10px}
+  .fld .req{color:var(--accent);margin-left:4px}
+  .fld .opt{color:var(--ink-faint);margin-left:6px;text-transform:none;letter-spacing:0}
+  input,textarea{width:100%;background:var(--bg-2);border:1px solid var(--line);border-radius:11px;padding:13px 15px;color:var(--ink);font-family:var(--mono);font-size:13.5px;line-height:1.55;outline:none;transition:border-color .2s,box-shadow .2s}
+  textarea{min-height:240px;resize:vertical;word-break:break-all}
+  input:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-wash)}
+  input::placeholder,textarea::placeholder{color:var(--ink-faint)}
+  .field{margin-bottom:18px}
+  .desc{font-family:var(--mono);font-size:11.5px;color:var(--ink-faint);margin-top:7px}
+  .multi{display:flex;flex-direction:column;gap:9px}
+  .multi-row{display:flex;gap:9px;align-items:center}
+  .multi-row input{flex:1}
+  .icon-btn{font-family:var(--mono);font-size:16px;font-weight:600;width:44px;height:44px;flex:none;border-radius:9px;cursor:pointer;border:1px solid var(--line);background:transparent;color:var(--ink-soft);display:grid;place-items:center;transition:border-color .15s,color .15s}
+  .icon-btn:hover{border-color:var(--accent-line);color:var(--ink-hi)}
+  .add-row{font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:9px 14px;border-radius:8px;cursor:pointer;border:1px dashed var(--line);background:transparent;color:var(--ink-soft);margin-top:9px;align-self:flex-start;transition:border-color .15s,color .15s}
+  .add-row:hover{border-color:var(--accent-line);color:var(--ink-hi)}
+
+  .row{display:flex;gap:11px;flex-wrap:wrap;margin-top:14px;align-items:center}
+  button.act{font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;padding:13px 22px;border-radius:9px;cursor:pointer;border:1px solid var(--line);background:transparent;color:var(--ink);transition:filter .15s,border-color .15s,background .15s}
+  button.primary{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+  button.primary:hover{filter:brightness(1.08)}
+  button.ghost:hover{border-color:var(--accent-line);color:var(--ink-hi)}
+  .hint{font-family:var(--mono);font-size:12px;color:var(--ink-faint);margin-left:auto}
+
+  .output{margin-top:20px}
+  .output h3{font-family:var(--mono);font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+  .output pre{font-family:var(--mono);font-size:13.5px;line-height:1.7;color:var(--ink);background:var(--bg-2);border:1px solid var(--line);border-radius:13px;padding:16px 18px;white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere}
+  .serve-note{margin-top:13px;font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);border:1px solid var(--line-2);border-radius:10px;padding:12px 14px;background:var(--panel-2);line-height:1.65}
+  .serve-note code{background:var(--bg-2);border:1px solid var(--line-2);border-radius:5px;padding:1px 6px;color:var(--ink)}
+
+  .summary{display:flex;align-items:center;gap:22px;background:var(--panel-2);border:1px solid var(--line);border-radius:16px;padding:22px 24px;margin:20px 0}
+  .verdict{font-family:var(--serif);font-size:46px;line-height:1;width:96px;height:96px;border-radius:18px;display:grid;place-items:center;flex:none;border:1.5px solid;text-align:center}
+  .verdict.ok{color:var(--pass);border-color:var(--pass);background:var(--pass-wash)}
+  .verdict.bad{color:var(--fail);border-color:var(--fail);background:var(--fail-wash)}
+  .verdict.warnv{color:var(--warn);border-color:var(--warn);background:var(--warn-wash)}
+  .summary-meta h2{font-family:var(--serif);font-weight:400;font-size:24px;color:var(--ink-hi);margin-bottom:4px}
+  .summary-meta p{color:var(--ink-soft);font-size:14.5px}
+
+  .expired-banner{display:flex;align-items:flex-start;gap:14px;border:1.5px solid var(--fail);background:var(--fail-wash);border-radius:14px;padding:18px 20px;margin:20px 0}
+  .expired-banner .mark{font-family:var(--serif);font-size:26px;color:var(--fail);flex:none;line-height:1.1}
+  .expired-banner h3{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--ink-hi);letter-spacing:-.01em;text-transform:uppercase}
+  .expired-banner p{margin-top:6px;font-size:14.5px;color:var(--ink)}
+
+  .checks{display:flex;flex-direction:column;gap:11px;margin-top:8px}
+  .check{border:1px solid var(--line);border-radius:13px;padding:16px 18px;background:var(--panel)}
+  .check .top{display:flex;align-items:flex-start;gap:13px}
+  .dot{width:20px;height:20px;border-radius:6px;flex:none;display:grid;place-items:center;font-size:13px;font-weight:700;margin-top:1px}
+  .dot.pass{background:var(--pass-wash);color:var(--pass)}
+  .dot.warn{background:var(--warn-wash);color:var(--warn)}
+  .dot.fail{background:var(--fail-wash);color:var(--fail)}
+  .dot.info{background:var(--info-wash);color:var(--info)}
+  .check h3{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--ink-hi);letter-spacing:-.01em}
+  .check .finding{margin-top:5px;font-size:14.5px;color:var(--ink)}
+  .check .why{margin-top:9px;font-size:13.5px;color:var(--ink-soft)}
+  .check .rule{margin-top:9px;font-size:12.5px;color:var(--ink-soft);font-family:var(--mono);background:var(--bg-2);border:1px solid var(--line-2);border-radius:8px;padding:9px 11px}
+  .check .rule b{color:var(--ink)}
+  .empty{color:var(--ink-faint);font-family:var(--mono);font-size:13px;text-align:center;padding:30px}
+
+  .prose{padding:44px 0 20px}
+  .prose h2{font-family:var(--serif);font-weight:400;font-size:30px;color:var(--ink-hi);margin:36px 0 14px;letter-spacing:-.01em}
+  .prose h3{font-family:var(--mono);font-size:15px;color:var(--ink-hi);margin:24px 0 8px}
+  .prose p{color:var(--ink-soft);margin-bottom:14px;font-size:16px}
+  .prose ul{color:var(--ink-soft);margin:0 0 14px 20px;font-size:16px}
+  .prose li{margin-bottom:7px}
+  .prose code{font-family:var(--mono);font-size:13.5px;background:var(--panel-2);border:1px solid var(--line-2);border-radius:5px;padding:1px 6px;color:var(--ink)}
+  .related{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:8px}
+  .related a{display:block;border:1px solid var(--line);border-radius:11px;padding:14px 16px;color:var(--ink);font-size:14.5px;background:var(--panel)}
+  .related a:hover{border-color:var(--accent-line);text-decoration:none}
+  .related a span{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:5px}
+
+  footer{border-top:1px solid var(--line-2);margin-top:40px;padding:30px 0;color:var(--ink-faint);font-family:var(--mono);font-size:12.5px}
+  footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px}
+  footer a{color:var(--ink-soft)}
+  @media (max-width:560px){
+    .related{grid-template-columns:1fr}
+    .summary{flex-direction:column;align-items:flex-start;gap:16px}
+    .hint{margin-left:0;width:100%}
+  }
+</style>
+</head>
+<body>
+
+<nav><div class="wrap">
+  <a class="brand" href="https://unboundcompute.com/">
+    <span class="badge"><svg viewBox="0 0 24 24" fill="none" style="width:15px;height:15px"><line x1="12" y1="3" x2="12" y2="21" stroke="var(--accent)" stroke-width="1.8" stroke-dasharray="2.6 2.6"/><circle cx="12" cy="12" r="3" fill="var(--accent)"/></svg></span>
+    UnboundCompute
+  </a>
+  <a class="cta" href="https://unboundcompute.com/#cta">Request access</a>
+</div></nav>
+
+<header class="hero"><div class="wrap">
+  <div class="eyebrow">Free tool</div>
+  <h1>security.txt Generator and Validator</h1>
+  <p class="lede">Build a well formed <code>security.txt</code> file or audit one you already serve, both against RFC 9116. The validator enforces the required Contact and Expires fields, calls out a file that has already expired, flags plain http where https belongs, and notes whether the file is PGP signed.</p>
+  <div class="privacy">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6l8-4z" stroke="var(--accent)" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Everything runs in your browser. Nothing you enter is sent to any server.
+  </div>
+</div></header>
+
+<div class="wrap">
+  <div class="modes">
+    <button id="tabGen" class="on">Generator</button>
+    <button id="tabVal">Validator</button>
+  </div>
+
+  <!-- GENERATOR -->
+  <div class="tool" id="genTool">
+    <div class="field">
+      <label class="fld">Contact<span class="req">required</span><span class="opt">one or more</span></label>
+      <div class="multi" id="contacts">
+        <div class="multi-row"><input class="ct" spellcheck="false" placeholder="mailto:security@acme.example"><button class="icon-btn rm" title="Remove">&minus;</button></div>
+      </div>
+      <button class="add-row" id="addContact">Add contact</button>
+      <div class="desc">Use <code>mailto:</code>, an <code>https://</code> form, or <code>tel:</code>. List the most preferred first.</div>
+    </div>
+
+    <div class="field">
+      <label class="fld" for="expDate">Expires<span class="req">required</span><span class="opt">future date and time</span></label>
+      <input type="datetime-local" id="expDate">
+      <div class="desc">Pick a future moment. It is written out as an ISO 8601 timestamp in UTC, for example <code>2027-01-31T23:59:59Z</code>.</div>
+    </div>
+
+    <div class="field">
+      <label class="fld" for="enc">Encryption<span class="opt">optional</span></label>
+      <input id="enc" spellcheck="false" placeholder="https://acme.example/.well-known/pgp-key.txt">
+      <div class="desc">A URL to your OpenPGP key, not the key bytes themselves.</div>
+    </div>
+
+    <div class="field">
+      <label class="fld" for="ack">Acknowledgments<span class="opt">optional</span></label>
+      <input id="ack" spellcheck="false" placeholder="https://acme.example/security/thanks">
+      <div class="desc">A page that credits researchers who have reported issues.</div>
+    </div>
+
+    <div class="field">
+      <label class="fld" for="langs">Preferred-Languages<span class="opt">optional</span></label>
+      <input id="langs" spellcheck="false" placeholder="en, fr, de">
+      <div class="desc">A comma list of language tags. Order carries no preference meaning.</div>
+    </div>
+
+    <div class="field">
+      <label class="fld" for="canon">Canonical<span class="opt">optional</span></label>
+      <input id="canon" spellcheck="false" placeholder="https://acme.example/.well-known/security.txt">
+      <div class="desc">The HTTPS URL where this exact file is served.</div>
+    </div>
+
+    <div class="field">
+      <label class="fld" for="policy">Policy<span class="opt">optional</span></label>
+      <input id="policy" spellcheck="false" placeholder="https://acme.example/security/policy">
+      <div class="desc">A page describing how you want vulnerabilities reported.</div>
+    </div>
+
+    <div class="field">
+      <label class="fld" for="hiring">Hiring<span class="opt">optional</span></label>
+      <input id="hiring" spellcheck="false" placeholder="https://acme.example/careers/security">
+      <div class="desc">A link to security roles you are recruiting for.</div>
+    </div>
+
+    <div class="row">
+      <button class="act primary" id="genBtn">Generate file</button>
+      <button class="act ghost" id="genExample">Load example</button>
+      <button class="act ghost" id="genClear">Clear</button>
+      <span class="hint">Nothing leaves this page</span>
+    </div>
+
+    <div id="genOut"></div>
+  </div>
+
+  <!-- VALIDATOR -->
+  <div class="tool" id="valTool" style="display:none">
+    <label class="fld" for="valInput">Paste an existing security.txt</label>
+    <textarea id="valInput" spellcheck="false" placeholder="Contact: mailto:security@acme.example&#10;Expires: 2027-01-31T23:59:59Z&#10;Canonical: https://acme.example/.well-known/security.txt&#10;&#10;The file is checked locally against RFC 9116. Nothing is sent anywhere."></textarea>
+    <div class="row">
+      <button class="act primary" id="valBtn">Validate</button>
+      <button class="act ghost" id="exValid">Load valid example</button>
+      <button class="act ghost" id="exExpired">Load expired example</button>
+      <button class="act ghost" id="valClear">Clear</button>
+      <span class="hint">Checked in your browser</span>
+    </div>
+    <div id="valOut"><div class="empty">Your validation report will appear here.</div></div>
+  </div>
+</div>
+
+<div class="wrap prose">
+  <h2>What a security.txt file is for</h2>
+  <p>A <code>security.txt</code> file is a small plain text file that answers one question for a security researcher: how do I report a problem to you. It lives at a predictable path, <code>/.well-known/security.txt</code>, so a researcher who finds a bug does not have to dig through your site for a contact. The format is standardized by <a href="https://www.rfc-editor.org/rfc/rfc9116" rel="noopener" target="_blank">RFC 9116</a>. The file is a list of <code>Name: value</code> lines, one per line, and a field may appear more than once where that makes sense, such as several Contact lines.</p>
+
+  <h3>The two required fields</h3>
+  <p>RFC 9116 requires exactly two things. There must be at least one <code>Contact</code> field, and there must be exactly one <code>Expires</code> field holding a single ISO 8601 timestamp. Contact tells a researcher where to reach you, by email with <code>mailto:</code>, by a web form over <code>https://</code>, or by phone with <code>tel:</code>. Expires states the moment after which the file should no longer be trusted, which keeps a stale file from quietly misdirecting reports for years.</p>
+
+  <h3>Why the expiry check is the one that bites</h3>
+  <p>The differentiator in the validator is the expiry check. A file whose <code>Expires</code> date is in the past is, by the letter of the standard, a file that should not be relied on. The trouble is that nothing breaks visibly when it lapses: the page still loads, the contact line still reads fine, and only a careful researcher notices the date has passed. That is exactly the kind of slow drift a security program is supposed to catch. The validator surfaces an expired file as a prominent, unmissable error rather than a quiet footnote, so you fix it before it costs you a report.</p>
+
+  <h3>The optional fields</h3>
+  <p>Beyond the two required fields, the standard defines several optional ones. <code>Encryption</code> points at your OpenPGP key so a reporter can send you an encrypted message. <code>Acknowledgments</code> links a page that credits past reporters. <code>Preferred-Languages</code> is a comma list of language tags. <code>Canonical</code> states the HTTPS URL where the file itself lives, which lets a reader confirm they are looking at the genuine file. <code>Policy</code> links your disclosure policy, and <code>Hiring</code> links security roles. Each is a single value per line, and the generator writes them in a sensible order.</p>
+
+  <h3>Serving it correctly</h3>
+  <p>A generated file is only useful once it is served the right way. Put it at <code>https://your-domain/.well-known/security.txt</code> and serve it over HTTPS so it cannot be tampered with in transit. Where the file lists a Contact URL or links to a Policy, those should be HTTPS too, otherwise you steer a researcher toward a plain text page an attacker on the path could rewrite. The standard also recommends signing the file with an OpenPGP cleartext signature so a reader can confirm it was not altered. Signing is advisory, and this tool never asks for your key, so it only reports whether a signature block looks present.</p>
+
+  <h2>How to read the report</h2>
+  <p>The validator parses each line, splits it on the first colon into a field name and a value, and checks the result against RFC 9116. A failed required field is an error. A plain <code>http://</code> URL where <code>https://</code> is expected is a warning, as is a field name the standard does not define or one whose casing is off. A missing signature is advisory. A file that has already expired is the loud one. This tool reads structure and dates, it does not fetch your site or verify any signature, because verifying a signature needs the key and the key never belongs in a page like this. For the wider picture of how a disclosure path fits into a security program, the <a href="https://security.unboundcompute.com/what-is-web-application-security/" rel="noopener">web application security</a> guide and the <a href="https://security.unboundcompute.com/ai-security-testing/" rel="noopener">AI security testing</a> writing go deeper than a single file can.</p>
+
+  <h2>Related reading</h2>
+  <div class="related">
+    <a href="https://security.unboundcompute.com/what-is-web-application-security/"><span>Guide</span>What is web application security</a>
+    <a href="https://security.unboundcompute.com/ai-security-testing/"><span>Guide</span>AI security testing</a>
+    <a href="https://security.unboundcompute.com/web-security-glossary/"><span>Reference</span>Web security glossary</a>
+    <a href="https://security.unboundcompute.com/category/access-control/"><span>Topic</span>Access control writing</a>
+  </div>
+
+  <h2>More free tools</h2>
+  <div class="related">
+    <a href="https://unboundcompute.com/tools/security-headers-analyzer.html"><span>Free tool</span>Security Headers and CSP Analyzer</a>
+    <a href="https://unboundcompute.com/tools/subdomain-takeover-checker.html"><span>Free tool</span>Subdomain Takeover Fingerprint Checker</a>
+    <a href="https://unboundcompute.com/tools/cookie-security-auditor.html"><span>Free tool</span>Cookie Security Auditor</a>
+    <a href="https://unboundcompute.com/tools/"><span>All tools</span>The free security tools hub</a>
+  </div>
+</div>
+
+<footer><div class="wrap">
+  <div>Built by <a href="https://unboundcompute.com/">UnboundCompute</a>, autonomous security research for web apps and APIs.</div>
+  <div><a href="https://unboundcompute.com/#cta">Request access</a></div>
+</div></footer>
+
+<script>
+(function(){
+  "use strict";
+  var $ = function(s){ return document.querySelector(s); };
+  var $$ = function(s){ return Array.prototype.slice.call(document.querySelectorAll(s)); };
+
+  function esc(s){ return String(s).replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];}); }
+
+  /* ---------- shared knowledge ---------- */
+  // Canonical field names from RFC 9116, in the order the generator emits them.
+  var KNOWN = ["Contact","Expires","Encryption","Acknowledgments","Preferred-Languages","Canonical","Policy","Hiring"];
+  var KNOWN_LC = {};
+  KNOWN.forEach(function(n){ KNOWN_LC[n.toLowerCase()] = n; });
+
+  /* ===================================================================
+     GENERATOR
+     =================================================================== */
+  function contactRows(){ return $$("#contacts .multi-row"); }
+
+  function newContactRow(value){
+    var row = document.createElement("div");
+    row.className = "multi-row";
+    var inp = document.createElement("input");
+    inp.className = "ct"; inp.spellcheck = false;
+    inp.placeholder = "mailto:security@acme.example";
+    if (value) inp.value = value;
+    var btn = document.createElement("button");
+    btn.className = "icon-btn rm"; btn.title = "Remove"; btn.innerHTML = "&minus;";
+    btn.addEventListener("click", function(){ if (contactRows().length > 1) row.remove(); else inp.value=""; });
+    row.appendChild(inp); row.appendChild(btn);
+    return row;
+  }
+
+  function toIsoZ(localValue){
+    // datetime-local gives "YYYY-MM-DDTHH:MM" (local time). Convert to UTC ISO with Z.
+    if (!localValue) return "";
+    var d = new Date(localValue);
+    if (isNaN(d.getTime())) return "";
+    return d.toISOString().replace(/\.\d{3}Z$/,"Z");
+  }
+
+  function buildFile(){
+    var lines = [];
+    var warns = [];
+    contactRows().forEach(function(r){
+      var v = r.querySelector("input").value.trim();
+      if (v) lines.push("Contact: " + v);
+    });
+    if (!lines.length) warns.push("Add at least one Contact. RFC 9116 requires it.");
+
+    var iso = toIsoZ($("#expDate").value);
+    if (iso){
+      lines.push("Expires: " + iso);
+      if (new Date(iso).getTime() <= Date.now()) warns.push("The Expires date you picked is not in the future. Choose a later moment.");
+    } else {
+      warns.push("Set an Expires date. RFC 9116 requires it.");
+    }
+
+    var single = [["Encryption","#enc"],["Acknowledgments","#ack"],["Preferred-Languages","#langs"],["Canonical","#canon"],["Policy","#policy"],["Hiring","#hiring"]];
+    single.forEach(function(pair){
+      var v = $(pair[1]).value.trim();
+      if (v) lines.push(pair[0] + ": " + v);
+    });
+
+    return { body: lines.join("\n") + "\n", warns: warns };
+  }
+
+  function renderGen(){
+    var out = buildFile();
+    var html = "";
+    if (out.warns.length){
+      html += '<div class="checks">';
+      out.warns.forEach(function(w){
+        html += '<div class="check"><div class="top"><span class="dot warn">!</span><div style="flex:1"><div class="finding">'+esc(w)+'</div></div></div></div>';
+      });
+      html += '</div>';
+    }
+    html += '<div class="output"><h3>security.txt</h3><pre id="genFile">'+esc(out.body)+'</pre>';
+    html += '<div class="row"><button class="act primary" id="copyBtn">Copy file</button>'
+         +  '<button class="act ghost" id="dlBtn">Download</button>'
+         +  '<span class="hint" id="copyHint">Serve over HTTPS</span></div>';
+    html += '<div class="serve-note">Save this as <code>security.txt</code> and serve it at <code>https://example/.well-known/security.txt</code> over HTTPS. A copy at the site root is tolerated, but the well known path is canonical. For tamper evidence, sign the file with an OpenPGP cleartext signature and link the key with an <code>Encryption</code> field.</div>';
+    html += '</div>';
+    $("#genOut").innerHTML = html;
+
+    $("#copyBtn").addEventListener("click", function(){
+      var txt = out.body;
+      var done = function(){ var h=$("#copyHint"); h.textContent="Copied"; setTimeout(function(){h.textContent="Serve over HTTPS";},1500); };
+      if (navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(done, function(){ fallbackCopy(txt); done(); }); }
+      else { fallbackCopy(txt); done(); }
+    });
+    $("#dlBtn").addEventListener("click", function(){
+      var blob = new Blob([out.body], {type:"text/plain"});
+      var a = document.createElement("a");
+      a.href = URL.createObjectURL(blob); a.download = "security.txt";
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1000);
+    });
+  }
+
+  function fallbackCopy(txt){
+    var ta = document.createElement("textarea");
+    ta.value = txt; ta.style.position="fixed"; ta.style.opacity="0";
+    document.body.appendChild(ta); ta.select();
+    try{ document.execCommand("copy"); }catch(e){}
+    ta.remove();
+  }
+
+  function loadGenExample(){
+    var box = $("#contacts");
+    box.innerHTML = "";
+    box.appendChild(newContactRow("mailto:security@acme.example"));
+    box.appendChild(newContactRow("https://acme.example/security/report"));
+    // a future date two years out, written in UTC for the datetime-local input
+    var d = new Date(); d.setFullYear(d.getFullYear()+2);
+    var pad = function(n){ return (n<10?"0":"")+n; };
+    $("#expDate").value = d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())+"T"+pad(d.getHours())+":"+pad(d.getMinutes());
+    $("#enc").value = "https://acme.example/.well-known/pgp-key.txt";
+    $("#ack").value = "https://acme.example/security/thanks";
+    $("#langs").value = "en, fr";
+    $("#canon").value = "https://acme.example/.well-known/security.txt";
+    $("#policy").value = "https://acme.example/security/policy";
+    $("#hiring").value = "https://acme.example/careers/security";
+    renderGen();
+  }
+
+  function clearGen(){
+    var box = $("#contacts"); box.innerHTML=""; box.appendChild(newContactRow(""));
+    ["#expDate","#enc","#ack","#langs","#canon","#policy","#hiring"].forEach(function(s){ $(s).value=""; });
+    $("#genOut").innerHTML = "";
+  }
+
+  /* ===================================================================
+     VALIDATOR
+     =================================================================== */
+
+  // Strict ISO 8601 timestamp with an offset (Z or +-hh:mm). RFC 9116 points at
+  // the Internet date/time format, which requires an explicit timezone.
+  var ISO_RE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2})$/;
+
+  function parseFile(text){
+    var contacts = [], fields = [], expires = [], unknown = [], formatErrs = [], casing = [];
+    var hasSig = /-----BEGIN PGP SIGNED MESSAGE-----/.test(text) || /-----BEGIN PGP SIGNATURE-----/.test(text);
+    var rawLines = text.split(/\r?\n/);
+    rawLines.forEach(function(line, idx){
+      var t = line.replace(/\s+$/,"");
+      if (t === "") return;                      // blank
+      if (/^#/.test(t)) return;                  // comment
+      if (/^-----(BEGIN|END) PGP/.test(t)) return; // signature framing
+      if (/^Hash:\s/i.test(t) && hasSig) return; // signature header
+      var ci = t.indexOf(":");
+      if (ci < 0){
+        formatErrs.push("Line "+(idx+1)+' is not a "Name: value" pair: '+JSON.stringify(t.slice(0,60)));
+        return;
+      }
+      var name = t.slice(0,ci).trim();
+      var value = t.slice(ci+1).trim();
+      if (!/^[A-Za-z-]+$/.test(name)){
+        formatErrs.push("Line "+(idx+1)+' has an unusual field name: '+JSON.stringify(name));
+        return;
+      }
+      var canonical = KNOWN_LC[name.toLowerCase()];
+      if (canonical){
+        if (canonical !== name) casing.push({line:idx+1, got:name, want:canonical});
+        if (canonical === "Contact") contacts.push(value);
+        if (canonical === "Expires") expires.push(value);
+        fields.push({name:canonical, value:value, line:idx+1});
+      } else {
+        unknown.push({name:name, line:idx+1});
+        fields.push({name:name, value:value, line:idx+1});
+      }
+    });
+    return { fields:fields, contacts:contacts, expires:expires, unknown:unknown, formatErrs:formatErrs, casing:casing, hasSig:hasSig };
+  }
+
+  function isHttp(v){ return /^http:\/\//i.test(v); }
+
+  function buildChecks(p){
+    var checks = [];
+    var expired = false;
+
+    // Contact (required, >= 1)
+    if (!p.contacts.length){
+      checks.push({s:"fail",h:"Contact is missing",f:"No Contact field was found. RFC 9116 requires at least one.",rule:"RFC 9116: the Contact field is REQUIRED, and there must be at least one.",why:"Without a Contact line a researcher has no defined way to reach you, which is the whole point of the file."});
+    } else {
+      var badContact = [];
+      p.contacts.forEach(function(v){
+        if (!/^(mailto:|tel:|https:\/\/|http:\/\/)/i.test(v)) badContact.push(v);
+      });
+      var httpContact = p.contacts.filter(isHttp);
+      if (badContact.length){
+        checks.push({s:"warn",h:"Contact value format",f:"A Contact value does not start with mailto:, tel:, or an https URL: "+esc(badContact.join("; "))+".",rule:"RFC 9116: a Contact value should be a URI such as a mailto, tel, or https address.",why:"A reader and any tooling expect a URI scheme so the contact can be acted on directly."});
+      } else if (httpContact.length){
+        checks.push({s:"warn",h:"Contact over plain http",f:"A Contact URL uses plain http: "+esc(httpContact.join("; "))+". Use https so the reporting path cannot be tampered with.",rule:"RFC 9116: web URIs in the file should use https.",why:"A plain http contact page can be rewritten by anyone on the network path, steering a report to an attacker."});
+      } else {
+        checks.push({s:"pass",h:"Contact present",f:"Found "+p.contacts.length+" Contact "+(p.contacts.length===1?"entry":"entries")+", all using a valid scheme.",rule:"RFC 9116: Contact is REQUIRED and at least one is present.",why:"A reachable contact is the minimum a disclosure file has to provide."});
+      }
+    }
+
+    // Expires (required, single, valid ISO 8601, in the future)
+    if (!p.expires.length){
+      checks.push({s:"fail",h:"Expires is missing",f:"No Expires field was found. RFC 9116 requires exactly one.",rule:"RFC 9116: the Expires field is REQUIRED and must appear exactly once.",why:"Without an expiry, a stale file can keep misdirecting reports indefinitely."});
+    } else if (p.expires.length > 1){
+      checks.push({s:"fail",h:"Expires appears more than once",f:"The Expires field is present "+p.expires.length+" times. It must appear exactly once.",rule:"RFC 9116: Expires MUST NOT appear more than once.",why:"Multiple expiry values are ambiguous, so a reader cannot tell which date governs the file."});
+    } else {
+      var raw = p.expires[0];
+      if (!ISO_RE.test(raw)){
+        checks.push({s:"fail",h:"Expires is not a valid timestamp",f:"The Expires value "+esc(JSON.stringify(raw))+" is not a valid ISO 8601 timestamp with a timezone.",rule:"RFC 9116: Expires must be a single timestamp in the Internet date/time format, for example 2027-01-31T23:59:59Z.",why:"A loosely formatted date may be parsed inconsistently, which can let an expired file look current."});
+      } else {
+        var when = new Date(raw).getTime();
+        if (isNaN(when)){
+          checks.push({s:"fail",h:"Expires is not a real date",f:"The Expires value "+esc(JSON.stringify(raw))+" parses to an invalid date.",rule:"RFC 9116: Expires must be a valid Internet date/time value.",why:"An unparseable date is effectively no expiry at all."});
+        } else if (when <= Date.now()){
+          expired = true;
+          checks.push({s:"fail",h:"This file has EXPIRED",f:"The Expires date is "+esc(raw)+", which is in the past. Per RFC 9116 this file should no longer be relied on.",rule:"RFC 9116: data in the file is meant to be used until the Expires moment and not after it.",why:"An expired file often points at a stale contact or a moved policy, and a researcher may treat the whole file as abandoned."});
+        } else {
+          checks.push({s:"pass",h:"Expires is valid and future dated",f:"Valid until "+esc(raw)+".",rule:"RFC 9116: Expires is REQUIRED, single, and a valid future timestamp. All satisfied.",why:"A future expiry tells a reader the file is still being maintained."});
+        }
+      }
+    }
+
+    // Canonical / Policy https
+    ["Canonical","Policy"].forEach(function(fn){
+      var hits = p.fields.filter(function(f){ return f.name===fn; });
+      var http = hits.filter(function(f){ return isHttp(f.value); });
+      if (http.length){
+        checks.push({s:"warn",h:fn+" over plain http",f:"The "+fn+" URL uses plain http: "+esc(http.map(function(f){return f.value;}).join("; "))+".",rule:"RFC 9116: web URIs in the file should use https.",why:"An http URL here can be altered in transit, undermining the trust the field is meant to provide."});
+      }
+    });
+
+    // Unknown fields
+    if (p.unknown.length){
+      var names = p.unknown.map(function(u){ return u.name+" (line "+u.line+")"; });
+      checks.push({s:"warn",h:"Unknown field name",f:"The file uses "+(p.unknown.length===1?"a field":"fields")+" the standard does not define: "+esc(names.join("; "))+".",rule:"RFC 9116 defines a fixed set of fields. Unknown names are not part of the standard and may be ignored.",why:"A typo in a field name silently drops the value, since a reader only acts on names it recognizes."});
+    }
+
+    // Casing
+    if (p.casing.length){
+      var cas = p.casing.map(function(c){ return c.got+" should be "+c.want+" (line "+c.line+")"; });
+      checks.push({s:"warn",h:"Field name casing",f:"A field name does not match the standard casing: "+esc(cas.join("; "))+".",rule:"RFC 9116: field names are case insensitive, but matching the documented casing avoids confusion.",why:"Mismatched casing still parses, but it reads as careless and can trip stricter tooling."});
+    }
+
+    // Format errors
+    if (p.formatErrs.length){
+      checks.push({s:"fail",h:"Malformed line",f:esc(p.formatErrs.join("  |  ")),rule:'RFC 9116: every non blank, non comment line must be a "Name: value" pair.',why:"A line without a colon carries no field, so its content is lost to any reader."});
+    }
+
+    // PGP signature (advisory)
+    if (p.hasSig){
+      checks.push({s:"info",h:"PGP signature present",f:"A PGP signed message block was detected. This tool does not verify the signature, because that needs your key.",rule:"RFC 9116: signing the file with an OpenPGP cleartext signature is RECOMMENDED, not required.",why:"A signature lets a reader confirm the file was not altered, as long as they have a trusted copy of your key."});
+    } else {
+      checks.push({s:"info",h:"No PGP signature",f:"No OpenPGP signature block was found. Signing is advisory, but it adds tamper evidence.",rule:"RFC 9116: an OpenPGP cleartext signature is RECOMMENDED.",why:"Without a signature, a reader cannot tell whether the file was modified after you published it."});
+    }
+
+    return { checks: checks, expired: expired };
+  }
+
+  function summarize(checks){
+    var fail = 0, warn = 0;
+    checks.forEach(function(c){ if (c.s==="fail") fail++; else if (c.s==="warn") warn++; });
+    return { fail: fail, warn: warn };
+  }
+
+  function renderVal(text){
+    var p = parseFile(text);
+    var res = buildChecks(p);
+    var s = summarize(res.checks);
+    var html = "";
+
+    if (res.expired){
+      html += '<div class="expired-banner"><span class="mark">&#10007;</span><div>'
+           +  '<h3>Expired file</h3>'
+           +  '<p>This security.txt has passed its Expires date. RFC 9116 says it should no longer be relied on. Refresh the Expires field and republish before a researcher hits a dead end.</p>'
+           +  '</div></div>';
+    }
+
+    var vclass, vtext, vmsg;
+    if (s.fail){ vclass="bad"; vtext="&#10007;"; vmsg=s.fail+" error"+(s.fail>1?"s":"")+(s.warn?(" and "+s.warn+" warning"+(s.warn>1?"s":"")):""); }
+    else if (s.warn){ vclass="warnv"; vtext="!"; vmsg=s.warn+" warning"+(s.warn>1?"s":"")+", no errors"; }
+    else { vclass="ok"; vtext="&#10003;"; vmsg="No errors or warnings"; }
+
+    html += '<div class="summary"><div class="verdict '+vclass+'">'+vtext+'</div>'
+         +  '<div class="summary-meta"><h2>'+(s.fail?"Not valid yet":(s.warn?"Valid, with notes":"Valid"))+'</h2>'
+         +  '<p>'+vmsg+'. Checked against RFC 9116. This reads structure and dates, it does not fetch your site or verify a signature.</p></div></div>';
+
+    html += '<div class="checks">';
+    res.checks.forEach(function(c){
+      var sym = c.s==="pass"?"&#10003;":c.s==="warn"?"!":c.s==="fail"?"&#10007;":"i";
+      html += '<div class="check"><div class="top"><span class="dot '+c.s+'">'+sym+'</span><div style="flex:1">';
+      html += '<h3>'+esc(c.h)+'</h3>';
+      html += '<div class="finding">'+c.f+'</div>';
+      if (c.why) html += '<div class="why">'+esc(c.why)+'</div>';
+      if (c.rule) html += '<div class="rule">'+esc(c.rule)+'</div>';
+      html += '</div></div></div>';
+    });
+    html += '</div>';
+    $("#valOut").innerHTML = html;
+    $("#valOut").scrollIntoView({ behavior:"smooth", block:"nearest" });
+  }
+
+  /* ---------- examples ---------- */
+  function futureIso(yearsAhead){
+    var d = new Date(); d.setFullYear(d.getFullYear()+yearsAhead);
+    return d.toISOString().replace(/\.\d{3}Z$/,"Z");
+  }
+  function pastIso(yearsBack){
+    var d = new Date(); d.setFullYear(d.getFullYear()-yearsBack);
+    return d.toISOString().replace(/\.\d{3}Z$/,"Z");
+  }
+  function validExample(){
+    return [
+      "Contact: mailto:security@acme.example",
+      "Contact: https://acme.example/security/report",
+      "Expires: " + futureIso(2),
+      "Encryption: https://acme.example/.well-known/pgp-key.txt",
+      "Acknowledgments: https://acme.example/security/thanks",
+      "Preferred-Languages: en, fr",
+      "Canonical: https://acme.example/.well-known/security.txt",
+      "Policy: https://acme.example/security/policy",
+      "Hiring: https://acme.example/careers/security",
+      ""
+    ].join("\n");
+  }
+  function expiredExample(){
+    return [
+      "Contact: mailto:security@acme.example",
+      "Expires: " + pastIso(1),
+      "Canonical: https://acme.example/.well-known/security.txt",
+      "Policy: https://acme.example/security/policy",
+      ""
+    ].join("\n");
+  }
+
+  /* ===================================================================
+     wiring
+     =================================================================== */
+  function showGen(){ $("#tabGen").classList.add("on"); $("#tabVal").classList.remove("on"); $("#genTool").style.display=""; $("#valTool").style.display="none"; }
+  function showVal(){ $("#tabVal").classList.add("on"); $("#tabGen").classList.remove("on"); $("#valTool").style.display=""; $("#genTool").style.display="none"; }
+
+  $("#tabGen").addEventListener("click", showGen);
+  $("#tabVal").addEventListener("click", showVal);
+
+  // generator wiring
+  contactRows()[0].querySelector(".rm").addEventListener("click", function(){
+    var rows = contactRows();
+    if (rows.length > 1) rows[0].remove(); else rows[0].querySelector("input").value="";
+  });
+  $("#addContact").addEventListener("click", function(){ $("#contacts").appendChild(newContactRow("")); });
+  $("#genBtn").addEventListener("click", renderGen);
+  $("#genExample").addEventListener("click", loadGenExample);
+  $("#genClear").addEventListener("click", clearGen);
+
+  // validator wiring
+  $("#valBtn").addEventListener("click", function(){ renderVal($("#valInput").value); });
+  $("#exValid").addEventListener("click", function(){ $("#valInput").value = validExample(); renderVal($("#valInput").value); });
+  $("#exExpired").addEventListener("click", function(){ $("#valInput").value = expiredExample(); renderVal($("#valInput").value); });
+  $("#valClear").addEventListener("click", function(){ $("#valInput").value=""; $("#valOut").innerHTML='<div class="empty">Your validation report will appear here.</div>'; $("#valInput").focus(); });
+  $("#valInput").addEventListener("keydown", function(e){ if ((e.metaKey||e.ctrlKey) && e.key==="Enter") renderVal($("#valInput").value); });
+
+  // expose pure functions for headless self test
+  if (typeof module !== "undefined" && module.exports){
+    module.exports = { parseFile: parseFile, buildChecks: buildChecks, validExample: validExample, expiredExample: expiredExample };
+  }
+})();
+</script>
+</body>
+</html>

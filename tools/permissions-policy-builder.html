@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Permissions-Policy Header Builder | UnboundCompute</title>
+<meta name="description" content="Build a valid, copyable Permissions-Policy header from simple toggles. Lock down camera, microphone, geolocation, payment, and other powerful browser features per origin, with ready to paste Nginx and Apache snippets. Runs fully in your browser." />
+<meta name="keywords" content="permissions policy generator, permissions-policy header, browser feature policy, lock down camera microphone geolocation, permissions policy builder, feature policy, disable geolocation header, permissions-policy nginx apache" />
+<meta name="robots" content="index, follow" />
+<meta name="author" content="UnboundCompute" />
+<meta name="theme-color" content="#0a0a0b" />
+<link rel="canonical" href="https://unboundcompute.com/tools/permissions-policy-builder.html" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a0a0b'/%3E%3Cline x1='16' y1='4' x2='16' y2='28' stroke='%23fb5b46' stroke-width='2' stroke-dasharray='3 3'/%3E%3Ccircle cx='16' cy='16' r='3.4' fill='%23fb5b46'/%3E%3C/svg%3E" />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="UnboundCompute" />
+<meta property="og:title" content="Permissions-Policy Header Builder" />
+<meta property="og:description" content="Build a valid, copyable Permissions-Policy header that locks down powerful browser features per origin. Runs fully in your browser, nothing is sent to any server." />
+<meta property="og:url" content="https://unboundcompute.com/tools/permissions-policy-builder.html" />
+<meta property="og:image" content="https://unboundcompute.com/og.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Permissions-Policy Header Builder" />
+<meta name="twitter:description" content="Build a valid, copyable Permissions-Policy header that locks down powerful browser features per origin. Runs fully in your browser." />
+<meta name="twitter:image" content="https://unboundcompute.com/og.png" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "Permissions-Policy Header Builder",
+      "applicationCategory": "SecurityApplication",
+      "operatingSystem": "Web",
+      "browserRequirements": "Requires JavaScript. Runs entirely client side.",
+      "url": "https://unboundcompute.com/tools/permissions-policy-builder.html",
+      "description": "A free tool that turns simple per feature toggles into a valid, copyable Permissions-Policy header. For each powerful browser feature, like camera, microphone, geolocation, and payment, you choose block everywhere, allow same origin, or allow a named allowlist of origins. It emits the raw header, an Nginx add_header line, an Apache Header set line, and a note for the Express helmet style. All generation happens in the browser.",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "publisher": { "@type": "Organization", "name": "UnboundCompute", "url": "https://unboundcompute.com/" }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is the Permissions-Policy header?",
+          "acceptedAnswer": { "@type": "Answer", "text": "The Permissions-Policy header is a response header that tells the browser which powerful features a page and the frames it embeds are allowed to use. Each directive names a feature, like camera or geolocation, and gives an allowlist of origins that may use it. With it you can block a feature everywhere, allow it only for your own origin, or allow it for a small set of named origins, which limits what injected or embedded content can reach." }
+        },
+        {
+          "@type": "Question",
+          "name": "What does an empty allowlist mean?",
+          "acceptedAnswer": { "@type": "Answer", "text": "An empty allowlist, written as the feature name followed by an empty pair of parentheses, blocks the feature for every origin including your own and every embedded frame. For example geolocation=() means no page in the document tree may call the geolocation API at all. It is the strongest setting and the right default for any feature your site does not use." }
+        },
+        {
+          "@type": "Question",
+          "name": "Does this Permissions-Policy builder send my data anywhere?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. The header is assembled entirely in your browser with JavaScript from the toggles you set. Nothing you type, including any origins you enter, is uploaded, logged, or sent to any server. You can build and copy a header without anything leaving your machine." }
+        },
+        {
+          "@type": "Question",
+          "name": "What happens if I leave a directive out of the header?",
+          "acceptedAnswer": { "@type": "Answer", "text": "If you omit a directive, the browser falls back to that feature default, which for most powerful features is allowed for the same origin and blocked for cross origin frames. Omitting a directive does not block the feature. To deny a feature you have to name it with an empty allowlist. That is why a hardened baseline lists every feature you want denied rather than relying on defaults." }
+        },
+        {
+          "@type": "Question",
+          "name": "Is this the same as the old Feature-Policy header?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Permissions-Policy is the successor to the older Feature-Policy header. They solve the same problem but use different syntax: Feature-Policy used space separated origins like geolocation 'self', while Permissions-Policy uses a structured allowlist like geolocation=(self). Feature-Policy is deprecated, so this tool only generates Permissions-Policy. If you still send Feature-Policy for very old browsers, treat it as a separate legacy header." }
+        }
+      ]
+    }
+  ]
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600&family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0a0b; --bg-2:#070708; --panel:#0e0e10; --panel-2:#131315;
+    --ink:#f4f2ec; --ink-hi:#fbf9f3; --ink-soft:#9b988f; --ink-faint:#5e5b54;
+    --line:rgba(244,242,236,.13); --line-2:rgba(244,242,236,.07);
+    --accent:#fb5b46; --accent-2:#ff7d6b; --accent-wash:rgba(251,91,70,.12); --on-accent:#1a0c09; --accent-line:rgba(251,91,70,.42);
+    --pass:#5fd6a4; --pass-wash:rgba(95,214,164,.1); --warn:#e8b04b; --warn-wash:rgba(232,176,75,.1); --fail:#fb5b46; --fail-wash:rgba(251,91,70,.1); --info:#7c93ff; --info-wash:rgba(124,147,255,.1);
+    --serif:'Newsreader',Georgia,serif; --mono:'JetBrains Mono',ui-monospace,monospace; --sans:'Inter',system-ui,sans-serif;
+    --maxw:920px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;line-height:1.6}
+  ::selection{background:var(--accent);color:var(--on-accent)}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+
+  nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);background:rgba(10,10,11,.72);border-bottom:1px solid var(--line-2)}
+  nav .wrap{height:64px;display:flex;align-items:center;justify-content:space-between}
+  nav a.brand{display:flex;align-items:center;gap:11px;font-family:var(--mono);font-weight:600;font-size:15px;color:var(--ink);letter-spacing:-.01em}
+  nav a.brand:hover{text-decoration:none}
+  nav .badge{width:27px;height:27px;border-radius:7px;border:1px solid var(--accent-line);display:grid;place-items:center}
+  nav a.cta{font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:9px 16px;border-radius:8px;background:var(--accent);color:var(--on-accent)}
+  nav a.cta:hover{filter:brightness(1.08);text-decoration:none}
+
+  header.hero{padding:64px 0 28px}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:18px}
+  h1{font-family:var(--serif);font-weight:400;font-size:clamp(32px,5vw,52px);line-height:1.08;letter-spacing:-.015em;color:var(--ink-hi)}
+  h1 code{font-family:var(--mono);font-size:.82em;font-weight:500;background:var(--panel-2);border:1px solid var(--line-2);border-radius:8px;padding:0 .14em;color:var(--ink-hi)}
+  .lede{margin-top:18px;font-size:18px;color:var(--ink-soft);max-width:660px}
+  .privacy{margin-top:18px;display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);border:1px solid var(--line);border-radius:8px;padding:8px 13px;background:var(--panel)}
+  .privacy svg{width:14px;height:14px;flex:none}
+
+  .tool{margin:30px 0 12px;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px}
+  .row{display:flex;gap:11px;flex-wrap:wrap;margin-top:14px;align-items:center}
+  button{font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;padding:13px 22px;border-radius:9px;cursor:pointer;border:1px solid var(--line);background:transparent;color:var(--ink);transition:filter .15s,border-color .15s,background .15s}
+  button.primary{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+  button.primary:hover{filter:brightness(1.08)}
+  button.ghost:hover{border-color:var(--accent-line);color:var(--ink-hi)}
+  .hint{font-family:var(--mono);font-size:12px;color:var(--ink-faint);margin-left:auto}
+
+  .group{border:1px solid var(--line);border-radius:13px;padding:16px 18px;margin-bottom:14px;background:var(--panel)}
+  .group > .glabel{font-family:var(--mono);font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--accent);margin-bottom:6px;display:block}
+  .group > .gnote{font-size:12.5px;color:var(--ink-faint);margin-bottom:12px}
+  .group > .gnote code{font-family:var(--mono);font-size:.92em;background:var(--panel-2);border:1px solid var(--line-2);border-radius:5px;padding:1px 5px;color:var(--ink)}
+
+  .feat{border-top:1px solid var(--line-2);padding:13px 0 12px}
+  .feat:first-of-type{border-top:none;padding-top:4px}
+  .feat:last-of-type{padding-bottom:0}
+  .feat .fhead{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  .feat .fname{font-family:var(--mono);font-size:13.5px;color:var(--ink-hi);font-weight:500}
+  .feat .fdesc{font-size:12.5px;color:var(--ink-soft);margin-top:2px;max-width:520px}
+  .feat code,.osub code,.prose code,.note code,.seg code,.gnote code{font-family:var(--mono);font-size:.92em;background:var(--panel-2);border:1px solid var(--line-2);border-radius:5px;padding:1px 5px;color:var(--ink)}
+  .segc{display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;flex:none;margin-top:2px}
+  .segc label{font-family:var(--mono);font-size:11.5px;letter-spacing:.02em;padding:7px 12px;cursor:pointer;color:var(--ink-soft);border-left:1px solid var(--line-2);transition:background .15s,color .15s;user-select:none}
+  .segc label:first-child{border-left:none}
+  .segc input{position:absolute;opacity:0;pointer-events:none}
+  .segc input:checked + span{color:var(--on-accent);background:var(--accent)}
+  .segc label span{display:block;margin:-7px -12px;padding:7px 12px}
+  input.txt{width:100%;background:var(--bg-2);border:1px solid var(--line);border-radius:9px;padding:9px 12px;color:var(--ink);font-family:var(--mono);font-size:12.5px;outline:none;transition:border-color .2s,box-shadow .2s;margin-top:9px}
+  input.txt:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-wash)}
+  input.txt::placeholder{color:var(--ink-faint)}
+  input.txt[disabled]{opacity:.4;cursor:not-allowed}
+
+  #out{margin-top:8px}
+  .seg{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:16px 18px;margin-bottom:14px;min-width:0}
+  .seg h3{font-family:var(--mono);font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--accent);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .seg pre{font-family:var(--mono);font-size:13px;line-height:1.6;color:var(--ink);white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere}
+  .seg .cap{font-family:var(--mono);font-size:11.5px;color:var(--ink-faint);margin-top:9px;text-transform:none;letter-spacing:0}
+  button.copy{font-size:11px;padding:6px 12px;letter-spacing:.05em}
+  button.copy:hover{border-color:var(--accent-line);color:var(--ink-hi)}
+
+  .checks{display:flex;flex-direction:column;gap:11px;margin-top:14px}
+  .check{border:1px solid var(--line);border-radius:13px;padding:16px 18px;background:var(--panel)}
+  .check .top{display:flex;align-items:flex-start;gap:13px}
+  .dot{width:20px;height:20px;border-radius:6px;flex:none;display:grid;place-items:center;font-size:13px;font-weight:700;margin-top:1px}
+  .dot.pass{background:var(--pass-wash);color:var(--pass)}
+  .dot.warn{background:var(--warn-wash);color:var(--warn)}
+  .dot.fail{background:var(--fail-wash);color:var(--fail)}
+  .dot.info{background:var(--info-wash);color:var(--info)}
+  .check h3{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--ink-hi);letter-spacing:-.01em}
+  .check .finding{margin-top:5px;font-size:14.5px;color:var(--ink)}
+  .check .fix{margin-top:9px;font-size:13px;color:var(--ink-soft);font-family:var(--mono);background:var(--bg-2);border:1px solid var(--line-2);border-radius:8px;padding:9px 11px;white-space:pre-wrap;word-break:break-word}
+  .note{margin-top:14px;border:1px solid var(--line);border-left:3px solid var(--accent-line);border-radius:11px;padding:15px 17px;background:var(--panel);font-size:14px;color:var(--ink-soft)}
+  .note b{color:var(--ink)}
+
+  .prose{padding:44px 0 20px}
+  .prose h2{font-family:var(--serif);font-weight:400;font-size:30px;color:var(--ink-hi);margin:36px 0 14px;letter-spacing:-.01em}
+  .prose h3{font-family:var(--mono);font-size:15px;color:var(--ink-hi);margin:24px 0 8px}
+  .prose p{color:var(--ink-soft);margin-bottom:14px;font-size:16px}
+  .prose ul{color:var(--ink-soft);margin:0 0 14px 20px;font-size:16px}
+  .prose li{margin-bottom:7px}
+  .prose code{font-family:var(--mono);font-size:13.5px;background:var(--panel-2);border:1px solid var(--line-2);border-radius:5px;padding:1px 6px;color:var(--ink)}
+  .related{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:8px}
+  .related a{display:block;border:1px solid var(--line);border-radius:11px;padding:14px 16px;color:var(--ink);font-size:14.5px;background:var(--panel)}
+  .related a:hover{border-color:var(--accent-line);text-decoration:none}
+  .related a span{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:5px}
+
+  footer{border-top:1px solid var(--line-2);margin-top:40px;padding:30px 0;color:var(--ink-faint);font-family:var(--mono);font-size:12.5px}
+  footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px}
+  footer a{color:var(--ink-soft)}
+  @media (max-width:560px){
+    .related{grid-template-columns:1fr}
+    .hint{margin-left:0;width:100%}
+    .feat .fhead{flex-direction:column}
+  }
+</style>
+</head>
+<body>
+
+<nav><div class="wrap">
+  <a class="brand" href="https://unboundcompute.com/">
+    <span class="badge"><svg viewBox="0 0 24 24" fill="none" style="width:15px;height:15px"><line x1="12" y1="3" x2="12" y2="21" stroke="var(--accent)" stroke-width="1.8" stroke-dasharray="2.6 2.6"/><circle cx="12" cy="12" r="3" fill="var(--accent)"/></svg></span>
+    UnboundCompute
+  </a>
+  <a class="cta" href="https://unboundcompute.com/#cta">Request access</a>
+</div></nav>
+
+<header class="hero"><div class="wrap">
+  <div class="eyebrow">Free tool</div>
+  <h1><code>Permissions-Policy</code> Header Builder</h1>
+  <p class="lede">Choose, per powerful browser feature, whether to block it everywhere, allow it only on your own origin, or allow a short list of origins. This tool turns those toggles into a valid, copyable <code>Permissions-Policy</code> header, with ready to paste Nginx and Apache snippets and an Express note.</p>
+  <div class="privacy">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6l8-4z" stroke="var(--accent)" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Everything runs in your browser. Nothing you type is sent to any server.
+  </div>
+</div></header>
+
+<div class="wrap">
+  <div class="tool">
+
+    <div class="group">
+      <span class="glabel">Powerful features</span>
+      <p class="gnote">For each feature pick <b>Off</b> for an empty allowlist <code>()</code> that blocks it everywhere, <b>Self</b> for <code>(self)</code> to allow only your own origin, or <b>Origins</b> to type a space separated allowlist. Features default to a locked down baseline. A feature you leave at <b>Off</b> is denied for every frame.</p>
+      <div id="features"></div>
+    </div>
+
+    <div class="row">
+      <button class="primary" id="build">Build header</button>
+      <button class="ghost" id="preset">Load hardened baseline</button>
+      <button class="ghost" id="reset">Reset</button>
+      <span class="hint" id="hint">No data leaves this page</span>
+    </div>
+  </div>
+
+  <div id="out"></div>
+</div>
+
+<div class="wrap prose">
+  <h2>What the <code>Permissions-Policy</code> header does</h2>
+  <p>The <code>Permissions-Policy</code> header is a response header that tells the browser which powerful features a page, and any frames it embeds, are allowed to use. A directive names a feature and gives it an allowlist of origins. For example <code>geolocation=()</code> blocks the geolocation API for everyone, <code>camera=(self)</code> allows the camera only on your own origin, and <code>payment=(self "https://acme.example")</code> allows the payment request flow on your origin plus one named partner. The mechanism follows the allowlist model in the <a href="https://www.w3.org/TR/permissions-policy/" rel="noopener" target="_blank">Permissions Policy specification</a>, and the per feature names line up with the current <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Permissions-Policy" rel="noopener" target="_blank">MDN reference</a>.</p>
+
+  <h3>Why an empty allowlist is the strong setting</h3>
+  <p>The single most useful pattern is the empty allowlist. Writing a feature name followed by an empty pair of parentheses, like <code>microphone=()</code>, blocks that feature for every origin in the document tree, including your own page and every embedded frame. It is the right default for any feature your site does not use. If a third party script or an injected iframe tries to call that API, the browser refuses, so the header shrinks what hostile content embedded in your page can reach. This is a containment layer that pairs well with a strict <a href="https://unboundcompute.com/tools/csp-generator.html">Content Security Policy</a>.</p>
+
+  <h3>Self, named origins, and the wildcard</h3>
+  <p>When your own page genuinely needs a feature, use <code>(self)</code> so it works on your origin but stays blocked in cross origin frames. When a named partner needs it inside a frame you embed, add their exact origin in quotes, as in <code>(self "https://acme.example")</code>. Avoid the wildcard <code>*</code>: it allows the feature for every origin, including any frame anyone can get onto your page, which gives away the control the header was meant to provide. This tool never emits a bare wildcard, and warns if a feature is left wide open.</p>
+
+  <h3>Omitting a directive is not the same as blocking</h3>
+  <p>A directive you leave out of the header is not denied. The browser falls back to that feature default, which for most powerful features means allowed for the same origin and blocked for cross origin frames. So to actually deny a feature you must name it with an empty allowlist; relying on defaults leaves it on for your own origin. That is why a hardened baseline lists every feature it wants off rather than trusting the defaults, and why this builder starts from a locked down set you can loosen where you really need a feature.</p>
+
+  <h3><code>Permissions-Policy</code> replaces <code>Feature-Policy</code></h3>
+  <p>The <code>Permissions-Policy</code> header is the successor to the older <code>Feature-Policy</code> header. They cover the same ground but the syntax differs: <code>Feature-Policy</code> used a space separated form like <code>geolocation 'self'</code>, while <code>Permissions-Policy</code> uses the structured allowlist form like <code>geolocation=(self)</code>. <code>Feature-Policy</code> is deprecated, so this tool only generates <code>Permissions-Policy</code> and never the legacy header. If you still send <code>Feature-Policy</code> for very old browsers, keep it as a separate legacy line and do not expect the two to share syntax.</p>
+
+  <h2>Test it before you trust it</h2>
+  <p>A generated header is a strong starting point, not a finished one, because the right set of allowances depends on exactly what your pages and embedded frames do. Set it, then click through any flow that uses a camera, a microphone, location, or payment, and confirm nothing you need silently broke. When you have a candidate, paste your full response into the <a href="https://unboundcompute.com/tools/security-headers-analyzer.html">Security Headers and CSP Analyzer</a> to see it alongside your other headers. Reasoning about whether a feature lockdown genuinely fits how an app embeds third parties, rather than pattern matching one string, is the kind of judgement an <a href="https://security.unboundcompute.com/ai-security-testing/" rel="noopener">AI security testing</a> approach is built for.</p>
+
+  <h2>Related reading</h2>
+  <div class="related">
+    <a href="https://security.unboundcompute.com/what-is-web-application-security/"><span>Guide</span>What is web application security</a>
+    <a href="https://security.unboundcompute.com/what-is-clickjacking/"><span>Deep dive</span>What is clickjacking</a>
+    <a href="https://security.unboundcompute.com/category/injection-and-input/"><span>Reference</span>Injection and input</a>
+    <a href="https://security.unboundcompute.com/web-security-glossary/"><span>Reference</span>Web security glossary</a>
+  </div>
+
+  <h2>More free tools</h2>
+  <div class="related">
+    <a href="https://unboundcompute.com/tools/csp-generator.html"><span>Tool</span>Content Security Policy Generator</a>
+    <a href="https://unboundcompute.com/tools/security-headers-analyzer.html"><span>Tool</span>Security Headers and CSP Analyzer</a>
+    <a href="https://unboundcompute.com/tools/csp-evaluator.html"><span>Tool</span>CSP Evaluator</a>
+    <a href="https://unboundcompute.com/tools/"><span>Hub</span>All free security tools</a>
+  </div>
+</div>
+
+<footer><div class="wrap">
+  <div>Built by <a href="https://unboundcompute.com/">UnboundCompute</a>, autonomous security research for web apps and APIs.</div>
+  <div><a href="https://unboundcompute.com/#cta">Request access</a></div>
+</div></footer>
+
+<script>
+(function(){
+  "use strict";
+  var $ = function(s){ return document.querySelector(s); };
+  function esc(s){ return String(s).replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];}); }
+
+  // The widely supported powerful features, with their standard directive name,
+  // a short description, and the default allowlist mode for the baseline this
+  // tool ships. "off" means an empty allowlist (); "self" means (self).
+  // Verified against the current MDN Permissions-Policy directive list.
+  var FEATURES = [
+    { id:"accelerometer", desc:"Reading device motion from the accelerometer sensor.", def:"off" },
+    { id:"autoplay", desc:"Letting media autoplay without a user gesture.", def:"self" },
+    { id:"camera", desc:"Access to video input devices.", def:"off" },
+    { id:"clipboard-read", desc:"Reading from the system clipboard.", def:"off" },
+    { id:"clipboard-write", desc:"Writing to the system clipboard.", def:"self" },
+    { id:"display-capture", desc:"Capturing the screen or a window.", def:"off" },
+    { id:"encrypted-media", desc:"Playing protected media with Encrypted Media Extensions.", def:"self" },
+    { id:"fullscreen", desc:"Entering fullscreen mode.", def:"self" },
+    { id:"geolocation", desc:"Access to device location.", def:"off" },
+    { id:"gyroscope", desc:"Reading orientation from the gyroscope sensor.", def:"off" },
+    { id:"magnetometer", desc:"Reading the device magnetometer sensor.", def:"off" },
+    { id:"microphone", desc:"Access to audio input devices.", def:"off" },
+    { id:"midi", desc:"Access to MIDI devices via the Web MIDI API.", def:"off" },
+    { id:"payment", desc:"Use of the Payment Request API.", def:"off" },
+    { id:"picture-in-picture", desc:"Playing video in a picture in picture window.", def:"self" },
+    { id:"publickey-credentials-get", desc:"Retrieving a WebAuthn public key credential.", def:"self" },
+    { id:"screen-wake-lock", desc:"Holding a screen wake lock to keep the display on.", def:"off" },
+    { id:"usb", desc:"Access to connected USB devices via the WebUSB API.", def:"off" },
+    { id:"web-share", desc:"Use of the Web Share API.", def:"self" },
+    { id:"xr-spatial-tracking", desc:"Access to WebXR spatial tracking data.", def:"off" }
+  ];
+
+  var MODES = [ ["off","Off"], ["self","Self"], ["origins","Origins"] ];
+
+  // Build the feature rows once, in the order above.
+  function buildForm(){
+    var root = $("#features");
+    var html = "";
+    FEATURES.forEach(function(f){
+      html += '<div class="feat" data-id="'+f.id+'">';
+      html += '<div class="fhead"><div><div class="fname"><code>'+f.id+'</code></div><div class="fdesc">'+esc(f.desc)+'</div></div>';
+      html += '<div class="segc">';
+      MODES.forEach(function(m){
+        var checked = (m[0] === f.def) ? " checked" : "";
+        html += '<label><input type="radio" name="m-'+f.id+'" value="'+m[0]+'"'+checked+'><span>'+m[1]+'</span></label>';
+      });
+      html += '</div></div>';
+      html += '<input class="txt" data-origins="'+f.id+'" placeholder=\'https://acme.example https://embed.acme.example\'>';
+      html += '</div>';
+    });
+    root.innerHTML = html;
+    refreshDisabled();
+  }
+
+  // Disable the origins box unless the feature is in origins mode.
+  function refreshDisabled(){
+    FEATURES.forEach(function(f){
+      var mode = modeOf(f.id);
+      var box = document.querySelector('input[data-origins="'+f.id+'"]');
+      if (box) box.disabled = (mode !== "origins");
+    });
+  }
+
+  function modeOf(id){
+    var radios = document.querySelectorAll('input[name="m-'+id+'"]');
+    for (var i=0;i<radios.length;i++){ if (radios[i].checked) return radios[i].value; }
+    return "off";
+  }
+
+  // Split a space or comma separated origin list into clean tokens.
+  function splitOrigins(raw){
+    if (!raw) return [];
+    return raw.split(/[\s,]+/).map(function(t){ return t.trim(); }).filter(Boolean);
+  }
+
+  function readState(){
+    var feats = {};
+    FEATURES.forEach(function(f){
+      var box = document.querySelector('input[data-origins="'+f.id+'"]');
+      feats[f.id] = { mode: modeOf(f.id), origins: splitOrigins(box ? box.value : "") };
+    });
+    return { feats: feats };
+  }
+
+  // Build one allowlist string for a feature, e.g. () or (self) or
+  // (self "https://acme.example"). Pure, no DOM.
+  function allowlist(spec){
+    if (spec.mode === "off") return "()";
+    if (spec.mode === "self") return "(self)";
+    // origins mode
+    var tokens = ["self"];
+    (spec.origins || []).forEach(function(o){
+      if (o === "*" || o === "self") return; // never emit a bare wildcard; self already present
+      tokens.push('"' + o + '"');
+    });
+    return "(" + tokens.join(" ") + ")";
+  }
+
+  // Core generator. Pure function of state, returns the directive list, the
+  // assembled header value, and a list of warnings. No DOM access here.
+  function buildHeader(st){
+    var directives = [];
+    var warnings = [];
+    function pushWarn(s,h,f,fix){ warnings.push({ s:s, h:h, f:f, fix:fix }); }
+
+    FEATURES.forEach(function(f){
+      var spec = st.feats[f.id];
+      if (!spec) return;
+      var value = allowlist(spec);
+      directives.push(f.id + "=" + value);
+
+      if (spec.mode === "origins"){
+        var raw = spec.origins || [];
+        if (raw.indexOf("*") !== -1){
+          pushWarn("fail","Wildcard requested for "+f.id,"You typed a bare wildcard in the "+f.id+" allowlist, which would allow the feature for every origin. This tool drops the wildcard and keeps the named origins instead.","List the exact origins that need "+f.id+" rather than a wildcard. A wildcard hands the feature to any frame that lands on your page.");
+        }
+        var named = raw.filter(function(o){ return o !== "*" && o !== "self"; });
+        if (!named.length){
+          pushWarn("info","No extra origins for "+f.id,"You chose the origins mode for "+f.id+" but listed no extra origins, so the result is the same as (self).","Add the partner origins that need "+f.id+", or switch this feature to Self.");
+        }
+        named.forEach(function(o){
+          if (/^http:\/\//i.test(o)){
+            pushWarn("warn","Plain http origin for "+f.id,"The origin "+o+" in the "+f.id+" allowlist is plain http, which can be tampered with in transit.","Use an https origin. A plain http origin can be impersonated by anyone on the network path.");
+          } else if (!/^https:\/\/[^\s"]+$/i.test(o)){
+            pushWarn("warn","Unusual origin for "+f.id,"The value "+o+" in the "+f.id+" allowlist does not look like a full https origin.","Use a full origin such as https://acme.example, with scheme and host and no trailing path.");
+          }
+        });
+      }
+    });
+
+    var anyOff = FEATURES.some(function(f){ return st.feats[f.id] && st.feats[f.id].mode === "off"; });
+    if (!anyOff){
+      pushWarn("info","No feature is fully blocked","Every feature is set to allow at least your own origin. Setting features you do not use to Off blocks them for every frame.","Switch any feature your site never calls to Off so an injected or embedded script cannot reach it.");
+    }
+
+    var value = directives.join(", ");
+    return { directives: directives, value: value, warnings: warnings };
+  }
+
+  // ---- rendering (DOM) ----
+  function copyBtn(id){ return '<button class="copy ghost" data-copy="'+id+'">Copy</button>'; }
+
+  function render(res){
+    var headerLine = "Permissions-Policy: " + res.value;
+    var html = "";
+
+    html += '<div class="seg"><h3>Header value'+copyBtn("c-value")+'</h3>';
+    html += '<pre id="c-value">'+esc(res.value)+'</pre>';
+    html += '<div class="cap">The raw value, comma separated. An empty allowlist () blocks the feature everywhere; (self) allows only your origin.</div>';
+    html += '</div>';
+
+    html += '<div class="seg"><h3>Full HTTP header'+copyBtn("c-header")+'</h3>';
+    html += '<pre id="c-header">'+esc(headerLine)+'</pre>';
+    html += '</div>';
+
+    html += '<div class="seg"><h3>Nginx'+copyBtn("c-nginx")+'</h3>';
+    var nginx = 'add_header Permissions-Policy "'+res.value+'" always;';
+    html += '<pre id="c-nginx">'+esc(nginx)+'</pre>';
+    html += '<div class="cap">Add inside a server or location block. The always flag sends the header on error responses too.</div>';
+    html += '</div>';
+
+    html += '<div class="seg"><h3>Apache'+copyBtn("c-apache")+'</h3>';
+    var apache = 'Header set Permissions-Policy "'+res.value+'"';
+    html += '<pre id="c-apache">'+esc(apache)+'</pre>';
+    html += '<div class="cap">Place in a vhost or .htaccess where mod_headers is enabled.</div>';
+    html += '</div>';
+
+    html += '<div class="seg"><h3>Express (helmet style)'+copyBtn("c-express")+'</h3>';
+    var express = 'app.use(function (req, res, next) {\n  res.setHeader("Permissions-Policy", "'+res.value+'");\n  next();\n});';
+    html += '<pre id="c-express">'+esc(express)+'</pre>';
+    html += '<div class="cap">Helmet does not set Permissions-Policy for you, so set it directly. Add this before your routes.</div>';
+    html += '</div>';
+
+    if (res.warnings.length){
+      html += '<div class="checks">';
+      res.warnings.forEach(function(w){
+        var sym = w.s==="pass"?"&#10003;":w.s==="warn"?"!":w.s==="fail"?"&#10007;":"i";
+        html += '<div class="check"><div class="top"><span class="dot '+w.s+'">'+sym+'</span><div style="flex:1">';
+        html += '<h3>'+esc(w.h)+'</h3>';
+        html += '<div class="finding">'+esc(w.f)+'</div>';
+        if (w.fix) html += '<div class="fix">'+esc(w.fix)+'</div>';
+        html += '</div></div></div>';
+      });
+      html += '</div>';
+    } else {
+      html += '<div class="checks"><div class="check"><div class="top"><span class="dot pass">&#10003;</span><div style="flex:1"><h3>No risky choices flagged</h3><div class="finding">This header blocks the features you turned off everywhere, allows the rest only where you said, and uses no wildcard. Still click through any flow that needs a feature before you ship it.</div></div></div></div></div>';
+    }
+
+    html += '<div class="note"><b>Omitting a directive does not block it.</b> A feature you leave out falls back to the browser default, which for most features is allowed for your own origin. To deny a feature you must list it with an empty allowlist (), which is why this builder names every feature. Then paste your full response into the <a href="https://unboundcompute.com/tools/security-headers-analyzer.html">Security Headers and CSP Analyzer</a> to see it alongside your other headers.</div>';
+
+    return html;
+  }
+
+  function run(){
+    refreshDisabled();
+    var st = readState();
+    var res = buildHeader(st);
+    $("#out").innerHTML = render(res);
+    bindCopy();
+  }
+
+  function bindCopy(){
+    var btns = document.querySelectorAll("button[data-copy]");
+    for (var i=0;i<btns.length;i++){
+      btns[i].addEventListener("click", function(){
+        var btn = this;
+        var el = document.getElementById(btn.getAttribute("data-copy"));
+        if (!el) return;
+        var text = el.textContent;
+        var done = function(){ var old = btn.textContent; btn.textContent = "Copied"; setTimeout(function(){ btn.textContent = old; }, 1400); };
+        if (navigator.clipboard && navigator.clipboard.writeText){
+          navigator.clipboard.writeText(text).then(done, function(){ legacyCopy(text, done); });
+        } else { legacyCopy(text, done); }
+      });
+    }
+  }
+
+  function legacyCopy(text, done){
+    try {
+      var ta = document.createElement("textarea");
+      ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.focus(); ta.select();
+      document.execCommand("copy"); document.body.removeChild(ta); done();
+    } catch(e){ /* clipboard unavailable, leave the text selectable */ }
+  }
+
+  function setMode(id, mode){
+    var radios = document.querySelectorAll('input[name="m-'+id+'"]');
+    for (var i=0;i<radios.length;i++){ radios[i].checked = (radios[i].value === mode); }
+  }
+
+  function resetForm(){
+    FEATURES.forEach(function(f){
+      setMode(f.id, f.def);
+      var box = document.querySelector('input[data-origins="'+f.id+'"]');
+      if (box) box.value = "";
+    });
+    run();
+  }
+
+  // Hardened baseline: disable camera, microphone, geolocation, payment, and
+  // usb for everyone, and lock down the rest of the sensor and capture features.
+  function loadPreset(){
+    var off = ["accelerometer","camera","clipboard-read","display-capture","geolocation","gyroscope","magnetometer","microphone","midi","payment","screen-wake-lock","usb","xr-spatial-tracking"];
+    var self = ["autoplay","clipboard-write","encrypted-media","fullscreen","picture-in-picture","publickey-credentials-get","web-share"];
+    FEATURES.forEach(function(f){
+      var box = document.querySelector('input[data-origins="'+f.id+'"]');
+      if (box) box.value = "";
+      setMode(f.id, off.indexOf(f.id) !== -1 ? "off" : (self.indexOf(f.id) !== -1 ? "self" : "off"));
+    });
+    run();
+  }
+
+  // Expose for the headless test harness.
+  if (typeof window !== "undefined"){ window.__pp = { buildHeader: buildHeader, allowlist: allowlist, splitOrigins: splitOrigins, FEATURES: FEATURES }; }
+
+  buildForm();
+  $("#build").addEventListener("click", run);
+  $("#preset").addEventListener("click", loadPreset);
+  $("#reset").addEventListener("click", resetForm);
+  // Live update on any control change so the box is never stale.
+  document.querySelectorAll(".tool").forEach(function(t){
+    t.addEventListener("change", run);
+    t.addEventListener("input", run);
+  });
+
+  // Generate the baseline header on first load.
+  run();
+})();
+</script>
+</body>
+</html>

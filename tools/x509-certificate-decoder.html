@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>X.509 Certificate Decoder | UnboundCompute</title>
+<meta name="description" content="Paste a PEM certificate and decode its X.509 fields in your browser: subject, issuer, validity dates, SAN names, public key size, and signature algorithm. Flags expiry, weak signatures, and small keys. Nothing is uploaded." />
+<meta name="keywords" content="x509 decoder, ssl certificate decoder, tls certificate parser, pem decoder, certificate viewer, san decoder, certificate expiry checker, der parser" />
+<meta name="robots" content="index, follow" />
+<meta name="author" content="UnboundCompute" />
+<meta name="theme-color" content="#0a0a0b" />
+<link rel="canonical" href="https://unboundcompute.com/tools/x509-certificate-decoder.html" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a0a0b'/%3E%3Cline x1='16' y1='4' x2='16' y2='28' stroke='%23fb5b46' stroke-width='2' stroke-dasharray='3 3'/%3E%3Ccircle cx='16' cy='16' r='3.4' fill='%23fb5b46'/%3E%3C/svg%3E" />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="UnboundCompute" />
+<meta property="og:title" content="X.509 Certificate Decoder" />
+<meta property="og:description" content="Decode an SSL or TLS certificate in your browser. View subject, issuer, validity, SAN names, key size, and signature algorithm. Nothing is sent to any server." />
+<meta property="og:url" content="https://unboundcompute.com/tools/x509-certificate-decoder.html" />
+<meta property="og:image" content="https://unboundcompute.com/og.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="X.509 Certificate Decoder" />
+<meta name="twitter:description" content="Decode an SSL or TLS certificate in your browser. View subject, issuer, validity, SAN names, key size, and signature algorithm." />
+<meta name="twitter:image" content="https://unboundcompute.com/og.png" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "X.509 Certificate Decoder",
+      "applicationCategory": "SecurityApplication",
+      "operatingSystem": "Web",
+      "browserRequirements": "Requires JavaScript. Runs entirely client side.",
+      "url": "https://unboundcompute.com/tools/x509-certificate-decoder.html",
+      "description": "A free tool that decodes a PEM encoded X.509 certificate in the browser. It parses the ASN.1 DER structure with a hand written parser and shows the subject, issuer, validity window, Subject Alternative Names, public key type and size, and the signature algorithm. It also flags an expired or soon to expire certificate, a weak signature, a small RSA key, and a self issued certificate. All parsing happens locally and nothing is uploaded.",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "publisher": { "@type": "Organization", "name": "UnboundCompute", "url": "https://unboundcompute.com/" }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is an X.509 certificate?",
+          "acceptedAnswer": { "@type": "Answer", "text": "An X.509 certificate is the structured document a TLS server presents to prove its identity. It binds a public key to a subject name, names the issuer that signed it, sets a validity window with a notBefore and a notAfter date, and lists extensions such as the Subject Alternative Names the certificate covers. It is encoded with ASN.1 DER, and the PEM form you usually paste is that binary wrapped in base64 between BEGIN and END certificate lines." }
+        },
+        {
+          "@type": "Question",
+          "name": "Does this decoder upload my certificate?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. The base64 is decoded and the ASN.1 DER bytes are walked entirely in your browser with JavaScript. The certificate text you paste is never uploaded, logged, or sent to any server. A public certificate is not secret, but a private key is, so the tool only reads the certificate body and never asks for a key." }
+        },
+        {
+          "@type": "Question",
+          "name": "Can it tell me if my certificate is expired?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes. It parses the notBefore and notAfter dates, which can be UTCTime or GeneralizedTime, and compares notAfter to the current time. It marks a certificate that has already expired, and warns when the expiry is within about thirty days so you have time to renew before clients start rejecting it." }
+        },
+        {
+          "@type": "Question",
+          "name": "What does the self issued flag mean?",
+          "acceptedAnswer": { "@type": "Answer", "text": "When the issuer name equals the subject name the certificate signed itself rather than being signed by a trusted authority. A root CA is self issued by design, but a leaf certificate that is self issued will not be trusted by browsers. The flag simply tells you the issuer and subject match so you can decide whether that is expected for this certificate." }
+        },
+        {
+          "@type": "Question",
+          "name": "Why does it flag SHA1 or a 1024 bit RSA key?",
+          "acceptedAnswer": { "@type": "Answer", "text": "A signature built on MD5 or SHA1 is considered broken because collisions are practical, which undermines the proof that the issuer signed the certificate. An RSA key below 2048 bits is too small to resist modern factoring effort. Both are surfaced as findings so you can reissue with a SHA256 based signature and a 2048 bit or larger key." }
+        }
+      ]
+    }
+  ]
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600&family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0a0b; --bg-2:#070708; --panel:#0e0e10; --panel-2:#131315;
+    --ink:#f4f2ec; --ink-hi:#fbf9f3; --ink-soft:#9b988f; --ink-faint:#5e5b54;
+    --line:rgba(244,242,236,.13); --line-2:rgba(244,242,236,.07);
+    --accent:#fb5b46; --accent-2:#ff7d6b; --accent-wash:rgba(251,91,70,.12); --on-accent:#1a0c09; --accent-line:rgba(251,91,70,.42);
+    --pass:#5fd6a4; --pass-wash:rgba(95,214,164,.1); --warn:#e8b04b; --warn-wash:rgba(232,176,75,.1); --fail:#fb5b46; --fail-wash:rgba(251,91,70,.1); --info:#7c93ff; --info-wash:rgba(124,147,255,.1);
+    --serif:'Newsreader',Georgia,serif; --mono:'JetBrains Mono',ui-monospace,monospace; --sans:'Inter',system-ui,sans-serif;
+    --maxw:920px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;line-height:1.6}
+  ::selection{background:var(--accent);color:var(--on-accent)}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+
+  nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);background:rgba(10,10,11,.72);border-bottom:1px solid var(--line-2)}
+  nav .wrap{height:64px;display:flex;align-items:center;justify-content:space-between}
+  nav a.brand{display:flex;align-items:center;gap:11px;font-family:var(--mono);font-weight:600;font-size:15px;color:var(--ink);letter-spacing:-.01em}
+  nav a.brand:hover{text-decoration:none}
+  nav .badge{width:27px;height:27px;border-radius:7px;border:1px solid var(--accent-line);display:grid;place-items:center}
+  nav a.cta{font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:9px 16px;border-radius:8px;background:var(--accent);color:var(--on-accent)}
+  nav a.cta:hover{filter:brightness(1.08);text-decoration:none}
+
+  header.hero{padding:64px 0 28px}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:18px}
+  h1{font-family:var(--serif);font-weight:400;font-size:clamp(32px,5vw,52px);line-height:1.08;letter-spacing:-.015em;color:var(--ink-hi)}
+  .lede{margin-top:18px;font-size:18px;color:var(--ink-soft);max-width:660px}
+  .privacy{margin-top:18px;display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);border:1px solid var(--line);border-radius:8px;padding:8px 13px;background:var(--panel)}
+  .privacy svg{width:14px;height:14px;flex:none}
+
+  .tool{margin:30px 0 12px;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px}
+  label.fld{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:10px}
+  textarea{width:100%;min-height:170px;resize:vertical;background:var(--bg-2);border:1px solid var(--line);border-radius:11px;padding:15px;color:var(--ink);font-family:var(--mono);font-size:13px;line-height:1.5;outline:none;transition:border-color .2s,box-shadow .2s;word-break:break-all}
+  textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-wash)}
+  textarea::placeholder{color:var(--ink-faint)}
+  .row{display:flex;gap:11px;flex-wrap:wrap;margin-top:14px;align-items:center}
+  button{font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;padding:13px 22px;border-radius:9px;cursor:pointer;border:1px solid var(--line);background:transparent;color:var(--ink);transition:filter .15s,border-color .15s,background .15s}
+  button.primary{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+  button.primary:hover{filter:brightness(1.08)}
+  button.ghost:hover{border-color:var(--accent-line);color:var(--ink-hi)}
+  .hint{font-family:var(--mono);font-size:12px;color:var(--ink-faint);margin-left:auto}
+
+  #results{margin-top:8px}
+  .decoded{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0}
+  .seg{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:16px 18px;min-width:0}
+  .seg.full{grid-column:1 / -1}
+  .seg h3{font-family:var(--mono);font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+  .seg .kv{display:flex;flex-direction:column;gap:7px}
+  .seg .kv > div{font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);line-height:1.5;word-break:break-word;overflow-wrap:anywhere}
+  .seg .kv b{color:var(--ink);font-weight:600}
+  .seg .kv .k{color:var(--ink-faint);display:inline-block;min-width:118px}
+  .seg .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+  .seg .tag{font-family:var(--mono);font-size:11.5px;color:var(--ink);background:var(--bg-2);border:1px solid var(--line-2);border-radius:6px;padding:3px 8px}
+  .seg .err{color:var(--fail);font-family:var(--mono);font-size:13px}
+
+  .grade-card{display:flex;align-items:center;gap:22px;background:var(--panel-2);border:1px solid var(--line);border-radius:16px;padding:22px 24px;margin:20px 0}
+  .grade{font-family:var(--serif);font-size:34px;line-height:1.05;width:96px;height:96px;border-radius:18px;display:grid;place-items:center;flex:none;border:1.5px solid;text-align:center;padding:6px}
+  .grade.g-ok{color:var(--pass);border-color:var(--pass);background:var(--pass-wash)}
+  .grade.g-warn{color:var(--warn);border-color:var(--warn);background:var(--warn-wash)}
+  .grade.g-bad{color:var(--fail);border-color:var(--fail);background:var(--fail-wash)}
+  .grade-meta h2{font-family:var(--serif);font-weight:400;font-size:24px;color:var(--ink-hi);margin-bottom:4px}
+  .grade-meta p{color:var(--ink-soft);font-size:14.5px}
+
+  .checks{display:flex;flex-direction:column;gap:11px}
+  .check{border:1px solid var(--line);border-radius:13px;padding:16px 18px;background:var(--panel)}
+  .check .top{display:flex;align-items:flex-start;gap:13px}
+  .dot{width:20px;height:20px;border-radius:6px;flex:none;display:grid;place-items:center;font-size:13px;font-weight:700;margin-top:1px}
+  .dot.pass{background:var(--pass-wash);color:var(--pass)}
+  .dot.warn{background:var(--warn-wash);color:var(--warn)}
+  .dot.fail{background:var(--fail-wash);color:var(--fail)}
+  .dot.info{background:var(--info-wash);color:var(--info)}
+  .check h3{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--ink-hi);letter-spacing:-.01em}
+  .check .finding{margin-top:5px;font-size:14.5px;color:var(--ink)}
+  .check .why{margin-top:9px;font-size:13.5px;color:var(--ink-soft)}
+  .empty{color:var(--ink-faint);font-family:var(--mono);font-size:13px;text-align:center;padding:30px}
+
+  .prose{padding:44px 0 20px}
+  .prose h2{font-family:var(--serif);font-weight:400;font-size:30px;color:var(--ink-hi);margin:36px 0 14px;letter-spacing:-.01em}
+  .prose h3{font-family:var(--mono);font-size:15px;color:var(--ink-hi);margin:24px 0 8px}
+  .prose p{color:var(--ink-soft);margin-bottom:14px;font-size:16px}
+  .prose ul{color:var(--ink-soft);margin:0 0 14px 20px;font-size:16px}
+  .prose li{margin-bottom:7px}
+  .prose code{font-family:var(--mono);font-size:13.5px;background:var(--panel-2);border:1px solid var(--line-2);border-radius:5px;padding:1px 6px;color:var(--ink)}
+  .related{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:8px}
+  .related a{display:block;border:1px solid var(--line);border-radius:11px;padding:14px 16px;color:var(--ink);font-size:14.5px;background:var(--panel)}
+  .related a:hover{border-color:var(--accent-line);text-decoration:none}
+  .related a span{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:5px}
+
+  footer{border-top:1px solid var(--line-2);margin-top:40px;padding:30px 0;color:var(--ink-faint);font-family:var(--mono);font-size:12.5px}
+  footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px}
+  footer a{color:var(--ink-soft)}
+  @media (max-width:560px){
+    .related{grid-template-columns:1fr}
+    .decoded{grid-template-columns:1fr}
+    .grade-card{flex-direction:column;align-items:flex-start;gap:16px}
+    .hint{margin-left:0;width:100%}
+  }
+</style>
+</head>
+<body>
+
+<nav><div class="wrap">
+  <a class="brand" href="https://unboundcompute.com/">
+    <span class="badge"><svg viewBox="0 0 24 24" fill="none" style="width:15px;height:15px"><line x1="12" y1="3" x2="12" y2="21" stroke="var(--accent)" stroke-width="1.8" stroke-dasharray="2.6 2.6"/><circle cx="12" cy="12" r="3" fill="var(--accent)"/></svg></span>
+    UnboundCompute
+  </a>
+  <a class="cta" href="https://unboundcompute.com/#cta">Request access</a>
+</div></nav>
+
+<header class="hero"><div class="wrap">
+  <div class="eyebrow">Free tool</div>
+  <h1>X.509 Certificate Decoder</h1>
+  <p class="lede">Paste a PEM certificate and read its X.509 fields in plain language: subject and issuer, the validity window, the Subject Alternative Names it covers, the public key type and size, and the signature algorithm. It also flags an expired certificate, an expiry coming up soon, a weak signature, a small RSA key, and a self issued certificate.</p>
+  <div class="privacy">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6l8-4z" stroke="var(--accent)" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    The base64 is decoded and the DER bytes are parsed in your browser. Nothing is sent to any server.
+  </div>
+</div></header>
+
+<div class="wrap">
+  <div class="tool">
+    <label class="fld" for="pem">Paste a PEM certificate</label>
+    <textarea id="pem" spellcheck="false" placeholder="-----BEGIN CERTIFICATE-----&#10;MIIEOjCCAyKgAwIBAgIJA...&#10;-----END CERTIFICATE-----&#10;&#10;The certificate body is base64 decoded to DER and parsed locally. It is never sent anywhere."></textarea>
+    <div class="row">
+      <button class="primary" id="decode">Decode certificate</button>
+      <button class="ghost" id="example">Load example</button>
+      <button class="ghost" id="clear">Clear</button>
+      <span class="hint" id="hint">No data leaves this page</span>
+    </div>
+  </div>
+  <div id="results"><div class="empty">Your decoded certificate and findings will appear here.</div></div>
+</div>
+
+<div class="wrap prose">
+  <h2>What this certificate decoder shows</h2>
+  <p>An X.509 certificate looks like one opaque block of base64, but underneath it is a precise tree of values encoded with ASN.1 DER. This tool decodes the base64 to the raw DER bytes and walks that tree in your browser, reading each tag, length, and value, then maps the object identifiers it finds to readable names. The structure and field meanings follow <a href="https://datatracker.ietf.org/doc/html/rfc5280" rel="noopener" target="_blank">RFC 5280</a>, the standard that defines the certificate profile used for the public web.</p>
+
+  <h3>Names, the subject and the issuer</h3>
+  <p>The subject is who the certificate is for, and the issuer is who signed it. Both are distinguished names built from attributes like <code>CN</code> for the common name, <code>O</code> for the organization, and <code>C</code> for the country. The decoder lists each attribute so you can confirm the certificate names the host you expect, and it compares the issuer to the subject so you can see when a certificate signed itself.</p>
+
+  <h3>Subject Alternative Names</h3>
+  <p>Modern clients ignore the common name for host matching and rely on the Subject Alternative Name extension instead. This is the list of <code>dNSName</code> entries the certificate is actually valid for, and a certificate that does not list the host a client connected to will be rejected even if everything else checks out. The tool pulls out every DNS name, and any IP address entries, so you can confirm the coverage matches the names you serve.</p>
+
+  <h3>The validity window</h3>
+  <p>Every certificate carries a <code>notBefore</code> and a <code>notAfter</code> date, which may be encoded as UTCTime for years up to 2049 or GeneralizedTime beyond that. The decoder parses both and compares <code>notAfter</code> to the current time, so an expired certificate is called out immediately and one that expires within about thirty days is flagged early enough to renew before clients start failing the handshake.</p>
+
+  <h3>The public key and the signature</h3>
+  <p>The certificate binds a public key to the subject. For an RSA key the tool reports the modulus size in bits, and for an elliptic curve key it reports the named curve. It also reads the signature algorithm, which is the proof that the issuer signed this exact certificate. A signature built on MD5 or SHA1 is treated as a weak signature, since collisions on those hashes are practical, and a small RSA key is flagged because a key under 2048 bits no longer resists modern factoring.</p>
+
+  <h2>How to read the findings</h2>
+  <p>The findings list is a quick read of the certificate as it stands, not a full trust decision. It surfaces the conditions that most often break a deployment or weaken it: an expired or soon to expire date, a weak signature algorithm, a small key, a self issued leaf, and a validity period so long it becomes a liability. It does not check the chain to a trusted root, confirm revocation, or verify the signature against the issuer key, because those need material this page deliberately never touches. Judging whether a certificate is genuinely safe in context is the kind of reasoning an <a href="https://security.unboundcompute.com/ai-security-testing/" rel="noopener">AI security testing</a> approach works through rather than reading one field. For the wider set of transport and trust boundaries attackers probe, the <a href="https://security.unboundcompute.com/what-is-web-application-security/" rel="noopener">web application security</a> writing goes deeper, and the <a href="https://security.unboundcompute.com/web-security-glossary/" rel="noopener">web security glossary</a> defines the terms used here.</p>
+
+  <h2>Related reading</h2>
+  <div class="related">
+    <a href="https://security.unboundcompute.com/what-is-web-application-security/"><span>Guide</span>What is web application security</a>
+    <a href="https://security.unboundcompute.com/ai-security-testing/"><span>Guide</span>AI security testing</a>
+    <a href="https://security.unboundcompute.com/what-is-csrf/"><span>Deep dive</span>What is CSRF</a>
+    <a href="https://security.unboundcompute.com/web-security-glossary/"><span>Reference</span>Web security glossary</a>
+  </div>
+
+  <h2>More free tools</h2>
+  <div class="related">
+    <a href="https://unboundcompute.com/tools/jwt-security-inspector.html"><span>Free tool</span>JWT Security Inspector</a>
+    <a href="https://unboundcompute.com/tools/sri-hash-generator.html"><span>Free tool</span>Subresource Integrity Hash Generator</a>
+    <a href="https://unboundcompute.com/tools/security-headers-analyzer.html"><span>Free tool</span>Security Headers and CSP Analyzer</a>
+    <a href="https://unboundcompute.com/tools/"><span>Hub</span>All free security tools</a>
+  </div>
+</div>
+
+<footer><div class="wrap">
+  <div>Built by <a href="https://unboundcompute.com/">UnboundCompute</a>, autonomous security research for web apps and APIs.</div>
+  <div><a href="https://unboundcompute.com/#cta">Request access</a></div>
+</div></footer>
+
+<script>
+(function(){
+  "use strict";
+  var $ = function(s){ return document.querySelector(s); };
+  function esc(s){ return String(s).replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];}); }
+
+  // A real, self signed test certificate for the invented domain acme.example.
+  // It parses cleanly in the decoder below and exercises every extension.
+  var EXAMPLE = [
+    "-----BEGIN CERTIFICATE-----",
+    "MIIEOjCCAyKgAwIBAgIJAPenvQCS1bpkMA0GCSqGSIb3DQEBCwUAMHsxCzAJBgNV",
+    "BAYTAlVTMRMwEQYDVQQIDApDYWxpZm9ybmlhMRYwFAYDVQQHDA1TYW4gRnJhbmNp",
+    "c2NvMRIwEAYDVQQKDAlBY21lIENvcnAxFDASBgNVBAsMC0VuZ2luZWVyaW5nMRUw",
+    "EwYDVQQDDAxhY21lLmV4YW1wbGUwHhcNMjYwNjIyMTE1NjQ1WhcNMjgwOTI0MTE1",
+    "NjQ1WjB7MQswCQYDVQQGEwJVUzETMBEGA1UECAwKQ2FsaWZvcm5pYTEWMBQGA1UE",
+    "BwwNU2FuIEZyYW5jaXNjbzESMBAGA1UECgwJQWNtZSBDb3JwMRQwEgYDVQQLDAtF",
+    "bmdpbmVlcmluZzEVMBMGA1UEAwwMYWNtZS5leGFtcGxlMIIBIjANBgkqhkiG9w0B",
+    "AQEFAAOCAQ8AMIIBCgKCAQEAu2inIq+EqNtWo+loNvmFK8t2FfDggDCHol2iGcwU",
+    "qYQ+qnUkAlGVVK8OXusZTNb1vAqsCib28txGa90Aqrng69WZBig9vQ5LS6/XapHk",
+    "gQ/GFZTwAgKQljfTmk0ZPsO63GXqpmURYU76rarGxc8aMQf1NOdzOYtbnwFlhKzL",
+    "PJ7e4zPw49KrPhjieISKRm/z+wM/7m6wwj4BGMcRQgXwRo+c6/d50cjMXU7iuSNZ",
+    "vl5CX536UNlvaqaA294fZQHg2OuipcXo8AXVRO8MBGQSeXSEBeUTyt0GnEwh0FwN",
+    "NKELB9F4SjN0azDT42lDGR/yQjKEmKx0MjY9Km6afTLdYQIDAQABo4HAMIG9MA8G",
+    "A1UdEwEB/wQFMAMBAf8wDgYDVR0PAQH/BAQDAgKkMB0GA1UdJQQWMBQGCCsGAQUF",
+    "BwMBBggrBgEFBQcDAjAdBgNVHQ4EFgQUzB3hrtNAC/2ipUv+tBsm3KgK3cwwHwYD",
+    "VR0jBBgwFoAUzB3hrtNAC/2ipUv+tBsm3KgK3cwwOwYDVR0RBDQwMoIMYWNtZS5l",
+    "eGFtcGxlghB3d3cuYWNtZS5leGFtcGxlghBhcGkuYWNtZS5leGFtcGxlMA0GCSqG",
+    "SIb3DQEBCwUAA4IBAQAHZL+rrZ00r8Jut8tFasfhayVkvoWDcNJ9MTOapy/BytDe",
+    "V7DuWHLZ6lw6Q4V2i9yxn56mll5K17URqNHxhRN7wDttdyIAYCzevcFilPPogA15",
+    "9WZSxr0pRJ6i8Lf+u6ZWNELsHTg01kZPCkYfRcwhNZ4rv7bLE7Khak5MwrjB/Nxm",
+    "QkzMRWGTPQw9MivdK3xidYmG/RNpM+cq7XSvrcBrp1ukjKWzL6GoU46svrpmLM8M",
+    "QRJPeGgvkzbW6weNlKcpiS2RqO3E+X9wFfNOxD/hA9kAPuWHq5yvMZ+wGO7sMjE0",
+    "1rwzL3eVOvHWFAgF0QQes+DZmElz0tmjl5z0aa1S",
+    "-----END CERTIFICATE-----"
+  ].join("\n");
+
+  // ===================== X.509 DER parser core =====================
+  var OIDS = {
+    "1.2.840.113549.1.1.1":"rsaEncryption",
+    "1.2.840.113549.1.1.4":"md5WithRSAEncryption",
+    "1.2.840.113549.1.1.5":"sha1WithRSAEncryption",
+    "1.2.840.113549.1.1.11":"sha256WithRSAEncryption",
+    "1.2.840.113549.1.1.12":"sha384WithRSAEncryption",
+    "1.2.840.113549.1.1.13":"sha512WithRSAEncryption",
+    "1.2.840.113549.1.1.10":"RSASSA-PSS",
+    "1.2.840.10040.4.3":"dsa-with-SHA1",
+    "1.2.840.10045.2.1":"id-ecPublicKey",
+    "1.2.840.10045.4.1":"ecdsa-with-SHA1",
+    "1.2.840.10045.4.3.2":"ecdsa-with-SHA256",
+    "1.2.840.10045.4.3.3":"ecdsa-with-SHA384",
+    "1.2.840.10045.4.3.4":"ecdsa-with-SHA512",
+    "1.3.101.112":"Ed25519",
+    "1.2.840.10045.3.1.7":"prime256v1 (P-256)",
+    "1.3.132.0.34":"secp384r1 (P-384)",
+    "1.3.132.0.35":"secp521r1 (P-521)",
+    "1.3.132.0.10":"secp256k1",
+    "2.5.4.3":"CN","2.5.4.6":"C","2.5.4.7":"L","2.5.4.8":"ST","2.5.4.10":"O",
+    "2.5.4.11":"OU","2.5.4.5":"serialNumber","2.5.4.4":"SN","2.5.4.42":"GN",
+    "2.5.4.9":"street","1.2.840.113549.1.9.1":"emailAddress","0.9.2342.19200300.100.1.25":"DC",
+    "2.5.29.14":"Subject Key Identifier","2.5.29.15":"Key Usage","2.5.29.17":"Subject Alternative Name",
+    "2.5.29.19":"Basic Constraints","2.5.29.31":"CRL Distribution Points","2.5.29.32":"Certificate Policies",
+    "2.5.29.35":"Authority Key Identifier","2.5.29.37":"Extended Key Usage",
+    "1.3.6.1.5.5.7.1.1":"Authority Information Access",
+    "1.3.6.1.5.5.7.3.1":"TLS Web Server Authentication","1.3.6.1.5.5.7.3.2":"TLS Web Client Authentication",
+    "1.3.6.1.5.5.7.3.3":"Code Signing","1.3.6.1.5.5.7.3.4":"Email Protection",
+    "1.3.6.1.5.5.7.3.8":"Time Stamping","1.3.6.1.5.5.7.3.9":"OCSP Signing"
+  };
+  var KEY_USAGE_BITS = ["digitalSignature","nonRepudiation","keyEncipherment","dataEncipherment",
+    "keyAgreement","keyCertSign","cRLSign","encipherOnly","decipherOnly"];
+
+  function pemToDer(pem){
+    var m = pem.match(/-----BEGIN CERTIFICATE-----([\s\S]*?)-----END CERTIFICATE-----/);
+    var b64 = m ? m[1] : pem;
+    b64 = b64.replace(/[^A-Za-z0-9+/=]/g,"");
+    if (!b64) throw new Error("No base64 certificate body found.");
+    var bin = atob(b64);
+    var out = new Uint8Array(bin.length);
+    for (var i=0;i<bin.length;i++) out[i] = bin.charCodeAt(i);
+    return out;
+  }
+
+  function Reader(bytes, start, end){
+    this.b = bytes; this.pos = start||0; this.end = (end===undefined)?bytes.length:end;
+  }
+  Reader.prototype.eof = function(){ return this.pos >= this.end; };
+  Reader.prototype.readTLV = function(){
+    if (this.pos >= this.end) throw new Error("Unexpected end of data.");
+    var tag = this.b[this.pos++];
+    var cls = tag >> 6, constructed = (tag & 0x20) !== 0, tagNo = tag & 0x1f;
+    if (tagNo === 0x1f) throw new Error("High tag numbers are not supported.");
+    var len = this.b[this.pos++];
+    if (len === undefined) throw new Error("Truncated length.");
+    if (len & 0x80){
+      var n = len & 0x7f;
+      if (n === 0) throw new Error("Indefinite length not allowed in DER.");
+      len = 0;
+      for (var i=0;i<n;i++){ len = (len*256) + this.b[this.pos++]; }
+    }
+    var vstart = this.pos, vend = this.pos + len;
+    if (vend > this.end) throw new Error("Length runs past end of data.");
+    this.pos = vend;
+    return { tag:tag, cls:cls, constructed:constructed, tagNo:tagNo, start:vstart, end:vend,
+             value:this.b.subarray(vstart, vend) };
+  };
+  Reader.prototype.children = function(tlv){
+    var r = new Reader(this.b, tlv.start, tlv.end), out = [];
+    while (!r.eof()) out.push(r.readTLV());
+    return out;
+  };
+
+  function decodeOID(bytes){
+    if (!bytes.length) return "";
+    var out = [], first = bytes[0];
+    out.push(Math.floor(first/40)); out.push(first%40);
+    var val = 0;
+    for (var i=1;i<bytes.length;i++){
+      val = (val*128) + (bytes[i] & 0x7f);
+      if (!(bytes[i] & 0x80)){ out.push(val); val = 0; }
+    }
+    return out.join(".");
+  }
+  function oidName(oid){ return OIDS[oid] || oid; }
+
+  function bytesToHex(bytes){
+    var s = "";
+    for (var i=0;i<bytes.length;i++){ var h = bytes[i].toString(16); s += (h.length<2?"0":"")+h; }
+    return s;
+  }
+  function colonHex(bytes){
+    var parts = [];
+    for (var i=0;i<bytes.length;i++){ var h = bytes[i].toString(16); parts.push((h.length<2?"0":"")+h); }
+    return parts.join(":");
+  }
+  function decodeStr(bytes){
+    var s = "";
+    for (var i=0;i<bytes.length;i++) s += String.fromCharCode(bytes[i]);
+    try { if (typeof TextDecoder === "function") return new TextDecoder("utf-8").decode(bytes); } catch(e){}
+    return s;
+  }
+
+  function parseName(reader, tlv){
+    var rdns = reader.children(tlv), parts = [];
+    rdns.forEach(function(rdn){
+      reader.children(rdn).forEach(function(atav){
+        var kids = reader.children(atav);
+        if (kids.length < 2) return;
+        var oid = decodeOID(kids[0].value);
+        var val = decodeStr(kids[1].value);
+        parts.push({ type: oidName(oid), oid: oid, value: val });
+      });
+    });
+    var str = parts.map(function(p){ return p.type+"="+p.value; }).join(", ");
+    return { parts: parts, str: str };
+  }
+
+  function parseTime(tlv){
+    var s = decodeStr(tlv.value), y,mo,d,h,mi,se;
+    if (tlv.tag === 0x17){
+      y = parseInt(s.substr(0,2),10); y = (y >= 50) ? 1900+y : 2000+y;
+      mo=s.substr(2,2); d=s.substr(4,2); h=s.substr(6,2); mi=s.substr(8,2); se=s.substr(10,2);
+    } else {
+      y = parseInt(s.substr(0,4),10);
+      mo=s.substr(4,2); d=s.substr(6,2); h=s.substr(8,2); mi=s.substr(10,2); se=s.substr(12,2);
+    }
+    var iso = y+"-"+mo+"-"+d+"T"+h+":"+mi+":"+(se||"00")+"Z";
+    var date = new Date(iso);
+    return { raw:s, iso:iso, date: isNaN(date.getTime())?null:date };
+  }
+
+  function parsePublicKey(reader, spkiTlv){
+    var kids = reader.children(spkiTlv);
+    var algKids = reader.children(kids[0]);
+    var algOid = decodeOID(algKids[0].value);
+    var info = { algOid: algOid, algName: oidName(algOid), type:null, bits:null, curve:null };
+    var bitStr = kids[1].value;
+    var keyBytes = bitStr.subarray(1);
+    if (algOid === "1.2.840.113549.1.1.1"){
+      info.type = "RSA";
+      var kr = new Reader(keyBytes, 0, keyBytes.length);
+      var seq = kr.readTLV();
+      var seqKids = new Reader(keyBytes, seq.start, seq.end);
+      var modulus = seqKids.readTLV();
+      var mb = modulus.value, off = 0;
+      while (off < mb.length && mb[off] === 0) off++;
+      info.bits = (mb.length - off) * 8;
+    } else if (algOid === "1.2.840.10045.2.1"){
+      info.type = "EC";
+      if (algKids.length > 1 && algKids[1].tagNo === 6){
+        info.curve = oidName(decodeOID(algKids[1].value));
+      }
+    } else {
+      info.type = info.algName;
+    }
+    return info;
+  }
+
+  function readerIter(bytes, start, end, cb){
+    var r = new Reader(bytes, start, end);
+    while (!r.eof()) cb(r.readTLV());
+  }
+  function ipFromBytes(bytes){
+    if (bytes.length === 4) return Array.prototype.join.call(bytes, ".");
+    if (bytes.length === 16){
+      var out = [];
+      for (var i=0;i<16;i+=2) out.push(((bytes[i]<<8)|bytes[i+1]).toString(16));
+      return out.join(":");
+    }
+    return colonHex(bytes);
+  }
+
+  function parseExtensions(reader, extWrapTlv, result){
+    var seq = reader.children(extWrapTlv)[0];
+    if (!seq) return;
+    reader.children(seq).forEach(function(ext){
+      var kids = reader.children(ext);
+      var oid = decodeOID(kids[0].value);
+      var critical = false, idx = 1;
+      if (kids[idx] && kids[idx].tagNo === 1){ critical = kids[idx].value[0] !== 0; idx++; }
+      var octet = kids[idx];
+      var inner = new Reader(octet.value, 0, octet.value.length);
+      try {
+        if (oid === "2.5.29.17"){
+          var sanSeq = inner.readTLV(), dns = [], ips = [], other = [];
+          readerIter(octet.value, sanSeq.start, sanSeq.end, function(item){
+            if (item.tagNo === 2) dns.push(decodeStr(item.value));
+            else if (item.tagNo === 7) ips.push(ipFromBytes(item.value));
+            else if (item.tagNo === 1) other.push("email:"+decodeStr(item.value));
+            else if (item.tagNo === 6) other.push("uri:"+decodeStr(item.value));
+          });
+          result.san = { dns: dns, ips: ips, other: other };
+        } else if (oid === "2.5.29.19"){
+          var bc = { ca:false, pathlen:null }, bcSeq = inner.readTLV();
+          readerIter(octet.value, bcSeq.start, bcSeq.end, function(item){
+            if (item.tagNo === 1) bc.ca = item.value.length ? item.value[0] !== 0 : false;
+            else if (item.tagNo === 2) bc.pathlen = item.value.length ? item.value[item.value.length-1] : 0;
+          });
+          result.basicConstraints = bc;
+        } else if (oid === "2.5.29.15"){
+          var ku = inner.readTLV(), bits = ku.value.subarray(1), usages = [];
+          for (var bi=0; bi<bits.length*8; bi++){
+            var byteI = Math.floor(bi/8), bitI = 7 - (bi%8);
+            if (bits[byteI] & (1<<bitI)){ if (KEY_USAGE_BITS[bi]) usages.push(KEY_USAGE_BITS[bi]); }
+          }
+          result.keyUsage = usages;
+        } else if (oid === "2.5.29.37"){
+          var ekuSeq = inner.readTLV(), ekus = [];
+          readerIter(octet.value, ekuSeq.start, ekuSeq.end, function(item){
+            if (item.tagNo === 6) ekus.push(oidName(decodeOID(item.value)));
+          });
+          result.extKeyUsage = ekus;
+        } else if (oid === "2.5.29.14"){
+          var ski = inner.readTLV();
+          result.subjectKeyId = colonHex(ski.value);
+        } else if (oid === "2.5.29.35"){
+          var akiSeq = inner.readTLV();
+          readerIter(octet.value, akiSeq.start, akiSeq.end, function(item){
+            if (item.tagNo === 0) result.authorityKeyId = colonHex(item.value);
+          });
+        }
+      } catch(e){ /* tolerate odd extensions */ }
+      result.extensions.push({ oid: oid, name: oidName(oid), critical: critical });
+    });
+  }
+
+  function parseCertificate(pem){
+    var der = pemToDer(pem);
+    var top = new Reader(der, 0, der.length);
+    var cert = top.readTLV();
+    var certKids = top.children(cert);
+    var tbs = certKids[0], sigAlgSeq = certKids[1];
+    var tbsKids = top.children(tbs);
+
+    var result = { version:1, serial:null, sigAlg:null, issuer:null, subject:null,
+      notBefore:null, notAfter:null, publicKey:null, extensions:[], san:null,
+      basicConstraints:null, keyUsage:null, extKeyUsage:null, subjectKeyId:null, authorityKeyId:null };
+
+    var i = 0;
+    if (tbsKids[0] && tbsKids[0].cls === 2 && tbsKids[0].tagNo === 0){
+      var vKids = top.children(tbsKids[0]);
+      if (vKids.length){ result.version = (vKids[0].value[vKids[0].value.length-1] || 0) + 1; }
+      i = 1;
+    }
+    var serialT = tbsKids[i++];
+    result.serial = colonHex(serialT.value).replace(/^00:/,"") || "0";
+    i++; // tbs signature alg (the outer one is authoritative)
+    result.issuer = parseName(top, tbsKids[i++]);
+    var validity = top.children(tbsKids[i++]);
+    result.notBefore = parseTime(validity[0]);
+    result.notAfter = parseTime(validity[1]);
+    result.subject = parseName(top, tbsKids[i++]);
+    result.publicKey = parsePublicKey(top, tbsKids[i++]);
+    for (; i<tbsKids.length; i++){
+      if (tbsKids[i].cls === 2 && tbsKids[i].tagNo === 3) parseExtensions(top, tbsKids[i], result);
+    }
+    result.sigAlg = oidName(decodeOID(top.children(sigAlgSeq)[0].value));
+    return result;
+  }
+  // =================== end parser core ===================
+
+  function fmtDate(t){
+    if (!t || !t.date) return t ? esc(t.raw) : "unknown";
+    var now = Date.now(), ms = t.date.getTime(), diff = ms - now, abs = Math.abs(diff);
+    var day = 86400000, rel;
+    if (abs < day) rel = Math.round(abs/3600000) + " hours";
+    else rel = Math.round(abs/day) + " days";
+    rel = diff >= 0 ? ("in " + rel) : (rel + " ago");
+    return t.iso + " (" + rel + ")";
+  }
+
+  function buildFindings(c){
+    var out = [], now = Date.now(), DAY = 86400000;
+
+    // expiry
+    (function(){
+      var na = c.notAfter && c.notAfter.date ? c.notAfter.date.getTime() : null;
+      var nb = c.notBefore && c.notBefore.date ? c.notBefore.date.getTime() : null;
+      if (na === null){ out.push({s:"warn",h:"Validity dates",f:"The notAfter date could not be parsed, so expiry cannot be checked here.",why:"A certificate without a readable expiry should be inspected with another tool before it is trusted."}); return; }
+      if (na < now){ out.push({s:"fail",h:"Expired",f:"This certificate expired "+fmtDate(c.notAfter)+". Clients will reject it during the handshake.",why:"An expired certificate fails validation everywhere. It must be renewed and redeployed before it will be accepted again."}); return; }
+      if (na - now < 30*DAY){ out.push({s:"warn",h:"Expiring soon",f:"This certificate expires "+fmtDate(c.notAfter)+", which is within about thirty days.",why:"Renew before the notAfter date so clients never see an expired certificate. Automated renewal removes this risk entirely."}); return; }
+      if (nb !== null && nb > now){ out.push({s:"warn",h:"Not yet valid",f:"The notBefore date is "+fmtDate(c.notBefore)+", so this certificate is not valid yet.",why:"A certificate is rejected before its notBefore date. Check the issuing clock if this is unexpected."}); return; }
+      out.push({s:"pass",h:"Within validity window",f:"Valid until "+fmtDate(c.notAfter)+".",why:"The certificate is inside its validity window, so the dates alone will not cause a rejection."});
+    })();
+
+    // long lifetime
+    (function(){
+      var na = c.notAfter && c.notAfter.date, nb = c.notBefore && c.notBefore.date;
+      if (!na || !nb) return;
+      var days = Math.round((na.getTime() - nb.getTime())/DAY);
+      if (days > 398){ out.push({s:"warn",h:"Long validity period",f:"The certificate is valid for about "+days+" days. Public certificates are now capped near 398 days, and a long lived certificate is a long lived liability if its key leaks.",why:"A shorter lifetime limits how long a compromised key stays usable and forces regular rotation."}); }
+    })();
+
+    // weak signature
+    (function(){
+      var alg = (c.sigAlg||"").toString();
+      if (/md5|MD5/.test(alg)){ out.push({s:"fail",h:"Weak signature algorithm",f:"The signature uses MD5 ("+esc(alg)+"). MD5 collisions are trivial, so the signature is not a meaningful proof that the issuer signed this certificate.",why:"Reissue with a SHA256 based signature. MD5 has been forbidden for certificates for many years."}); return; }
+      if (/(^|[^2])sha-?1|SHA1|sha1/i.test(alg) && /sha1|SHA1|sha-1/i.test(alg)){ out.push({s:"fail",h:"Weak signature algorithm",f:"The signature uses SHA1 ("+esc(alg)+"). SHA1 collisions are practical, so the signature no longer provides strong integrity.",why:"Reissue with a SHA256 based signature. Browsers have rejected SHA1 certificates for years."}); return; }
+      out.push({s:"pass",h:"Signature algorithm",f:"Signed with "+esc(alg)+", which is a current and accepted algorithm.",why:"A modern hash keeps the signature a meaningful proof that the named issuer signed this exact certificate."});
+    })();
+
+    // key size
+    (function(){
+      var k = c.publicKey;
+      if (!k){ return; }
+      if (k.type === "RSA"){
+        if (k.bits && k.bits < 2048){ out.push({s:"fail",h:"Small RSA key",f:"The RSA key is "+k.bits+" bits, below the 2048 bit minimum.",why:"A key under 2048 bits is within reach of modern factoring effort. Reissue with a 2048 bit or larger RSA key, or move to an elliptic curve key."}); return; }
+        out.push({s:"pass",h:"Key strength",f:"RSA "+(k.bits||"?")+" bit key, at or above the accepted minimum.",why:"A 2048 bit or larger RSA key resists current factoring effort."});
+      } else if (k.type === "EC"){
+        out.push({s:"pass",h:"Key strength",f:"Elliptic curve key on "+(k.curve||"an unnamed curve")+".",why:"A named EC curve such as P-256 gives strong security with a small key, which is fine for TLS."});
+      }
+    })();
+
+    // self signed
+    (function(){
+      if (!c.issuer || !c.subject) return;
+      if (c.issuer.str && c.issuer.str === c.subject.str){
+        var isCa = c.basicConstraints && c.basicConstraints.ca;
+        out.push({s:"info",h:"Self issued",f:"The issuer name equals the subject name, so this certificate signed itself"+(isCa?" and is marked as a CA":"")+".",why:isCa?"A root CA is self issued by design. A self issued leaf, on the other hand, is not trusted by browsers.":"A self issued leaf certificate is not trusted by browsers. This is expected for a local test or an internal root, not for a public site."});
+      }
+    })();
+
+    return out;
+  }
+
+  function rowsFor(parts){
+    return parts.map(function(p){ return '<div><span class="k">'+esc(p.type)+'</span> <b>'+esc(p.value)+'</b></div>'; }).join("");
+  }
+
+  function renderDecoded(c){
+    var html = '<div class="decoded">';
+
+    // Subject
+    html += '<div class="seg"><h3>Subject</h3><div class="kv">'+rowsFor(c.subject.parts)+'</div></div>';
+    // Issuer
+    html += '<div class="seg"><h3>Issuer</h3><div class="kv">'+rowsFor(c.issuer.parts)+'</div></div>';
+
+    // Validity
+    html += '<div class="seg"><h3>Validity</h3><div class="kv">';
+    html += '<div><span class="k">notBefore</span> <b>'+esc(fmtDate(c.notBefore))+'</b></div>';
+    html += '<div><span class="k">notAfter</span> <b>'+esc(fmtDate(c.notAfter))+'</b></div>';
+    html += '</div></div>';
+
+    // Key + signature
+    var k = c.publicKey, keyDesc;
+    if (k && k.type === "RSA") keyDesc = "RSA, "+(k.bits||"?")+" bit";
+    else if (k && k.type === "EC") keyDesc = "EC, "+(k.curve||"unnamed curve");
+    else keyDesc = k ? esc(k.algName) : "unknown";
+    html += '<div class="seg"><h3>Key and signature</h3><div class="kv">';
+    html += '<div><span class="k">version</span> <b>v'+esc(c.version)+'</b></div>';
+    html += '<div><span class="k">serial</span> <b>'+esc(c.serial)+'</b></div>';
+    html += '<div><span class="k">public key</span> <b>'+esc(keyDesc)+'</b></div>';
+    html += '<div><span class="k">signature</span> <b>'+esc(c.sigAlg||"unknown")+'</b></div>';
+    html += '</div></div>';
+
+    // SAN (full width)
+    html += '<div class="seg full"><h3>Subject Alternative Names</h3>';
+    if (c.san && (c.san.dns.length || c.san.ips.length || c.san.other.length)){
+      html += '<div class="tags">';
+      c.san.dns.forEach(function(d){ html += '<span class="tag">'+esc(d)+'</span>'; });
+      c.san.ips.forEach(function(d){ html += '<span class="tag">IP '+esc(d)+'</span>'; });
+      c.san.other.forEach(function(d){ html += '<span class="tag">'+esc(d)+'</span>'; });
+      html += '</div>';
+    } else {
+      html += '<div class="kv"><div>No Subject Alternative Name extension. Modern clients require a matching SAN entry, so a certificate without one will fail host matching.</div></div>';
+    }
+    html += '</div>';
+
+    // Extensions detail (full width)
+    html += '<div class="seg full"><h3>Extensions</h3><div class="kv">';
+    if (c.basicConstraints){
+      html += '<div><span class="k">Basic Constraints</span> <b>CA '+(c.basicConstraints.ca?"TRUE":"FALSE")+(c.basicConstraints.pathlen!==null?(", pathlen "+c.basicConstraints.pathlen):"")+'</b></div>';
+    }
+    if (c.keyUsage && c.keyUsage.length){
+      html += '<div><span class="k">Key Usage</span> <b>'+esc(c.keyUsage.join(", "))+'</b></div>';
+    }
+    if (c.extKeyUsage && c.extKeyUsage.length){
+      html += '<div><span class="k">Ext Key Usage</span> <b>'+esc(c.extKeyUsage.join(", "))+'</b></div>';
+    }
+    if (c.subjectKeyId){
+      html += '<div><span class="k">Subject Key ID</span> <b>'+esc(c.subjectKeyId)+'</b></div>';
+    }
+    if (c.authorityKeyId){
+      html += '<div><span class="k">Authority Key ID</span> <b>'+esc(c.authorityKeyId)+'</b></div>';
+    }
+    if (!c.basicConstraints && !c.keyUsage && !c.extKeyUsage && !c.subjectKeyId && !c.authorityKeyId){
+      html += '<div>No common extensions were present in this certificate.</div>';
+    }
+    if (c.extensions.length){
+      html += '<div style="margin-top:6px"><span class="k">All present</span> <b>'+esc(c.extensions.map(function(e){return e.name+(e.critical?" (critical)":"");}).join(" | "))+'</b></div>';
+    }
+    html += '</div></div>';
+
+    html += '</div>';
+    return html;
+  }
+
+  function render(c, findings){
+    var html = renderDecoded(c);
+
+    var fails = 0, warns = 0;
+    findings.forEach(function(f){ if (f.s==="fail") fails++; else if (f.s==="warn") warns++; });
+    var cls = fails ? "g-bad" : warns ? "g-warn" : "g-ok";
+    var label = fails ? "Issues" : warns ? "Review" : "Healthy";
+    var msg;
+    if (fails) msg = fails+" finding"+(fails>1?"s":"")+" need attention"+(warns?(", plus "+warns+" to review"):"")+". This reads the certificate fields, it does not check the chain or revocation.";
+    else if (warns) msg = warns+" finding"+(warns>1?"s":"")+" to review. Nothing here blocks the certificate outright, but each is worth a look.";
+    else msg = "The fields this tool reads look healthy. It does not verify the chain, revocation, or the signature against the issuer key.";
+
+    html += '<div class="grade-card">';
+    html += '<div class="grade '+cls+'">'+label+'</div>';
+    html += '<div class="grade-meta"><h2>'+esc(c.subject.parts.reduce(function(a,p){return p.type==="CN"?p.value:a;}, "Certificate"))+'</h2>';
+    html += '<p>'+esc(msg)+'</p></div></div>';
+
+    html += '<div class="checks">';
+    findings.forEach(function(f){
+      var sym = f.s==="pass"?"&#10003;":f.s==="warn"?"!":f.s==="fail"?"&#10007;":"i";
+      html += '<div class="check"><div class="top"><span class="dot '+f.s+'">'+sym+'</span><div style="flex:1">';
+      html += '<h3>'+esc(f.h)+'</h3>';
+      html += '<div class="finding">'+esc(f.f)+'</div>';
+      if (f.why) html += '<div class="why">'+esc(f.why)+'</div>';
+      html += '</div></div></div>';
+    });
+    html += '</div>';
+    return html;
+  }
+
+  function run(){
+    var text = $("#pem").value.trim();
+    if (!text){ $("#results").innerHTML = '<div class="empty">Paste a PEM certificate first.</div>'; return; }
+    var c;
+    try { c = parseCertificate(text); }
+    catch(e){
+      $("#results").innerHTML = '<div class="empty">Could not parse this as an X.509 certificate. '+esc(e.message||"")+'</div>';
+      return;
+    }
+    var findings = buildFindings(c);
+    $("#results").innerHTML = render(c, findings);
+    $("#results").scrollIntoView({ behavior:"smooth", block:"start" });
+  }
+
+  $("#decode").addEventListener("click", run);
+  $("#example").addEventListener("click", function(){ $("#pem").value = EXAMPLE; run(); });
+  $("#clear").addEventListener("click", function(){ $("#pem").value=""; $("#results").innerHTML='<div class="empty">Your decoded certificate and findings will appear here.</div>'; $("#pem").focus(); });
+  $("#pem").addEventListener("keydown", function(e){ if ((e.metaKey||e.ctrlKey) && e.key==="Enter") run(); });
+})();
+</script>
+</body>
+</html>

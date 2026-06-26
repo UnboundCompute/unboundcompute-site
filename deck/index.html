@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>UnboundCompute Deck</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600;700&family=JetBrains+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --paper: #14120e;
+    --paper-2: #100e0b;
+    --card: #1d1a14;
+    --ink: #ece7da;
+    --ink-soft: #a39a87;
+    --ink-faint: #726b5b;
+    --line: rgba(236, 231, 218, 0.12);
+    --line-soft: rgba(236, 231, 218, 0.06);
+    --accent: #7c93ff;
+    --clay: #e08f55;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: #000; }
+  body {
+    font-family: 'Inter', system-ui, sans-serif; font-weight: 450; color: var(--ink);
+    -webkit-font-smoothing: antialiased; -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  .serif { font-family: 'Newsreader', Georgia, serif; }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+
+  @page { size: 1280px 720px; margin: 0; }
+  .slide {
+    width: 1280px; height: 720px; position: relative; overflow: hidden;
+    background: var(--paper); color: var(--ink); padding: 84px 96px;
+    page-break-after: always; display: flex; flex-direction: column;
+  }
+  .slide:last-child { page-break-after: auto; }
+
+  /* shared chrome */
+  .kicker { font-family:'JetBrains Mono',monospace; font-size: 14px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--clay); margin-bottom: 26px; }
+  h1.title { font-family:'Newsreader',serif; font-weight: 400; font-size: 78px; line-height: 1.02; letter-spacing: -0.02em; }
+  h2 { font-family:'Newsreader',serif; font-weight: 400; font-size: 50px; line-height: 1.08; letter-spacing: -0.02em; max-width: 22ch; }
+  h2 em, .title em { font-style: italic; color: var(--accent); }
+  .lead { font-size: 23px; color: var(--ink-soft); line-height: 1.5; max-width: 60ch; margin-top: 24px; }
+
+  .foot { position: absolute; left: 96px; right: 96px; bottom: 44px; display: flex; justify-content: space-between; align-items: center; font-family:'JetBrains Mono',monospace; font-size: 13px; color: var(--ink-faint); letter-spacing: 0.04em; }
+  .foot .brand { display: flex; align-items: center; gap: 9px; color: var(--ink-soft); }
+  .mark { width: 22px; height: 22px; border-radius: 6px; background: var(--ink); color: var(--paper); display: grid; place-items: center; font-family:'Newsreader',serif; font-size: 13px; font-weight: 600; }
+
+  .body { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+
+  /* lists */
+  ul.pts { list-style: none; margin-top: 36px; display: flex; flex-direction: column; gap: 22px; max-width: 64ch; }
+  ul.pts li { font-size: 21px; line-height: 1.45; color: var(--ink); padding-left: 30px; position: relative; }
+  ul.pts li::before { content: ""; position: absolute; left: 0; top: 13px; width: 9px; height: 9px; border-radius: 50%; background: var(--accent); }
+  ul.pts li b { color: var(--ink); font-weight: 600; }
+  ul.pts li span { color: var(--ink-soft); }
+
+  /* title slide */
+  .slide.cover { justify-content: center; }
+  .wash { position: absolute; inset: 0; pointer-events: none;
+    background:
+      radial-gradient(ellipse 50% 55% at 22% 25%, rgba(124,147,255,0.18), transparent 60%),
+      radial-gradient(ellipse 45% 50% at 80% 30%, rgba(224,143,85,0.15), transparent 60%);
+  }
+  .cover .eyebrow { display:inline-flex; align-items:center; gap:10px; font-family:'JetBrains Mono',monospace; font-size:14px; letter-spacing:0.08em; color:var(--ink-soft); border:1px solid var(--line); border-radius:100px; padding:9px 18px; width:max-content; margin-bottom:34px; }
+  .cover .eyebrow .dot { width:8px; height:8px; border-radius:50%; background:var(--clay); }
+  .cover .wordmark { display:flex; align-items:center; gap:14px; margin-bottom:30px; }
+  .cover .wordmark .mark { width: 40px; height: 40px; border-radius: 10px; font-size: 22px; }
+  .cover .wordmark .name { font-family:'Newsreader',serif; font-size: 34px; letter-spacing:-0.01em; }
+
+  /* two-column */
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 44px; }
+  .cols.three { grid-template-columns: repeat(3, 1fr); }
+  .tile { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 28px; }
+  .tile h3 { font-family:'Newsreader',serif; font-weight:500; font-size: 24px; margin-bottom: 10px; letter-spacing:-0.01em; }
+  .tile.accent h3 { color: var(--accent); }
+  .tile.dim { background: var(--paper-2); border-style: dashed; }
+  .tile.dim h3 { color: var(--ink-soft); font-style: italic; }
+  .tile p { color: var(--ink-soft); font-size: 16px; line-height: 1.5; }
+  .tile .lbl { font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.06em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:12px; }
+
+  /* feature grid */
+  .grid5 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 40px; }
+  .fcard { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 24px; }
+  .fcard h3 { font-size: 19px; font-weight: 600; margin-bottom: 8px; letter-spacing:-0.01em; }
+  .fcard p { color: var(--ink-soft); font-size: 15px; line-height: 1.45; }
+  .fcard .n { font-family:'Newsreader',serif; font-style:italic; color: var(--accent); font-size: 19px; margin-bottom: 10px; }
+
+  /* loop diagram */
+  .loopwrap { display: grid; grid-template-columns: 1.05fr 1fr; gap: 40px; align-items: center; margin-top: 30px; }
+  .loop svg { width: 100%; height: auto; }
+  .lp-label { font-family:'JetBrains Mono',monospace; font-size: 16px; fill: var(--ink); }
+  .lp-core { fill: var(--ink-faint); font-family:'JetBrains Mono',monospace; font-size: 12px; letter-spacing:0.16em; }
+  .lp-node { fill: var(--accent); }
+  .lp-ring { fill: none; stroke: var(--line); stroke-width: 2; stroke-dasharray: 2 9; }
+  .lp-arrow { fill: var(--accent); }
+
+  /* roadmap */
+  .road { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; margin-top: 48px; border-top: 1px solid var(--line); }
+  .road .col { padding: 30px 26px 30px 0; border-right: 1px solid var(--line); }
+  .road .col:last-child { border-right: none; padding-right: 0; padding-left: 26px; }
+  .road .col:nth-child(2) { padding-left: 26px; }
+  .road .when { font-family:'JetBrains Mono',monospace; font-size: 13px; letter-spacing:0.08em; text-transform:uppercase; color: var(--clay); margin-bottom: 16px; }
+  .road .col h3 { font-family:'Newsreader',serif; font-weight:500; font-size: 22px; margin-bottom: 12px; }
+  .road .col p { color: var(--ink-soft); font-size: 16px; line-height: 1.5; }
+
+  .note { margin-top: 30px; font-size: 15px; color: var(--ink-faint); font-style: italic; max-width: 70ch; }
+</style>
+</head>
+<body>
+
+  <!-- 1 · COVER -->
+  <section class="slide cover">
+    <div class="wash"></div>
+    <div style="position:relative;">
+      <span class="eyebrow"><span class="dot"></span> Autonomous offensive security</span>
+      <div class="wordmark"><span class="mark">U</span><span class="name">UnboundCompute</span></div>
+      <h1 class="title">An autonomous security <em>researcher.</em></h1>
+      <p class="lead">It learns how an application is meant to work, finds where its own rules break, and proves it, for modern web apps and APIs.</p>
+    </div>
+    <div class="foot">
+      <span class="brand"><span class="mark">U</span> UnboundCompute</span>
+      <span>Early stage · Confidential · 2026</span>
+    </div>
+  </section>
+
+  <!-- 2 · PROBLEM -->
+  <section class="slide">
+    <div class="body">
+      <p class="kicker">The problem</p>
+      <h2>The highest impact bugs require <em>understanding</em> the app.</h2>
+      <ul class="pts">
+        <li><b>Scanners test a fixed list of known vulnerability types.</b> <span>They have no idea what the application is actually supposed to do.</span></li>
+        <li><b>The most damaging issues live in that gap</b> <span>, like broken access control, business logic abuse, and privilege escalation. They depend entirely on context.</span></li>
+        <li><b>Finding them means human researchers</b> <span>, scarce, expensive, and impossible to run continuously across everything you ship.</span></li>
+      </ul>
+    </div>
+    <div class="foot"><span class="brand"><span class="mark">U</span> UnboundCompute</span><span>02</span></div>
+  </section>
+
+  <!-- 3 · IDEA -->
+  <section class="slide">
+    <div class="body">
+      <p class="kicker">The idea</p>
+      <h2>Test the <em>assumptions</em>, not the payloads.</h2>
+      <p class="lead">A strong researcher models how an application is meant to behave, then designs the one experiment that should be forbidden, and watches what happens.</p>
+      <p class="lead" style="margin-top:18px;">We are building an autonomous agent that works the same way: understand the app, form the assumptions it makes, try to break each one, and verify the result.</p>
+    </div>
+    <div class="foot"><span class="brand"><span class="mark">U</span> UnboundCompute</span><span>03</span></div>
+  </section>
+
+  <!-- 4 · HOW IT WORKS (LOOP) -->
+  <section class="slide">
+    <p class="kicker">How it works</p>
+    <h2>A researcher's loop, run on its <em>own.</em></h2>
+    <div class="loopwrap">
+      <div class="loop">
+        <svg viewBox="0 0 460 360" xmlns="http://www.w3.org/2000/svg">
+          <circle class="lp-ring" cx="230" cy="180" r="130" />
+          <!-- nodes -->
+          <circle class="lp-node" cx="230" cy="50" r="7" />
+          <text class="lp-label" x="230" y="32" text-anchor="middle">understand</text>
+          <circle class="lp-node" cx="353" cy="141" r="7" />
+          <text class="lp-label" x="372" y="146" text-anchor="start">assume</text>
+          <circle class="lp-node" cx="306" cy="285" r="7" />
+          <text class="lp-label" x="306" y="312" text-anchor="middle">experiment</text>
+          <circle class="lp-node" cx="154" cy="285" r="7" />
+          <text class="lp-label" x="154" y="312" text-anchor="middle">verify</text>
+          <circle class="lp-node" cx="107" cy="141" r="7" />
+          <text class="lp-label" x="88" y="146" text-anchor="end">chain</text>
+          <text class="lp-core" x="230" y="178" text-anchor="middle">CONTINUOUS</text>
+          <text class="lp-core" x="230" y="196" text-anchor="middle">RESEARCH LOOP</text>
+        </svg>
+      </div>
+      <div>
+        <ul class="pts" style="margin-top:0;">
+          <li><b>Reasoning engine</b> <span>builds a live model of the app, forms its assumptions, and designs the experiments that would break them.</span></li>
+          <li><b>Verification</b> <span>confirms each finding with real, repeatable evidence, a proven contradiction, not a guess.</span></li>
+          <li><b>Chaining</b> <span>feeds every confirmed result back in as the next lead, the way an attacker actually works.</span></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot"><span class="brand"><span class="mark">U</span> UnboundCompute</span><span>04</span></div>
+  </section>
+
+  <!-- 5 · WHAT'S DIFFERENT -->
+  <section class="slide">
+    <p class="kicker">What's different</p>
+    <h2>Built to <em>reason</em>, designed to be trusted.</h2>
+    <div class="grid5">
+      <div class="fcard"><div class="n">01</div><h3>Reasons, doesn't scan</h3><p>Works from assumptions about your app, not a fixed checklist of vulnerability types.</p></div>
+      <div class="fcard"><div class="n">02</div><h3>Verified, not guessed</h3><p>Every finding rests on repeatable evidence from a real request, so there is little to triage.</p></div>
+      <div class="fcard"><div class="n">03</div><h3>Findings become tests</h3><p>Each confirmed issue is a repeatable proof that can check the fix again over time.</p></div>
+      <div class="fcard"><div class="n">04</div><h3>Depth and breadth</h3><p>Covers the surface while chaining single findings into deeper, multi step attacks.</p></div>
+      <div class="fcard"><div class="n">05</div><h3>APIs and modern apps</h3><p>Reads API specifications and drives a real browser for apps heavy on JavaScript.</p></div>
+      <div class="fcard"><div class="n">06</div><h3>Efficient by design</h3><p>Spends costly reasoning only where it pays off, so coverage grows without runaway cost.</p></div>
+    </div>
+    <div class="foot"><span class="brand"><span class="mark">U</span> UnboundCompute</span><span>05</span></div>
+  </section>
+
+  <!-- 6 · EARLY SIGNAL -->
+  <section class="slide">
+    <div class="body">
+      <p class="kicker">Early signal</p>
+      <h2>An early run gave us reason to <em>keep going.</em></h2>
+      <ul class="pts">
+        <li><b>A frontier model drove the full methodology autonomously,</b> <span>with no human in the loop.</span></li>
+        <li><b>It identified and verified real access control and injection issues</b> <span>in test applications it had not seen before.</span></li>
+      </ul>
+      <p class="note">This is an early, encouraging indication of the approach, not a benchmark. Validation at scale is still ahead of us.</p>
+    </div>
+    <div class="foot"><span class="brand"><span class="mark">U</span> UnboundCompute</span><span>06</span></div>
+  </section>
+
+  <!-- 7 · WHERE WE ARE -->
+  <section class="slide">
+    <p class="kicker">Where we are today</p>
+    <h2>An honest <em>snapshot.</em></h2>
+    <div class="cols">
+      <div class="tile accent">
+        <div class="lbl">Built and working</div>
+        <h3>The loop runs end to end</h3>
+        <p>An autonomous research loop runs against live test applications today, understanding, experimenting, and verifying on its own, across web apps and APIs.</p>
+      </div>
+      <div class="tile dim">
+        <div class="lbl">Not yet</div>
+        <h3>Where we're still early</h3>
+        <p>Early stage, small team. No external benchmark or third party validation yet. The deterministic verification layer and chaining across runs are being expanded.</p>
+      </div>
+    </div>
+    <p class="note" style="margin-top:36px;">Current focus: making the autonomous loop reliable, measurable, and consistent before opening it up.</p>
+    <div class="foot"><span class="brand"><span class="mark">U</span> UnboundCompute</span><span>07</span></div>
+  </section>
+
+  <!-- 8 · WHY NOW -->
+  <section class="slide">
+    <div class="body">
+      <p class="kicker">Why now</p>
+      <h2>The pieces just came <em>together.</em></h2>
+      <ul class="pts">
+        <li><b>Models can finally reason and use tools</b> <span>across many steps, enough to carry a real research method, not just answer a prompt.</span></li>
+        <li><b>Demand far outpaces supply</b> <span>of skilled security researchers, and every team ships faster than it can be tested.</span></li>
+        <li><b>The market is shifting to continuous, verified testing</b> <span>, away from point in time scans toward proof that holds over time.</span></li>
+      </ul>
+    </div>
+    <div class="foot"><span class="brand"><span class="mark">U</span> UnboundCompute</span><span>08</span></div>
+  </section>
+
+  <!-- 9 · ROADMAP -->
+  <section class="slide">
+    <p class="kicker">Roadmap</p>
+    <h2>From a reliable loop to <em>continuous</em> assurance.</h2>
+    <div class="road">
+      <div class="col">
+        <div class="when">Now</div>
+        <h3>Reliable autonomy</h3>
+        <p>Make the research loop consistent and measurable; strengthen coverage and depth on web apps and APIs.</p>
+      </div>
+      <div class="col">
+        <div class="when">Next</div>
+        <h3>Stronger verification</h3>
+        <p>Expand deterministic verification and carry confirmed results forward across a run for deeper chaining.</p>
+      </div>
+      <div class="col">
+        <div class="when">Later</div>
+        <h3>Continuous testing</h3>
+        <p>Test again on every change and turn each finding into a regression check wired into the release pipeline.</p>
+      </div>
+    </div>
+    <div class="foot"><span class="brand"><span class="mark">U</span> UnboundCompute</span><span>09</span></div>
+  </section>
+
+  <!-- 10 · CLOSING -->
+  <section class="slide cover">
+    <div class="wash"></div>
+    <div style="position:relative;">
+      <p class="kicker">Where we're headed</p>
+      <h1 class="title" style="font-size:60px;">Point it at an app.<br/><em>Trust the findings.</em></h1>
+      <p class="lead">We're building toward an autonomous researcher you can run continuously and rely on. We're looking for early design partners to shape it with us.</p>
+      <p class="lead" style="margin-top:22px; color:var(--ink);">unboundcompute.com</p>
+    </div>
+    <div class="foot">
+      <span class="brand"><span class="mark">U</span> UnboundCompute</span>
+      <span>Early stage · Confidential · 2026</span>
+    </div>
+  </section>
+
+</body>
+</html>

@@ -1,0 +1,158 @@
+# UnboundCompute
+
+> UnboundCompute is an autonomous security researcher for web apps and APIs. This site has a free security tool suite and a deep technical blog covering web, API, cloud, kernel, crypto, and AI agent security. Every blog post explains the assumption a bug breaks, with invented example apps and honest framing. The company is early and still being built.
+
+## Company
+
+- [Home: what UnboundCompute is](https://unboundcompute.com/)
+- [Design partners: work with us early](https://unboundcompute.com/design-partners.html)
+- [About: what we are building and why](https://unboundcompute.com/about.html)
+- [Research approach](https://unboundcompute.com/research.html)
+- [Careers](https://unboundcompute.com/careers.html)
+- [Trust and security posture](https://unboundcompute.com/trust.html)
+- [Free security tool suite (index)](https://unboundcompute.com/tools/)
+
+## Free in-browser security tools
+
+Client side only, nothing you paste leaves the page.
+
+- [Classical cipher solver](https://unboundcompute.com/tools/classical-cipher-solver.html)
+- [Cookie security auditor](https://unboundcompute.com/tools/cookie-security-auditor.html)
+- [CORS misconfiguration checker](https://unboundcompute.com/tools/cors-misconfiguration-checker.html)
+- [CSP evaluator](https://unboundcompute.com/tools/csp-evaluator.html)
+- [CSP generator](https://unboundcompute.com/tools/csp-generator.html)
+- [Encoded payload deobfuscator](https://unboundcompute.com/tools/encoded-payload-deobfuscator.html)
+- [EXIF metadata viewer scrubber](https://unboundcompute.com/tools/exif-metadata-viewer-scrubber.html)
+- [File entropy magic analyzer](https://unboundcompute.com/tools/file-entropy-magic-analyzer.html)
+- [Forensic timestamp converter](https://unboundcompute.com/tools/forensic-timestamp-converter.html)
+- [IOC defanger extractor](https://unboundcompute.com/tools/ioc-defanger-extractor.html)
+- [JWT security inspector](https://unboundcompute.com/tools/jwt-security-inspector.html)
+- [MCP server security auditor](https://unboundcompute.com/tools/mcp-server-security-auditor.html)
+- [MIME sniffing checker](https://unboundcompute.com/tools/mime-sniffing-checker.html)
+- [OWASP LLM Top 10 scorecard](https://unboundcompute.com/tools/owasp-llm-top10-scorecard.html)
+- [Password strength analyzer](https://unboundcompute.com/tools/password-strength-analyzer.html)
+- [Permissions policy builder](https://unboundcompute.com/tools/permissions-policy-builder.html)
+- [Prompt template injection linter](https://unboundcompute.com/tools/prompt-template-injection-linter.html)
+- [ReDoS regex analyzer](https://unboundcompute.com/tools/redos-regex-analyzer.html)
+- [Secret scanner](https://unboundcompute.com/tools/secret-scanner.html)
+- [Security headers analyzer](https://unboundcompute.com/tools/security-headers-analyzer.html)
+- [Security txt generator validator](https://unboundcompute.com/tools/security-txt-generator-validator.html)
+- [SRI hash generator](https://unboundcompute.com/tools/sri-hash-generator.html)
+- [SSRF IP URL normalizer](https://unboundcompute.com/tools/ssrf-ip-url-normalizer.html)
+- [Subdomain takeover checker](https://unboundcompute.com/tools/subdomain-takeover-checker.html)
+- [URL parser confusion analyzer](https://unboundcompute.com/tools/url-parser-confusion-analyzer.html)
+- [X.509 certificate decoder](https://unboundcompute.com/tools/x509-certificate-decoder.html)
+
+## Blog: AI and agent security
+
+- [Agent Memory Poisoning: When an AI Agent Remembers an Attacker's Instruction](https://security.unboundcompute.com/agent-memory-poisoning/): focus on agent memory poisoning.
+- [AI in Security Testing: What It Actually Does and Where It Falls Down](https://security.unboundcompute.com/ai-in-security-testing/): focus on ai in security testing.
+- [AI Security Testing: A Vendor Neutral Guide to Where AI Helps and Where It Fails](https://security.unboundcompute.com/ai-security-testing/): focus on ai security testing.
+- [ASCII Smuggling: Invisible Unicode Prompt Injection That Humans Cannot See](https://security.unboundcompute.com/ascii-smuggling-prompt-injection/): focus on ASCII smuggling.
+- [Denial of Wallet: When Attackers Run Up Your AI Agent's Bill](https://security.unboundcompute.com/denial-of-wallet-ai-agents/): focus on denial of wallet.
+- [Excessive Agency in AI Agents: When a Tool Can Do Too Much](https://security.unboundcompute.com/excessive-agency-in-ai-agents/): focus on excessive agency.
+- [LLM Data Exfiltration Through Markdown Image Rendering](https://security.unboundcompute.com/llm-data-exfiltration-markdown/): focus on LLM data exfiltration.
+- [LLM Security Testing Tools: A Vendor Neutral Landscape Guide](https://security.unboundcompute.com/llm-security-testing-tools/): focus on llm security testing tools.
+- [MCP Tool Poisoning: When the Tool Description Is the Attack](https://security.unboundcompute.com/mcp-tool-poisoning-explained/): focus on mcp tool poisoning.
+- [MCP Tool Shadowing: When One Server Hijacks Another's Tools](https://security.unboundcompute.com/mcp-tool-shadowing/): focus on MCP tool shadowing.
+- [RAG Data Poisoning: How Attackers Corrupt the Knowledge Base Behind an LLM](https://security.unboundcompute.com/rag-data-poisoning/): focus on RAG data poisoning.
+- [Slopsquatting: When Attackers Register the Packages AI Hallucinates](https://security.unboundcompute.com/slopsquatting-attack/): focus on slopsquatting.
+- [System Prompt Extraction: Why Keeping the Prompt Secret Is Not Security](https://security.unboundcompute.com/system-prompt-extraction/): focus on system prompt extraction.
+- [The AI Agent Attack Surface, Mapped Component by Component](https://security.unboundcompute.com/ai-agent-attack-surface/): focus on ai agent attack surface.
+- [The Confused Deputy Attack in AI Agents Explained](https://security.unboundcompute.com/confused-deputy-ai-agents/): focus on confused deputy attack.
+- [The lethal trifecta in AI agents](https://security.unboundcompute.com/the-lethal-trifecta/): focus on the lethal trifecta.
+- [The MCP Rug Pull: When an Approved Tool Changes After You Trust It](https://security.unboundcompute.com/mcp-rug-pull-attack/): focus on MCP rug pull attack.
+- [What Is Indirect Prompt Injection and Why It Is So Hard to Stop](https://security.unboundcompute.com/what-is-indirect-prompt-injection/): focus on indirect prompt injection.
+
+## Blog: Deep dives: web, network, cloud, kernel, crypto
+
+- [AES GCM Nonce Reuse: The Forbidden Attack Explained](https://security.unboundcompute.com/aes-gcm-nonce-reuse/): focus on AES GCM nonce reuse.
+- [Client Side Path Traversal: When the Browser Sends Your Fetch Somewhere Else](https://security.unboundcompute.com/client-side-path-traversal/): focus on client side path traversal.
+- [Cross Site WebSocket Hijacking: The CSRF of WebSockets](https://security.unboundcompute.com/cross-site-websocket-hijacking/): focus on cross site WebSocket hijacking.
+- [Dependency Confusion Attack Explained](https://security.unboundcompute.com/dependency-confusion-attack/): focus on dependency confusion attack.
+- [Double Clickjacking: The Clickjacking Revival That Beats Frame Defenses](https://security.unboundcompute.com/double-clickjacking/): focus on double clickjacking.
+- [Hash Length Extension Attack: How to Forge a MAC Without the Secret](https://security.unboundcompute.com/hash-length-extension-attack/): focus on hash length extension attack.
+- [How a Container Escape Works: The cgroups v1 release_agent Technique](https://security.unboundcompute.com/how-a-container-escape-works/): focus on container escape.
+- [How a Device Decides to Trust Its Own Firmware](https://security.unboundcompute.com/how-secure-boot-works/): focus on secure boot.
+- [How Bluetooth LE Pairing Breaks: KNOB, BLESA, Just Works, and Sniffed Keys](https://security.unboundcompute.com/how-bluetooth-le-pairing-breaks/): focus on bluetooth le pairing.
+- [How Browser Fingerprinting Identifies You Without a Cookie](https://security.unboundcompute.com/how-browser-fingerprinting-works/): focus on browser fingerprinting.
+- [How DNS Rebinding Works and Reaches Inside Your Private Network](https://security.unboundcompute.com/how-dns-rebinding-works/): focus on dns rebinding.
+- [How NTLM Relay Works and Why a Portable Authentication Breaks Active Directory](https://security.unboundcompute.com/how-ntlm-relay-works/): focus on ntlm relay.
+- [How Rowhammer Works: Flipping Bits in Memory You Were Never Allowed to Touch](https://security.unboundcompute.com/how-rowhammer-works/): focus on rowhammer.
+- [How the eBPF verifier works, and where its proof has broken](https://security.unboundcompute.com/how-the-ebpf-verifier-works/): focus on ebpf verifier.
+- [How TLS Fingerprinting Works: JA3, JA4, and the ClientHello](https://security.unboundcompute.com/how-tls-fingerprinting-works/): focus on tls fingerprinting.
+- [Instance metadata service: the 169.254.169.254 credential leak](https://security.unboundcompute.com/instance-metadata-service-explained/): focus on instance metadata service.
+- [JWT Algorithm Confusion Attack Explained](https://security.unboundcompute.com/jwt-algorithm-confusion-attack/): focus on JWT algorithm confusion attack.
+- [Kubernetes service account token abuse: from one pod to cluster admin](https://security.unboundcompute.com/kubernetes-service-account-token-abuse/): focus on Kubernetes service account token.
+- [OAuth redirect_uri Manipulation: How a Loose Callback Check Leaks Your Code](https://security.unboundcompute.com/oauth-redirect-uri-manipulation/): focus on OAuth redirect_uri manipulation.
+- [Poisoned Pipeline Execution: When Your CI Runs Attacker Code With Your Secrets](https://security.unboundcompute.com/poisoned-pipeline-execution/): focus on poisoned pipeline execution.
+- [postMessage Vulnerabilities: When Cross Origin Messages Turn Into XSS](https://security.unboundcompute.com/postmessage-vulnerabilities/): focus on postMessage vulnerabilities.
+- [SAML Signature Wrapping Explained: When a Valid Signature Lies](https://security.unboundcompute.com/saml-signature-wrapping/): focus on SAML signature wrapping.
+- [The GraphQL Attack Surface: Introspection, Query DoS, Broken Authorization, and Injection](https://security.unboundcompute.com/graphql-api-attack-surface/): focus on graphql attack surface.
+- [What Actually Happens In A Kernel Use After Free](https://security.unboundcompute.com/how-a-kernel-use-after-free-works/): focus on kernel use after free.
+- [What Is a Hash Flooding Attack and Why It Stalls a Server With Bytes](https://security.unboundcompute.com/what-is-a-hash-flooding-attack/): focus on hash flooding attack.
+- [What Is a Padding Oracle Attack and How It Decrypts CBC Without the Key](https://security.unboundcompute.com/what-is-a-padding-oracle-attack/): focus on padding oracle attack.
+- [What Is HTTP Request Smuggling](https://security.unboundcompute.com/what-is-http-request-smuggling/): focus on http request smuggling.
+- [What Is Sigreturn Oriented Programming and Why One Gadget Owns the CPU](https://security.unboundcompute.com/what-is-sigreturn-oriented-programming/): focus on sigreturn oriented programming.
+- [What Is Subdomain Takeover and Why a Forgotten DNS Record Is Dangerous](https://security.unboundcompute.com/what-is-subdomain-takeover/): focus on subdomain takeover.
+- [What Is Web Cache Deception and How a Crafted URL Leaks Private Pages](https://security.unboundcompute.com/what-is-web-cache-deception/): focus on web cache deception.
+- [What is Web Cache Poisoning? How One Request Hits Many Users](https://security.unboundcompute.com/what-is-web-cache-poisoning/): focus on web cache poisoning.
+
+## Blog: Injection and input handling
+
+- [What is command injection? Examples explained](https://security.unboundcompute.com/what-is-command-injection/): focus on command injection.
+- [What is CSV injection (formula injection)?](https://security.unboundcompute.com/what-is-csv-injection/): focus on csv injection.
+- [What is DOM based XSS?](https://security.unboundcompute.com/what-is-dom-based-xss/): focus on dom based xss.
+- [What is Host Header Injection? How a Trusted Header Goes Wrong](https://security.unboundcompute.com/what-is-host-header-injection/): focus on host header injection.
+- [What is insecure deserialization?](https://security.unboundcompute.com/what-is-insecure-deserialization/): focus on insecure deserialization.
+- [What is NoSQL Injection? How Query Operators Get Abused](https://security.unboundcompute.com/what-is-nosql-injection/): focus on NoSQL injection.
+- [What is path traversal?](https://security.unboundcompute.com/what-is-path-traversal/): focus on path traversal.
+- [What is prototype pollution?](https://security.unboundcompute.com/what-is-prototype-pollution/): focus on prototype pollution.
+- [What is Server Side Template Injection? SSTI Explained](https://security.unboundcompute.com/what-is-server-side-template-injection/): focus on server side template injection.
+- [What is SQL injection and how does it work?](https://security.unboundcompute.com/what-is-sql-injection/): focus on sql injection.
+- [What is SSRF? Server Side Request Forgery Explained](https://security.unboundcompute.com/what-is-ssrf/): focus on server side request forgery.
+- [What is XSS and how does it work? With examples](https://security.unboundcompute.com/what-is-xss-and-how-does-it-work/): focus on cross site scripting.
+- [What is XXE injection and how does it work?](https://security.unboundcompute.com/what-is-xxe-injection/): focus on xxe injection.
+
+## Blog: Access control and authorization
+
+- [Authentication vs authorization, explained with examples](https://security.unboundcompute.com/authentication-vs-authorization/): focus on authentication vs authorization.
+- [Broken object level authorization and IDOR, with examples](https://security.unboundcompute.com/broken-object-level-authorization-idor/): focus on broken object level authorization.
+- [What is a CORS Misconfiguration? How It Leaks Data](https://security.unboundcompute.com/what-is-cors-misconfiguration/): focus on CORS misconfiguration.
+- [What is a Mass Assignment Vulnerability? How Extra Fields Break Access Control](https://security.unboundcompute.com/what-is-mass-assignment/): focus on mass assignment vulnerability.
+- [What is an access control vulnerability? Broken access control explained](https://security.unboundcompute.com/what-is-an-access-control-vulnerability/): focus on broken access control.
+- [What is CSRF (cross site request forgery)?](https://security.unboundcompute.com/what-is-csrf/): focus on csrf attack.
+- [What is privilege escalation? Examples explained](https://security.unboundcompute.com/what-is-privilege-escalation/): focus on privilege escalation.
+
+## Blog: Web application security basics
+
+- [How do hackers find vulnerabilities?](https://security.unboundcompute.com/how-do-hackers-find-vulnerabilities/): focus on how do hackers find vulnerabilities.
+- [The most common web vulnerabilities, explained simply](https://security.unboundcompute.com/most-common-web-vulnerabilities/): focus on most common web vulnerabilities.
+- [Web and API Security Glossary: Vulnerabilities and Terms Explained](https://security.unboundcompute.com/web-security-glossary/): focus on web application vulnerabilities.
+- [What is a business logic vulnerability?](https://security.unboundcompute.com/what-is-a-business-logic-vulnerability/): focus on business logic vulnerability.
+- [What is an open redirect vulnerability?](https://security.unboundcompute.com/what-is-an-open-redirect/): focus on open redirect vulnerability.
+- [What is web application security?](https://security.unboundcompute.com/what-is-web-application-security/): focus on web application security.
+
+## Blog: Attack teardowns
+
+- [Teardown: chaining small bugs into a real breach](https://security.unboundcompute.com/teardown-chaining-bugs-into-a-breach/): focus on exploit chaining.
+- [Teardown: how an IDOR quietly exposes another user's data](https://security.unboundcompute.com/teardown-idor-exposes-user-data/): focus on idor example.
+
+## Blog: Scanners vs real research
+
+- [SAST vs DAST vs IAST, what is the difference?](https://security.unboundcompute.com/sast-vs-dast-vs-iast/): focus on sast vs dast.
+- [What is automated penetration testing?](https://security.unboundcompute.com/what-is-automated-penetration-testing/): focus on automated penetration testing.
+
+## Blog: About UnboundCompute
+
+- [How UnboundCompute differs from a vulnerability scanner](https://security.unboundcompute.com/unboundcompute-vs-vulnerability-scanner/): focus on ai vulnerability scanner.
+- [How UnboundCompute works, from understanding an app to proving a bug](https://security.unboundcompute.com/how-unboundcompute-works/): focus on ai penetration testing.
+- [Meet UnboundCompute, an autonomous security researcher for web apps and APIs](https://security.unboundcompute.com/meet-unboundcompute/): focus on autonomous penetration testing.
+- [Why we are building UnboundCompute](https://security.unboundcompute.com/why-we-are-building-unboundcompute/): focus on automated security testing.
+- [Why we only report proven vulnerabilities](https://security.unboundcompute.com/why-we-only-report-proven-vulnerabilities/): focus on vulnerability verification.
+
+## Optional
+
+- [Blog index](https://security.unboundcompute.com/blog/): every post.
+- [Apex sitemap](https://unboundcompute.com/sitemap.xml)
+- [Blog sitemap](https://security.unboundcompute.com/sitemap.xml)

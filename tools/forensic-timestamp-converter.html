@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Forensic Timestamp Converter | UnboundCompute</title>
+<meta name="description" content="Paste an artifact timestamp and see every plausible decoding side by side: Windows FILETIME, Active Directory, Chrome WebKit time, Apple Cocoa and HFS+, OLE date, DOS date, and Unix epoch. Auto detects the likely format from the magnitude. Runs fully in your browser." />
+<meta name="keywords" content="forensic timestamp converter, windows filetime converter, chrome webkit time, cocoa core data timestamp, epoch converter, dfir timestamp, ldap timestamp, ole automation date, dos date time decoder, unix epoch converter" />
+<meta name="robots" content="index, follow" />
+<meta name="author" content="UnboundCompute" />
+<meta name="theme-color" content="#0a0a0b" />
+<link rel="canonical" href="https://unboundcompute.com/tools/forensic-timestamp-converter.html" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a0a0b'/%3E%3Cline x1='16' y1='4' x2='16' y2='28' stroke='%23fb5b46' stroke-width='2' stroke-dasharray='3 3'/%3E%3Ccircle cx='16' cy='16' r='3.4' fill='%23fb5b46'/%3E%3C/svg%3E" />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="UnboundCompute" />
+<meta property="og:title" content="Forensic Timestamp Converter" />
+<meta property="og:description" content="Decode any artifact timestamp into a human readable date. FILETIME, Chrome WebKit, Cocoa, OLE, DOS, and Unix epoch, side by side. Runs fully in your browser." />
+<meta property="og:url" content="https://unboundcompute.com/tools/forensic-timestamp-converter.html" />
+<meta property="og:image" content="https://unboundcompute.com/og.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Forensic Timestamp Converter" />
+<meta name="twitter:description" content="Decode any artifact timestamp into a human readable date. FILETIME, Chrome WebKit, Cocoa, and Unix epoch, side by side." />
+<meta name="twitter:image" content="https://unboundcompute.com/og.png" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "Forensic Timestamp Converter",
+      "applicationCategory": "SecurityApplication",
+      "operatingSystem": "Web",
+      "browserRequirements": "Requires JavaScript. Runs entirely client side.",
+      "url": "https://unboundcompute.com/tools/forensic-timestamp-converter.html",
+      "description": "A free tool for digital forensics and incident response that decodes an artifact timestamp into a human readable date. It auto detects the likely source format from the magnitude of the value and shows every plausible interpretation side by side, including Windows FILETIME, Active Directory and LDAP timestamps, Chrome and WebKit time, Apple Cocoa Core Data absolute time, Mac HFS plus time, OLE Automation date, packed DOS date and time, and Unix epoch in seconds, milliseconds, microseconds, and nanoseconds. An ISO 8601 input is re encoded into each of those formats. All conversion happens in the browser as pure math on the input.",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "publisher": { "@type": "Organization", "name": "UnboundCompute", "url": "https://unboundcompute.com/" }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is a Windows FILETIME and how is it converted?",
+          "acceptedAnswer": { "@type": "Answer", "text": "A Windows FILETIME is a 64 bit count of 100 nanosecond intervals that have elapsed since midnight on the first of January 1601 in UTC. To convert it to a Unix style date you divide by ten million to get seconds, then subtract the 11644473600 seconds that separate the 1601 epoch from the 1970 epoch. Because the raw value can exceed what a double can hold exactly, this tool does that arithmetic with BigInt so the result stays precise." }
+        },
+        {
+          "@type": "Question",
+          "name": "How does the tool know which format my number is?",
+          "acceptedAnswer": { "@type": "Answer", "text": "It does not assume one answer. It looks at the magnitude and the shape of the value, then decodes it under every format that could plausibly produce a number that size and lands on a sane date. The most likely interpretation is highlighted, but every plausible reading is shown side by side so you, the analyst, make the final call from the surrounding context of the artifact." }
+        },
+        {
+          "@type": "Question",
+          "name": "Does this timestamp converter send my data anywhere?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. Every conversion is pure arithmetic that runs in your browser with JavaScript. The value you paste is never uploaded, logged, or sent to any server. That matters in forensics because a timestamp can come from a sealed image or a live investigation, and the input never leaves your machine." }
+        },
+        {
+          "@type": "Question",
+          "name": "Why do some formats not have a time zone?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Most of the epoch based formats here are defined in UTC, so the tool shows UTC as the source of truth and adds your local rendering for convenience. A few artifacts, notably classic Mac HFS plus timestamps, were historically stored in local time on the machine that wrote them. The tool decodes the raw value against the documented epoch and labels it so you remember to reason about the original time zone yourself." }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I go the other way, from a date to these encodings?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes. Paste an ISO 8601 date and time such as 2021-01-01T00:00:00Z and the tool re encodes that instant into each supported format, so you can search a disk image or a database for the matching raw value." }
+        }
+      ]
+    }
+  ]
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600&family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0a0b; --bg-2:#070708; --panel:#0e0e10; --panel-2:#131315;
+    --ink:#f4f2ec; --ink-hi:#fbf9f3; --ink-soft:#9b988f; --ink-faint:#5e5b54;
+    --line:rgba(244,242,236,.13); --line-2:rgba(244,242,236,.07);
+    --accent:#fb5b46; --accent-2:#ff7d6b; --accent-wash:rgba(251,91,70,.12); --on-accent:#1a0c09; --accent-line:rgba(251,91,70,.42);
+    --pass:#5fd6a4; --pass-wash:rgba(95,214,164,.1); --warn:#e8b04b; --warn-wash:rgba(232,176,75,.1); --fail:#fb5b46; --fail-wash:rgba(251,91,70,.1); --info:#7c93ff; --info-wash:rgba(124,147,255,.1);
+    --serif:'Newsreader',Georgia,serif; --mono:'JetBrains Mono',ui-monospace,monospace; --sans:'Inter',system-ui,sans-serif;
+    --maxw:920px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;line-height:1.6}
+  ::selection{background:var(--accent);color:var(--on-accent)}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+
+  nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);background:rgba(10,10,11,.72);border-bottom:1px solid var(--line-2)}
+  nav .wrap{height:64px;display:flex;align-items:center;justify-content:space-between}
+  nav a.brand{display:flex;align-items:center;gap:11px;font-family:var(--mono);font-weight:600;font-size:15px;color:var(--ink);letter-spacing:-.01em}
+  nav a.brand:hover{text-decoration:none}
+  nav .badge{width:27px;height:27px;border-radius:7px;border:1px solid var(--accent-line);display:grid;place-items:center}
+  nav a.cta{font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:9px 16px;border-radius:8px;background:var(--accent);color:var(--on-accent)}
+  nav a.cta:hover{filter:brightness(1.08);text-decoration:none}
+
+  header.hero{padding:64px 0 28px}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:18px}
+  h1{font-family:var(--serif);font-weight:400;font-size:clamp(32px,5vw,52px);line-height:1.08;letter-spacing:-.015em;color:var(--ink-hi)}
+  .lede{margin-top:18px;font-size:18px;color:var(--ink-soft);max-width:660px}
+  .privacy{margin-top:18px;display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);border:1px solid var(--line);border-radius:8px;padding:8px 13px;background:var(--panel)}
+  .privacy svg{width:14px;height:14px;flex:none}
+
+  .tool{margin:30px 0 12px;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px}
+  label.fld{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:10px}
+  textarea{width:100%;min-height:96px;resize:vertical;background:var(--bg-2);border:1px solid var(--line);border-radius:11px;padding:15px;color:var(--ink);font-family:var(--mono);font-size:13.5px;line-height:1.55;outline:none;transition:border-color .2s,box-shadow .2s;word-break:break-all}
+  textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-wash)}
+  textarea::placeholder{color:var(--ink-faint)}
+  .row{display:flex;gap:11px;flex-wrap:wrap;margin-top:14px;align-items:center}
+  button{font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;padding:13px 22px;border-radius:9px;cursor:pointer;border:1px solid var(--line);background:transparent;color:var(--ink);transition:filter .15s,border-color .15s,background .15s}
+  button.primary{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+  button.primary:hover{filter:brightness(1.08)}
+  button.ghost:hover{border-color:var(--accent-line);color:var(--ink-hi)}
+  .hint{font-family:var(--mono);font-size:12px;color:var(--ink-faint);margin-left:auto}
+  .examples{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}
+  .examples span{font-family:var(--mono);font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-faint);align-self:center;margin-right:2px}
+  .examples button{padding:8px 13px;font-size:11.5px;letter-spacing:.03em;text-transform:none}
+
+  #results{margin-top:8px}
+  .empty{color:var(--ink-faint);font-family:var(--mono);font-size:13px;text-align:center;padding:30px}
+
+  .summary{background:var(--panel-2);border:1px solid var(--line);border-radius:16px;padding:20px 22px;margin:20px 0}
+  .summary h2{font-family:var(--serif);font-weight:400;font-size:23px;color:var(--ink-hi);margin-bottom:6px}
+  .summary p{color:var(--ink-soft);font-size:14.5px}
+  .summary .read{font-family:var(--mono);font-size:13px;color:var(--ink-soft);margin-top:10px;word-break:break-all}
+  .summary .read b{color:var(--ink)}
+
+  .tbl-wrap{margin:18px 0;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  thead th{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);text-align:left;padding:13px 16px;background:var(--panel-2);border-bottom:1px solid var(--line)}
+  tbody td{padding:13px 16px;border-bottom:1px solid var(--line-2);vertical-align:top;color:var(--ink-soft)}
+  tbody tr:last-child td{border-bottom:none}
+  tbody tr.best{background:var(--accent-wash)}
+  tbody tr.best td{color:var(--ink)}
+  td.fmt{color:var(--ink);font-weight:500}
+  td.fmt small{display:block;font-family:var(--mono);font-size:11px;color:var(--ink-faint);font-weight:400;margin-top:2px;letter-spacing:.02em}
+  td.dt{font-family:var(--mono);color:var(--ink);white-space:nowrap}
+  td.dt .local{display:block;color:var(--ink-faint);font-size:12px;margin-top:2px;white-space:nowrap}
+  td.dt .bad{color:var(--ink-faint);font-style:italic}
+  .plaus{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;letter-spacing:.04em;text-transform:uppercase;padding:4px 9px;border-radius:99px;border:1px solid}
+  .plaus.best{color:var(--accent);border-color:var(--accent-line);background:var(--accent-wash)}
+  .plaus.ok{color:var(--info);border-color:rgba(124,147,255,.3);background:var(--info-wash)}
+  .plaus.weak{color:var(--ink-faint);border-color:var(--line-2)}
+
+  .encoded h3{font-family:var(--mono);font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--accent);margin:22px 0 10px}
+  .enc-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+  .enc{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:13px 15px;min-width:0}
+  .enc .name{font-family:var(--mono);font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:5px}
+  .enc .val{font-family:var(--mono);font-size:13px;color:var(--ink);word-break:break-all}
+
+  .err{color:var(--fail);font-family:var(--mono);font-size:13.5px;background:var(--fail-wash);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+
+  .prose{padding:44px 0 20px}
+  .prose h2{font-family:var(--serif);font-weight:400;font-size:30px;color:var(--ink-hi);margin:36px 0 14px;letter-spacing:-.01em}
+  .prose h3{font-family:var(--mono);font-size:15px;color:var(--ink-hi);margin:24px 0 8px}
+  .prose p{color:var(--ink-soft);margin-bottom:14px;font-size:16px}
+  .prose ul{color:var(--ink-soft);margin:0 0 14px 20px;font-size:16px}
+  .prose li{margin-bottom:7px}
+  .prose code{font-family:var(--mono);font-size:13.5px;background:var(--panel-2);border:1px solid var(--line-2);border-radius:5px;padding:1px 6px;color:var(--ink)}
+  .related{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:8px}
+  .related a{display:block;border:1px solid var(--line);border-radius:11px;padding:14px 16px;color:var(--ink);font-size:14.5px;background:var(--panel)}
+  .related a:hover{border-color:var(--accent-line);text-decoration:none}
+  .related a span{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:5px}
+
+  footer{border-top:1px solid var(--line-2);margin-top:40px;padding:30px 0;color:var(--ink-faint);font-family:var(--mono);font-size:12.5px}
+  footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px}
+  footer a{color:var(--ink-soft)}
+  @media (max-width:560px){
+    .related{grid-template-columns:1fr}
+    .enc-grid{grid-template-columns:1fr}
+    .hint{margin-left:0;width:100%}
+    thead{display:none}
+    table,tbody,tr,td{display:block;width:100%}
+    tbody tr{border-bottom:1px solid var(--line);padding:6px 0}
+    tbody tr:last-child{border-bottom:none}
+    tbody td{border-bottom:none;padding:6px 16px}
+    td.dt{white-space:normal}
+    td.dt .local,td.dt{white-space:normal}
+  }
+</style>
+</head>
+<body>
+
+<nav><div class="wrap">
+  <a class="brand" href="https://unboundcompute.com/">
+    <span class="badge"><svg viewBox="0 0 24 24" fill="none" style="width:15px;height:15px"><line x1="12" y1="3" x2="12" y2="21" stroke="var(--accent)" stroke-width="1.8" stroke-dasharray="2.6 2.6"/><circle cx="12" cy="12" r="3" fill="var(--accent)"/></svg></span>
+    UnboundCompute
+  </a>
+  <a class="cta" href="https://unboundcompute.com/#cta">Request access</a>
+</div></nav>
+
+<header class="hero"><div class="wrap">
+  <div class="eyebrow">Free tool</div>
+  <h1>Forensic Timestamp Converter</h1>
+  <p class="lede">Paste a raw timestamp from an artifact and see every plausible decoding side by side. It auto detects the likely format from the magnitude of the value, so you can tell a Windows FILETIME from a Chrome time from a plain Unix epoch and read the date each one really means.</p>
+  <div class="privacy">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6l8-4z" stroke="var(--accent)" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Conversion is pure math in your browser. Nothing is sent to any server.
+  </div>
+</div></header>
+
+<div class="wrap">
+  <div class="tool">
+    <label class="fld" for="ts">Paste a timestamp value or an ISO 8601 date</label>
+    <textarea id="ts" spellcheck="false" placeholder="A number such as 132480000000000000, 0x01D5F2A0..., or an ISO date such as 2021-01-01T00:00:00Z&#10;&#10;Decimal, hex (0x prefix), and ISO input are all accepted. Everything is decoded locally."></textarea>
+    <div class="examples">
+      <span>Try</span>
+      <button class="ghost" data-ex="filetime">FILETIME</button>
+      <button class="ghost" data-ex="webkit">Chrome WebKit</button>
+      <button class="ghost" data-ex="unixms">Unix ms</button>
+      <button class="ghost" data-ex="cocoa">Cocoa</button>
+      <button class="ghost" data-ex="iso">ISO date</button>
+    </div>
+    <div class="row">
+      <button class="primary" id="convert">Convert</button>
+      <button class="ghost" id="now">Use current time</button>
+      <button class="ghost" id="clear">Clear</button>
+      <span class="hint" id="hint">No data leaves this page</span>
+    </div>
+  </div>
+  <div id="results"><div class="empty">Decoded interpretations will appear here, with the most plausible one highlighted.</div></div>
+</div>
+
+<div class="wrap prose">
+  <h2>Why one number has many meanings</h2>
+  <p>In disk and memory forensics a timestamp is rarely labelled. You pull a 64 bit integer out of a registry hive, a SQLite cell, a plist, or a raw struct, and the same digits could be a Windows FILETIME, a Chrome history time, an Apple absolute time, or a Unix epoch in one of four resolutions. Reading it under the wrong epoch can move an event by decades. This tool decodes the value under every format that could plausibly produce a number that size, shows each result, and highlights the most likely reading so you can confirm it against the artifact it came from.</p>
+
+  <h3>Windows FILETIME, Active Directory, and LDAP</h3>
+  <p>A FILETIME is a 64 bit count of <code>100 nanosecond</code> intervals since the first of January 1601 in UTC. The same epoch backs Active Directory and LDAP attributes such as <code>lastLogonTimestamp</code> and <code>pwdLastSet</code>. Modern values are 18 digits long and are often seen in hex inside a memory image, so the tool accepts a <code>0x</code> prefixed hex value as well as decimal. The arithmetic uses BigInt, because a raw FILETIME is larger than a JavaScript number can represent exactly, and an off by one in the low digits is still a real time difference.</p>
+
+  <h3>Chrome and WebKit time</h3>
+  <p>Chromium based browsers store history, cookie, and cache timestamps as microseconds since the same 1601 epoch as FILETIME. WebKit on Apple platforms uses the same base for some artifacts. Because the unit is microseconds rather than <code>100 nanosecond</code> ticks, a Chrome value is a thousand times smaller than the FILETIME for the same instant, which is exactly the kind of factor that makes a naive epoch converter silently wrong.</p>
+
+  <h3>Apple Cocoa and HFS plus</h3>
+  <p>Apple Cocoa Core Data absolute time counts seconds since the first of January 2001 in UTC, so a recent value is a smallish number and a value before that date is negative. Classic Mac HFS plus timestamps count seconds since the first of January 1904 and were historically written in the local time of the machine, so the tool decodes the raw value against the documented epoch and reminds you to reason about the original time zone yourself.</p>
+
+  <h3>OLE date, DOS date and time, and Unix epoch</h3>
+  <p>An OLE Automation date is a floating point count of days since the thirtieth of December 1899, common in older Office and Windows artifacts. A packed DOS date and time squeezes the date into the high 16 bits and the time into the low 16 bits of a 32 bit value, with two second resolution, and the tool unpacks it when the value is in that range. Finally a plain Unix epoch can arrive in seconds, milliseconds, microseconds, or nanoseconds, and the magnitude usually tells you which, which is why all four are shown together.</p>
+
+  <h2>How to read the table</h2>
+  <p>Each row is one way to decode the number you pasted. The most plausible interpretation, judged from the magnitude and whether it lands on a sane date, is highlighted and tagged. Treat that as a strong hint, not a verdict: the surrounding artifact, the field name, and the tool that wrote it are what settle which epoch is correct. This converter runs entirely client side, so you can safely decode a value from a sealed image or a live investigation without the input leaving your machine, the same care that the wider <a href="https://security.unboundcompute.com/ai-security-testing/" rel="noopener">AI security testing</a> work is built around. For more terms you meet in this kind of analysis, the <a href="https://security.unboundcompute.com/web-security-glossary/" rel="noopener">web security glossary</a> is a useful companion.</p>
+
+  <h2>Related reading</h2>
+  <div class="related">
+    <a href="https://security.unboundcompute.com/what-is-web-application-security/"><span>Guide</span>What is web application security</a>
+    <a href="https://security.unboundcompute.com/ai-security-testing/"><span>Guide</span>AI security testing</a>
+    <a href="https://security.unboundcompute.com/web-security-glossary/"><span>Reference</span>Web security glossary</a>
+    <a href="https://security.unboundcompute.com/category/access-control/"><span>Deep dive</span>Access control</a>
+  </div>
+
+  <h2>More free tools</h2>
+  <div class="related">
+    <a href="https://unboundcompute.com/tools/ioc-defanger-extractor.html"><span>Free tool</span>IOC Defanger and Extractor</a>
+    <a href="https://unboundcompute.com/tools/file-entropy-magic-analyzer.html"><span>Free tool</span>File Entropy and Magic Analyzer</a>
+    <a href="https://unboundcompute.com/tools/jwt-security-inspector.html"><span>Free tool</span>JWT Security Inspector</a>
+    <a href="https://unboundcompute.com/tools/"><span>Hub</span>All free security tools</a>
+  </div>
+</div>
+
+<footer><div class="wrap">
+  <div>Built by <a href="https://unboundcompute.com/">UnboundCompute</a>, autonomous security research for web apps and APIs.</div>
+  <div><a href="https://unboundcompute.com/#cta">Request access</a></div>
+</div></footer>
+
+<script>
+(function(){
+  "use strict";
+  var $ = function(s){ return document.querySelector(s); };
+
+  // ---- epoch offsets in SECONDS from the Unix epoch (1970-01-01 UTC) ----
+  // Negative means the epoch is before 1970.
+  var SEC_1601 = -11644473600;   // 1601-01-01 -> 1970-01-01
+  var SEC_1904 = -2082844800;    // 1904-01-01
+  var SEC_1899 = -2209161600;    // 1899-12-30 (OLE base)
+  var SEC_2001 = 978307200;      // 2001-01-01
+
+  // BigInt constants
+  var B = function(n){ return BigInt(n); };
+  var TEN_MILLION = B(10000000);          // 100ns ticks per second
+  var FT_OFFSET_TICKS = B(116444736000000000); // ticks between 1601 and 1970
+  var WEBKIT_OFFSET_US = B(11644473600000000);  // microseconds between 1601 and 1970
+
+  var SANE_MIN = -2208988800000; // ~1900 in unix ms
+  var SANE_MAX = 4102444800000;  // ~2100 in unix ms
+
+  function esc(s){ return String(s).replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];}); }
+
+  // Format a Unix-milliseconds value (Number, may be fractional) to UTC + local.
+  function fromUnixMs(ms){
+    var d = new Date(ms);
+    if (isNaN(d.getTime())) return null;
+    return d;
+  }
+  function utcStr(d){
+    return d.toISOString().replace(/\.000Z$/, "Z");
+  }
+  function localStr(d){
+    // Local rendering. Computed only when a result is rendered, from the date object.
+    try {
+      return d.toLocaleString(undefined, { year:"numeric", month:"short", day:"2-digit", hour:"2-digit", minute:"2-digit", second:"2-digit", hour12:false }) + " local";
+    } catch(e){ return ""; }
+  }
+  function sane(ms){ return ms >= SANE_MIN && ms <= SANE_MAX; }
+
+  // ---- DECODERS: each takes the parsed input and returns {ms} or null ----
+  // BigInt-based ones take a BigInt; float ones take a Number.
+
+  function ftToMs(ticks){            // FILETIME / AD / LDAP: 100ns since 1601
+    var us = ticks - FT_OFFSET_TICKS;      // in 100ns ticks relative to 1970
+    // convert to ms with millisecond precision: divide ticks by 10000
+    var ms = us / B(10000);
+    // keep remainder for fractional ms (best effort, ms precision is enough)
+    return numFromBig(ms);
+  }
+  function webkitToMs(us){           // microseconds since 1601
+    var rel = us - WEBKIT_OFFSET_US; // microseconds relative to 1970
+    return numFromBig(rel / B(1000));
+  }
+  function numFromBig(b){
+    // Safe conversion of a BigInt millisecond count to Number.
+    var n = Number(b);
+    return n;
+  }
+
+  function buildInterpretations(input){
+    // input: { kind:'int'|'float'|'iso', big:BigInt|null, num:Number|null, hex:bool }
+    var rows = [];
+    function add(name, note, ms, baseScore){
+      var d = (ms===null||ms===undefined) ? null : fromUnixMs(ms);
+      var ok = d && sane(ms);
+      rows.push({ name:name, note:note, d:d, ms:ms, ok:ok, score: ok ? baseScore : -1 });
+    }
+
+    if (input.kind === "iso"){ return rows; } // handled separately
+
+    var big = input.big, num = input.num;
+
+    // Unix epoch in four resolutions (use Number for ms math; big for precision where needed)
+    if (num !== null){
+      add("Unix seconds", "seconds since 1970-01-01 UTC", num*1000, 50);
+      add("Unix milliseconds", "ms since 1970-01-01 UTC", num, 50);
+      add("Unix microseconds", "us since 1970-01-01 UTC", num/1000, 50);
+      add("Unix nanoseconds", "ns since 1970-01-01 UTC", num/1e6, 50);
+    }
+
+    if (big !== null){
+      add("Windows FILETIME", "100ns intervals since 1601-01-01 UTC", ftToMs(big), 50);
+      add("Active Directory / LDAP", "same 1601 epoch as FILETIME", ftToMs(big), 49);
+      add("Chrome / WebKit time", "microseconds since 1601-01-01 UTC", webkitToMs(big), 50);
+    }
+
+    if (num !== null){
+      add("Apple Cocoa absolute", "seconds since 2001-01-01 UTC", (num + SEC_2001)*1000, 50);
+      add("Apple Mac HFS+", "seconds since 1904-01-01 (stored local)", (num + SEC_1904)*1000, 48);
+      // OLE Automation date: floating days since 1899-12-30
+      add("OLE Automation date", "days since 1899-12-30", (num*86400 + SEC_1899)*1000, 50);
+    }
+
+    // DOS packed date/time: 32-bit value, two 16-bit halves.
+    if (big !== null && big >= B(0) && big <= B(0xFFFFFFFF) && num !== null){
+      var v = Number(big & B(0xFFFFFFFF));
+      var dosDate = (v >>> 16) & 0xFFFF;
+      var dosTime = v & 0xFFFF;
+      var day = dosDate & 0x1F;
+      var month = (dosDate >>> 5) & 0x0F;
+      var year = 1980 + ((dosDate >>> 9) & 0x7F);
+      var sec = (dosTime & 0x1F) * 2;
+      var min = (dosTime >>> 5) & 0x3F;
+      var hour = (dosTime >>> 11) & 0x1F;
+      var valid = day>=1 && day<=31 && month>=1 && month<=12 && hour<=23 && min<=59 && sec<=59;
+      if (valid){
+        var dms = Date.UTC(year, month-1, day, hour, min, sec);
+        add("DOS date/time (packed)", "32-bit packed FAT date and time", dms, 40);
+      }
+    }
+
+    return rows;
+  }
+
+  function pickBest(rows){
+    // Highest score among sane rows; tie-break by score order (FILETIME/WebKit favored
+    // implicitly because of digit-count heuristic applied below).
+    var best = -1, bi = -1;
+    rows.forEach(function(r, i){
+      if (r.ok && r.score > best){ best = r.score; bi = i; }
+    });
+    return bi;
+  }
+
+  // Heuristic: bump the score of the interpretation whose natural digit count
+  // matches the input, so the "most plausible" tag reflects magnitude.
+  function applyMagnitudeHeuristic(rows, input){
+    if (input.kind === "iso") return;
+    var digits = input.digits;       // number of significant decimal digits of the integer part
+    function bump(name, by){ rows.forEach(function(r){ if (r.name===name && r.ok) r.score += by; }); }
+
+    if (input.hex){
+      // Hex usually means FILETIME or WebKit pulled from memory.
+      bump("Windows FILETIME", 8);
+      bump("Chrome / WebKit time", 6);
+    }
+    if (digits >= 17){ bump("Windows FILETIME", 10); bump("Active Directory / LDAP", 9); }
+    else if (digits >= 15 && digits <= 17){ bump("Chrome / WebKit time", 10); }
+    else if (digits === 13){ bump("Unix milliseconds", 10); }
+    else if (digits === 16){ bump("Unix microseconds", 8); }
+    else if (digits >= 18 && digits <= 20){ bump("Unix nanoseconds", 8); }
+    else if (digits >= 9 && digits <= 11){ bump("Unix seconds", 10); bump("Apple Cocoa absolute", 6); }
+  }
+
+  function parseInput(raw){
+    raw = raw.trim();
+    if (!raw) return { error:"Paste a timestamp value or an ISO date first." };
+
+    // ISO 8601 detection: contains a letter T or a dash in date position, or ends with Z.
+    if (/[A-Za-z]/.test(raw) && !/^0x/i.test(raw)){
+      var d = new Date(raw);
+      if (!isNaN(d.getTime())) return { kind:"iso", d:d };
+      return { error:"That looks like a date but could not be parsed. Use an ISO 8601 form such as 2021-01-01T00:00:00Z." };
+    }
+
+    // Hex
+    if (/^0x[0-9a-f]+$/i.test(raw)){
+      var hb;
+      try { hb = BigInt(raw); } catch(e){ return { error:"Could not parse that hex value." }; }
+      return { kind:"int", big:hb, num: Number(hb), hex:true, digits: hb.toString().replace("-","").length };
+    }
+
+    // Float (has a decimal point)
+    if (/^[+-]?\d+\.\d+$/.test(raw)){
+      var f = Number(raw);
+      if (!isFinite(f)) return { error:"Could not parse that number." };
+      var intDigits = Math.floor(Math.abs(f)).toString().length;
+      return { kind:"float", big:null, num:f, hex:false, digits:intDigits };
+    }
+
+    // Integer (possibly very large)
+    if (/^[+-]?\d+$/.test(raw)){
+      var bg;
+      try { bg = BigInt(raw); } catch(e){ return { error:"Could not parse that number." }; }
+      var n = Number(bg);
+      return { kind:"int", big:bg, num:n, hex:false, digits: bg.toString().replace("-","").length };
+    }
+
+    return { error:"Unrecognized input. Paste a decimal number, a 0x hex value, or an ISO 8601 date." };
+  }
+
+  // ---- ENCODERS (ISO date -> each format) ----
+  function encodeAll(d){
+    var ms = d.getTime();                         // Number, ms since 1970
+    var msBig = B(Math.round(ms));
+    var out = [];
+    out.push(["Unix seconds", String(Math.floor(ms/1000))]);
+    out.push(["Unix milliseconds", String(Math.round(ms))]);
+    out.push(["Unix microseconds", (msBig * B(1000)).toString()]);
+    out.push(["Unix nanoseconds", (msBig * B(1000000)).toString()]);
+    // FILETIME ticks = ms*10000 + offset
+    var ftTicks = msBig * B(10000) + FT_OFFSET_TICKS;
+    out.push(["Windows FILETIME", ftTicks.toString()]);
+    out.push(["FILETIME (hex)", "0x" + ftTicks.toString(16).toUpperCase()]);
+    out.push(["Chrome / WebKit", (msBig * B(1000) + WEBKIT_OFFSET_US).toString()]);
+    out.push(["Apple Cocoa", String(Math.round(ms/1000) - SEC_2001)]);
+    out.push(["Apple Mac HFS+", String(Math.round(ms/1000) - SEC_1904)]);
+    var oleDays = ms/86400000 - SEC_1899/86400;
+    out.push(["OLE Automation date", oleDays.toFixed(8).replace(/0+$/,"").replace(/\.$/,".0")]);
+    return out;
+  }
+
+  function renderInterpretations(input){
+    var rows = buildInterpretations(input);
+    applyMagnitudeHeuristic(rows, input);
+    var bestIdx = pickBest(rows);
+
+    var html = '<div class="summary">';
+    if (bestIdx >= 0){
+      var b = rows[bestIdx];
+      html += '<h2>Most plausible: ' + esc(b.name) + '</h2>';
+      html += '<p>Based on the magnitude of the value, this is the most likely source format. Confirm it against the artifact it came from.</p>';
+      html += '<div class="read"><b>' + esc(utcStr(b.d)) + '</b> &middot; ' + esc(localStr(b.d)) + '</div>';
+    } else {
+      html += '<h2>No clear match</h2>';
+      html += '<p>None of the supported formats decode this value to a date between 1900 and 2100. The full set of interpretations is below.</p>';
+    }
+    html += '</div>';
+
+    html += '<div class="tbl-wrap"><table><thead><tr><th>Format</th><th>Decoded UTC</th><th>Plausibility</th></tr></thead><tbody>';
+    // Sort: best first, then sane by score desc, then non-sane last.
+    var order = rows.map(function(r,i){ return i; }).sort(function(a,bb){
+      var ra = rows[a], rb = rows[bb];
+      if (ra.ok !== rb.ok) return ra.ok ? -1 : 1;
+      return rb.score - ra.score;
+    });
+    order.forEach(function(i){
+      var r = rows[i];
+      var isBest = (i === bestIdx);
+      var tag, cls;
+      if (isBest){ tag = "Most plausible"; cls = "best"; }
+      else if (r.ok){ tag = "Plausible"; cls = "ok"; }
+      else { tag = "Out of range"; cls = "weak"; }
+      html += '<tr' + (isBest ? ' class="best"' : '') + '>';
+      html += '<td class="fmt">' + esc(r.name) + '<small>' + esc(r.note) + '</small></td>';
+      if (r.d){
+        html += '<td class="dt">' + esc(utcStr(r.d)) + '<span class="local">' + esc(localStr(r.d)) + '</span></td>';
+      } else {
+        html += '<td class="dt"><span class="bad">not a valid date</span></td>';
+      }
+      html += '<td><span class="plaus ' + cls + '">' + tag + '</span></td>';
+      html += '</tr>';
+    });
+    html += '</tbody></table></div>';
+    return html;
+  }
+
+  function renderEncoded(d){
+    var html = '<div class="summary">';
+    html += '<h2>' + esc(utcStr(d)) + '</h2>';
+    html += '<p>This instant, re encoded into each supported timestamp format. Use a value to search a disk image or a database.</p>';
+    html += '<div class="read">' + esc(localStr(d)) + '</div>';
+    html += '</div>';
+    html += '<div class="encoded"><h3>Encodings of this instant</h3><div class="enc-grid">';
+    encodeAll(d).forEach(function(p){
+      html += '<div class="enc"><div class="name">' + esc(p[0]) + '</div><div class="val">' + esc(p[1]) + '</div></div>';
+    });
+    html += '</div></div>';
+    return html;
+  }
+
+  function run(){
+    var input = parseInput($("#ts").value);
+    if (input.error){ $("#results").innerHTML = '<div class="err">' + esc(input.error) + '</div>'; return; }
+    var html;
+    if (input.kind === "iso") html = renderEncoded(input.d);
+    else html = renderInterpretations(input);
+    $("#results").innerHTML = html;
+    $("#results").scrollIntoView({ behavior:"smooth", block:"start" });
+  }
+
+  var EXAMPLES = {
+    filetime: "132539328000000000",       // FILETIME for 2021-01-01T00:00:00Z
+    webkit:   "13253932800000000",         // Chrome time for 2021-01-01T00:00:00Z
+    unixms:   "1609459200000",             // Unix ms for 2021-01-01T00:00:00Z
+    cocoa:    "631152000",                 // Cocoa for 2021-01-01T00:00:00Z
+    iso:      "2021-01-01T00:00:00Z"
+  };
+
+  Array.prototype.forEach.call(document.querySelectorAll(".examples button"), function(btn){
+    btn.addEventListener("click", function(){
+      $("#ts").value = EXAMPLES[btn.getAttribute("data-ex")] || "";
+      run();
+    });
+  });
+
+  $("#convert").addEventListener("click", run);
+  $("#now").addEventListener("click", function(){
+    // "now" is computed ONLY here, inside the handler, never at script load.
+    var d = new Date();
+    $("#ts").value = d.toISOString();
+    run();
+  });
+  $("#clear").addEventListener("click", function(){
+    $("#ts").value = "";
+    $("#results").innerHTML = '<div class="empty">Decoded interpretations will appear here, with the most plausible one highlighted.</div>';
+    $("#ts").focus();
+  });
+  $("#ts").addEventListener("keydown", function(e){ if ((e.metaKey||e.ctrlKey) && e.key==="Enter") run(); });
+})();
+</script>
+</body>
+</html>

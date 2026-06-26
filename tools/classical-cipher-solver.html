@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Classical Cipher Identifier and Auto Solver | UnboundCompute</title>
+<meta name="description" content="Paste a mystery string and this tool tries to identify and decode it: base64, hex, binary, Morse, ROT13/ROT47, Caesar, Atbash, single byte XOR, and Vigenere. It ranks candidate plaintexts by English likelihood. Built for CTF crypto, runs fully in your browser." />
+<meta name="keywords" content="cipher identifier, cipher solver, caesar cipher solver, rot13 decoder, vigenere solver, xor brute force, base64 decoder, ctf crypto, classical cipher, frequency analysis" />
+<meta name="robots" content="index, follow" />
+<meta name="author" content="UnboundCompute" />
+<meta name="theme-color" content="#0a0a0b" />
+<link rel="canonical" href="https://unboundcompute.com/tools/classical-cipher-solver.html" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a0a0b'/%3E%3Cline x1='16' y1='4' x2='16' y2='28' stroke='%23fb5b46' stroke-width='2' stroke-dasharray='3 3'/%3E%3Ccircle cx='16' cy='16' r='3.4' fill='%23fb5b46'/%3E%3C/svg%3E" />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="UnboundCompute" />
+<meta property="og:title" content="Classical Cipher Identifier and Auto Solver" />
+<meta property="og:description" content="Paste a ciphertext and get ranked candidate plaintexts across base64, hex, Morse, ROT13/ROT47, Caesar, Atbash, XOR, and Vigenere. Runs fully in your browser, nothing is sent to any server." />
+<meta property="og:url" content="https://unboundcompute.com/tools/classical-cipher-solver.html" />
+<meta property="og:image" content="https://unboundcompute.com/og.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Classical Cipher Identifier and Auto Solver" />
+<meta name="twitter:description" content="Paste a ciphertext and get ranked candidate plaintexts across many classical ciphers and encodings. Runs fully in your browser." />
+<meta name="twitter:image" content="https://unboundcompute.com/og.png" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "Classical Cipher Identifier and Auto Solver",
+      "applicationCategory": "SecurityApplication",
+      "operatingSystem": "Web",
+      "browserRequirements": "Requires JavaScript. Runs entirely client side.",
+      "url": "https://unboundcompute.com/tools/classical-cipher-solver.html",
+      "description": "A free tool that identifies and decodes a mystery string. It auto decodes base64, base32, hex, binary, decimal ASCII, Morse, URL encoding, and ROT13 or ROT47, then attempts classical ciphers: Caesar across all shifts, Atbash, single byte XOR across all keys, and a best effort Vigenere key recovery. Every candidate plaintext is scored by English letter frequency and ranked. All analysis happens in the browser.",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "publisher": { "@type": "Organization", "name": "UnboundCompute", "url": "https://unboundcompute.com/" }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How does the tool decide which decoding is the right one?",
+          "acceptedAnswer": { "@type": "Answer", "text": "It runs every method it knows over your input, produces a candidate plaintext for each, and scores that candidate by how closely its letter frequencies match ordinary English using a chi squared test. A lower chi squared score means a closer match. The candidates are ranked so the most English looking result sits at the top. This is a heuristic, not a proof, so the real answer is usually but not always the top row." }
+        },
+        {
+          "@type": "Question",
+          "name": "Does this cipher solver send my text anywhere?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. Every decode, brute force, and score runs in your browser with JavaScript. The text you paste is never uploaded, logged, or sent to any server. You can safely work on a CTF flag or a private puzzle without it leaving your machine." }
+        },
+        {
+          "@type": "Question",
+          "name": "Why is the Vigenere result only a best effort?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Vigenere is solved in two steps that can each go wrong. The tool first estimates the key length from the index of coincidence, then recovers each key letter by treating the column as a Caesar shift and picking the shift that scores best. Short ciphertext, an unusual key, or a key length the estimate misses can all throw it off. Treat the Vigenere row as a strong hint and verify by reading the plaintext, not as a guaranteed solve." }
+        },
+        {
+          "@type": "Question",
+          "name": "Why does substitution only show frequency analysis instead of a full solve?",
+          "acceptedAnswer": { "@type": "Answer", "text": "A general monoalphabetic substitution has a vast key space and no clean closed form solve from frequencies alone on short text. Rather than pretend, the tool gives you the raw material a human or a hill climbing solver uses: per letter counts and the most common bigrams. You map the high frequency letters to common English letters and refine from there." }
+        },
+        {
+          "@type": "Question",
+          "name": "Is this useful outside of CTF puzzles?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Classical ciphers are not secure and should never protect real data, so the practical use is learning and play: CTF challenges, puzzle hunts, and understanding why frequency analysis breaks these schemes. The encoding detectors, like base64 and hex, also help when you simply need to read an obfuscated blob quickly." }
+        }
+      ]
+    }
+  ]
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600&family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0a0b; --bg-2:#070708; --panel:#0e0e10; --panel-2:#131315;
+    --ink:#f4f2ec; --ink-hi:#fbf9f3; --ink-soft:#9b988f; --ink-faint:#5e5b54;
+    --line:rgba(244,242,236,.13); --line-2:rgba(244,242,236,.07);
+    --accent:#fb5b46; --accent-2:#ff7d6b; --accent-wash:rgba(251,91,70,.12); --on-accent:#1a0c09; --accent-line:rgba(251,91,70,.42);
+    --pass:#5fd6a4; --pass-wash:rgba(95,214,164,.1); --warn:#e8b04b; --warn-wash:rgba(232,176,75,.1); --fail:#fb5b46; --fail-wash:rgba(251,91,70,.1); --info:#7c93ff; --info-wash:rgba(124,147,255,.1);
+    --serif:'Newsreader',Georgia,serif; --mono:'JetBrains Mono',ui-monospace,monospace; --sans:'Inter',system-ui,sans-serif;
+    --maxw:920px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;line-height:1.6}
+  ::selection{background:var(--accent);color:var(--on-accent)}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+
+  nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);background:rgba(10,10,11,.72);border-bottom:1px solid var(--line-2)}
+  nav .wrap{height:64px;display:flex;align-items:center;justify-content:space-between}
+  nav a.brand{display:flex;align-items:center;gap:11px;font-family:var(--mono);font-weight:600;font-size:15px;color:var(--ink);letter-spacing:-.01em}
+  nav a.brand:hover{text-decoration:none}
+  nav .badge{width:27px;height:27px;border-radius:7px;border:1px solid var(--accent-line);display:grid;place-items:center}
+  nav a.cta{font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:9px 16px;border-radius:8px;background:var(--accent);color:var(--on-accent)}
+  nav a.cta:hover{filter:brightness(1.08);text-decoration:none}
+
+  header.hero{padding:64px 0 28px}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:18px}
+  h1{font-family:var(--serif);font-weight:400;font-size:clamp(32px,5vw,52px);line-height:1.08;letter-spacing:-.015em;color:var(--ink-hi)}
+  .lede{margin-top:18px;font-size:18px;color:var(--ink-soft);max-width:660px}
+  .privacy{margin-top:18px;display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);border:1px solid var(--line);border-radius:8px;padding:8px 13px;background:var(--panel)}
+  .privacy svg{width:14px;height:14px;flex:none}
+
+  .tool{margin:30px 0 12px;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px}
+  label.fld{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:10px}
+  textarea{width:100%;min-height:150px;resize:vertical;background:var(--bg-2);border:1px solid var(--line);border-radius:11px;padding:15px;color:var(--ink);font-family:var(--mono);font-size:13.5px;line-height:1.55;outline:none;transition:border-color .2s,box-shadow .2s;word-break:break-all}
+  textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-wash)}
+  textarea::placeholder{color:var(--ink-faint)}
+  .row{display:flex;gap:11px;flex-wrap:wrap;margin-top:14px;align-items:center}
+  button{font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;padding:13px 22px;border-radius:9px;cursor:pointer;border:1px solid var(--line);background:transparent;color:var(--ink);transition:filter .15s,border-color .15s,background .15s}
+  button.primary{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+  button.primary:hover{filter:brightness(1.08)}
+  button.ghost:hover{border-color:var(--accent-line);color:var(--ink-hi)}
+  .hint{font-family:var(--mono);font-size:12px;color:var(--ink-faint);margin-left:auto}
+  .examples{display:flex;gap:9px;flex-wrap:wrap;margin-top:13px}
+  .examples span{font-family:var(--mono);font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-faint);align-self:center;margin-right:2px}
+  .examples button{padding:8px 13px;font-size:11.5px}
+
+  #results{margin-top:8px}
+
+  .grade-card{display:flex;align-items:center;gap:22px;background:var(--panel-2);border:1px solid var(--line);border-radius:16px;padding:22px 24px;margin:20px 0}
+  .grade{font-family:var(--mono);font-weight:500;font-size:15px;line-height:1.25;min-width:96px;padding:14px 16px;border-radius:14px;flex:none;border:1.5px solid var(--accent-line);color:var(--accent);background:var(--accent-wash);text-align:center;text-transform:uppercase;letter-spacing:.04em}
+  .grade-meta h2{font-family:var(--serif);font-weight:400;font-size:24px;color:var(--ink-hi);margin-bottom:4px}
+  .grade-meta p{color:var(--ink-soft);font-size:14.5px}
+
+  .cands{display:flex;flex-direction:column;gap:11px}
+  .cand{border:1px solid var(--line);border-radius:13px;padding:16px 18px;background:var(--panel)}
+  .cand.best{border-color:var(--accent-line);background:var(--panel-2)}
+  .cand .top{display:flex;align-items:center;gap:13px;flex-wrap:wrap}
+  .rankno{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--ink-faint);min-width:22px}
+  .method{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--ink-hi);letter-spacing:-.01em}
+  .key{font-family:var(--mono);font-size:12px;color:var(--ink-soft);background:var(--bg-2);border:1px solid var(--line-2);border-radius:6px;padding:2px 8px}
+  .score{font-family:var(--mono);font-size:12px;color:var(--ink-soft);margin-left:auto}
+  .badge-eng{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;border-radius:6px;padding:2px 8px}
+  .badge-eng.hi{background:var(--pass-wash);color:var(--pass)}
+  .badge-eng.mid{background:var(--warn-wash);color:var(--warn)}
+  .badge-eng.lo{background:var(--info-wash);color:var(--info)}
+  .cand pre{margin-top:11px;font-family:var(--mono);font-size:13.5px;line-height:1.55;color:var(--ink);white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere;background:var(--bg-2);border:1px solid var(--line-2);border-radius:9px;padding:11px 13px}
+
+  .panelblock{border:1px solid var(--line);border-radius:13px;padding:16px 18px;background:var(--panel);margin-top:14px}
+  .panelblock h3{font-family:var(--mono);font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--accent);margin-bottom:11px}
+  .panelblock p.note{font-size:13.5px;color:var(--ink-soft);margin-bottom:11px}
+  .freqgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(58px,1fr));gap:7px}
+  .freqcell{font-family:var(--mono);font-size:12px;background:var(--bg-2);border:1px solid var(--line-2);border-radius:7px;padding:7px 8px;text-align:center}
+  .freqcell b{color:var(--accent);display:block;font-size:14px}
+  .freqcell span{color:var(--ink-soft)}
+  .bigrams{display:flex;flex-wrap:wrap;gap:7px;margin-top:11px}
+  .bigrams .bg{font-family:var(--mono);font-size:12px;background:var(--bg-2);border:1px solid var(--line-2);border-radius:7px;padding:5px 9px;color:var(--ink-soft)}
+  .bigrams .bg b{color:var(--ink)}
+  .empty{color:var(--ink-faint);font-family:var(--mono);font-size:13px;text-align:center;padding:30px}
+
+  .prose{padding:44px 0 20px}
+  .prose h2{font-family:var(--serif);font-weight:400;font-size:30px;color:var(--ink-hi);margin:36px 0 14px;letter-spacing:-.01em}
+  .prose h3{font-family:var(--mono);font-size:15px;color:var(--ink-hi);margin:24px 0 8px}
+  .prose p{color:var(--ink-soft);margin-bottom:14px;font-size:16px}
+  .prose ul{color:var(--ink-soft);margin:0 0 14px 20px;font-size:16px}
+  .prose li{margin-bottom:7px}
+  .prose code{font-family:var(--mono);font-size:13.5px;background:var(--panel-2);border:1px solid var(--line-2);border-radius:5px;padding:1px 6px;color:var(--ink)}
+  .related{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:8px}
+  .related a{display:block;border:1px solid var(--line);border-radius:11px;padding:14px 16px;color:var(--ink);font-size:14.5px;background:var(--panel)}
+  .related a:hover{border-color:var(--accent-line);text-decoration:none}
+  .related a span{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:5px}
+
+  footer{border-top:1px solid var(--line-2);margin-top:40px;padding:30px 0;color:var(--ink-faint);font-family:var(--mono);font-size:12.5px}
+  footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px}
+  footer a{color:var(--ink-soft)}
+  @media (max-width:560px){
+    .related{grid-template-columns:1fr}
+    .grade-card{flex-direction:column;align-items:flex-start;gap:16px}
+    .hint{margin-left:0;width:100%}
+    .score{margin-left:0;width:100%}
+  }
+</style>
+</head>
+<body>
+
+<nav><div class="wrap">
+  <a class="brand" href="https://unboundcompute.com/">
+    <span class="badge"><svg viewBox="0 0 24 24" fill="none" style="width:15px;height:15px"><line x1="12" y1="3" x2="12" y2="21" stroke="var(--accent)" stroke-width="1.8" stroke-dasharray="2.6 2.6"/><circle cx="12" cy="12" r="3" fill="var(--accent)"/></svg></span>
+    UnboundCompute
+  </a>
+  <a class="cta" href="https://unboundcompute.com/#cta">Request access</a>
+</div></nav>
+
+<header class="hero"><div class="wrap">
+  <div class="eyebrow">Free tool</div>
+  <h1>Classical Cipher Solver</h1>
+  <p class="lede">Paste a mystery string and the tool tries to identify and decode it. It auto decodes the common encodings, brute forces Caesar, Atbash, and single byte XOR, takes a best effort run at Vigenere, and ranks every candidate plaintext by how much it looks like English. Built for CTF players and anyone learning how these schemes fall apart.</p>
+  <div class="privacy">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6l8-4z" stroke="var(--accent)" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Everything runs in your browser. Nothing is sent to any server.
+  </div>
+</div></header>
+
+<div class="wrap">
+  <div class="tool">
+    <label class="fld" for="ct">Paste a ciphertext or mystery string</label>
+    <textarea id="ct" spellcheck="false" placeholder="Uryyb jbeyq&#10;&#10;Try a base64 blob, a hex dump, a Morse string, a Caesar shifted phrase, or a single byte XOR sample. The input is analyzed locally and never sent anywhere."></textarea>
+    <div class="row">
+      <button class="primary" id="solve">Identify and decode</button>
+      <button class="ghost" id="clear">Clear</button>
+      <span class="hint" id="hint">No data leaves this page</span>
+    </div>
+    <div class="examples">
+      <span>Examples</span>
+      <button class="ghost" data-ex="caesar">Caesar shifted</button>
+      <button class="ghost" data-ex="b64">base64</button>
+      <button class="ghost" data-ex="xor">single byte XOR</button>
+    </div>
+  </div>
+  <div id="results"><div class="empty">Ranked candidate plaintexts will appear here.</div></div>
+</div>
+
+<div class="wrap prose">
+  <h2>What this cipher solver does</h2>
+  <p>A captured string in a CTF rarely arrives labelled. It might be base64, it might be a Caesar shift, it might be a single byte XOR of an ASCII flag. The fast way to find out is to try every plausible decoding at once and let an English likeness score float the right one to the top. That is exactly what this tool does: it runs each method over your input, builds a candidate plaintext, and scores that candidate against ordinary English letter frequencies.</p>
+
+  <h3>Encodings it auto decodes</h3>
+  <p>Before any cipher work, the tool checks whether the input is simply encoded rather than encrypted. It detects and decodes base64, base32, hex, binary in eight bit groups, decimal ASCII codes, Morse code, URL percent encoding, and the rotation tricks <code>ROT13</code> and <code>ROT47</code>. These are reversible transforms with no key, so when one applies it usually produces clean readable text in a single step.</p>
+
+  <h3>Caesar and <code>ROT-N</code> by brute force</h3>
+  <p>A Caesar cipher shifts every letter by a fixed amount, which means there are only twenty five non trivial shifts to try. The tool decodes all of them, scores each result with a chi squared test against English letter frequencies, and surfaces the best scoring shifts. Because the key space is tiny, the correct shift almost always lands at the top of the Caesar candidates.</p>
+
+  <h3>Atbash and single byte XOR</h3>
+  <p>Atbash is a fixed substitution that maps A to Z, B to Y, and so on, so it is a one shot decode with nothing to brute. Single byte XOR is the classic beginner crypto challenge: the same byte is exclusive ored against every byte of the message. With only two hundred fifty six possible keys, the tool tries them all, keeps the results that look like printable English, and shows the best along with the key it used.</p>
+
+  <h3>Vigenere as a best effort</h3>
+  <p>Vigenere resists a single brute force because the shift changes with a repeating key. The tool estimates the key length using the index of coincidence, then treats each column of the ciphertext as its own Caesar cipher and picks the shift that scores best, assembling those into a likely key. This works well on longer ciphertext and can miss on short or unusual inputs, so the Vigenere row is labelled a best effort guess, not a guaranteed solve. Read the plaintext to confirm it.</p>
+
+  <h3>Substitution as a hint, not a solve</h3>
+  <p>A general substitution cipher has far too large a key space to crack from frequencies alone on short text, and pretending otherwise would be dishonest. Instead the tool gives you the raw material a human solver actually uses: a per letter frequency count and the most common bigrams in the text. You match the high frequency letters to the usual English suspects and work outward from there.</p>
+
+  <h2>How to read the ranking</h2>
+  <p>Each candidate carries the method that produced it, any key that was used, and a chi squared score where lower means closer to English. The most English looking result is pinned at the top and marked as the best guess. This is a heuristic and not a proof, so when the top row reads like nonsense, scan the next few, since the real answer often sits just below on tricky inputs. Classical ciphers are studied here to learn how they break, never to protect real data, which is the same hands on reasoning an <a href="https://security.unboundcompute.com/ai-security-testing/" rel="noopener">AI security testing</a> approach applies to live systems. For the wider vocabulary of attacks and defenses, see the <a href="https://security.unboundcompute.com/web-security-glossary/" rel="noopener">web security glossary</a>.</p>
+
+  <h2>Related reading</h2>
+  <div class="related">
+    <a href="https://security.unboundcompute.com/what-is-web-application-security/"><span>Guide</span>What is web application security</a>
+    <a href="https://security.unboundcompute.com/ai-security-testing/"><span>Guide</span>AI security testing</a>
+    <a href="https://security.unboundcompute.com/web-security-glossary/"><span>Reference</span>Web security glossary</a>
+    <a href="https://security.unboundcompute.com/category/access-control/"><span>Deep dive</span>Access control</a>
+  </div>
+
+  <h2>More free tools</h2>
+  <div class="related">
+    <a href="https://unboundcompute.com/tools/jwt-security-inspector.html"><span>Free tool</span>JWT Security Inspector</a>
+    <a href="https://unboundcompute.com/tools/secret-scanner.html"><span>Free tool</span>Secret Scanner</a>
+    <a href="https://unboundcompute.com/tools/ioc-defanger-extractor.html"><span>Free tool</span>IOC Defanger and Extractor</a>
+    <a href="https://unboundcompute.com/tools/"><span>Hub</span>All free security tools</a>
+  </div>
+</div>
+
+<footer><div class="wrap">
+  <div>Built by <a href="https://unboundcompute.com/">UnboundCompute</a>, autonomous security research for web apps and APIs.</div>
+  <div><a href="https://unboundcompute.com/#cta">Request access</a></div>
+</div></footer>
+
+<script>
+(function(){
+  "use strict";
+  var $ = function(s){ return document.querySelector(s); };
+
+  // English letter frequencies (percent), index 0 = A.
+  var ENG = [8.167,1.492,2.782,4.253,12.702,2.228,2.015,6.094,6.966,0.153,0.772,4.025,2.406,6.749,7.507,1.929,0.095,5.987,6.327,9.056,2.758,0.978,2.360,0.150,1.974,0.074];
+  var COMMON = ["the","and","that","have","for","not","with","you","this","but","his","from","they","flag","ctf","secret","attack","crypto","cipher","hello","world"];
+
+  function letterCounts(s){
+    var c = new Array(26).fill(0), total = 0;
+    for (var i=0;i<s.length;i++){
+      var ch = s.charCodeAt(i);
+      if (ch>=65 && ch<=90){ c[ch-65]++; total++; }
+      else if (ch>=97 && ch<=122){ c[ch-97]++; total++; }
+    }
+    return { c:c, total:total };
+  }
+
+  // chi squared distance to English. Lower is more English like.
+  function chiSquared(s){
+    var lc = letterCounts(s), total = lc.total;
+    if (total === 0) return 1e9;
+    var chi = 0;
+    for (var i=0;i<26;i++){
+      var expected = ENG[i]/100*total;
+      var diff = lc.c[i] - expected;
+      chi += diff*diff/(expected || 0.0001);
+    }
+    // penalty for non letter noise, so binary garbage scores poorly
+    var printable = 0, letters = 0;
+    for (var k=0;k<s.length;k++){
+      var cc = s.charCodeAt(k);
+      if (cc>=32 && cc<127) printable++;
+      if ((cc>=65&&cc<=90)||(cc>=97&&cc<=122)||cc===32) letters++;
+    }
+    var nonText = s.length ? 1 - (letters/s.length) : 1;
+    var unprintable = s.length ? 1 - (printable/s.length) : 1;
+    return chi + nonText*900 + unprintable*4000;
+  }
+
+  function wordBonus(s){
+    var lower = " " + s.toLowerCase() + " ", hits = 0;
+    for (var i=0;i<COMMON.length;i++){
+      if (lower.indexOf(COMMON[i]) !== -1) hits++;
+    }
+    return hits;
+  }
+
+  // final score: chi squared reduced by word hits. Lower is better.
+  function score(s){
+    return chiSquared(s) - wordBonus(s)*120;
+  }
+
+  function englishBand(sc){
+    if (sc < 120) return "hi";
+    if (sc < 600) return "mid";
+    return "lo";
+  }
+
+  // ---- decoders ----
+  function tryBase64(s){
+    var t = s.replace(/\s+/g,"");
+    if (!/^[A-Za-z0-9+/]+={0,2}$/.test(t) || t.length < 4 || t.length % 4 !== 0) return null;
+    try {
+      var bin = atob(t);
+      if (!bin.length) return null;
+      return bin;
+    } catch(e){ return null; }
+  }
+
+  function tryBase32(s){
+    var t = s.replace(/\s+/g,"").toUpperCase().replace(/=+$/,"");
+    if (!/^[A-Z2-7]+$/.test(t) || t.length < 8) return null;
+    var alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567", bits = "", out = "";
+    for (var i=0;i<t.length;i++){
+      var idx = alpha.indexOf(t[i]);
+      if (idx < 0) return null;
+      bits += idx.toString(2).padStart(5,"0");
+    }
+    for (var b=0;b+8<=bits.length;b+=8){
+      out += String.fromCharCode(parseInt(bits.substr(b,8),2));
+    }
+    return out.length ? out : null;
+  }
+
+  function tryHex(s){
+    var t = s.replace(/0x/gi,"").replace(/[\s,:]+/g,"");
+    if (!/^[0-9a-fA-F]+$/.test(t) || t.length < 4 || t.length % 2 !== 0) return null;
+    var out = "";
+    for (var i=0;i<t.length;i+=2) out += String.fromCharCode(parseInt(t.substr(i,2),16));
+    return out;
+  }
+
+  function tryBinary(s){
+    var t = s.replace(/[^01]/g,"");
+    if (t.length < 8 || t.length % 8 !== 0) return null;
+    var out = "";
+    for (var i=0;i<t.length;i+=8){
+      var code = parseInt(t.substr(i,8),2);
+      out += String.fromCharCode(code);
+    }
+    return out;
+  }
+
+  function tryDecimal(s){
+    var parts = s.trim().split(/[\s,]+/);
+    if (parts.length < 2) return null;
+    var out = "";
+    for (var i=0;i<parts.length;i++){
+      if (!/^\d{1,3}$/.test(parts[i])) return null;
+      var n = parseInt(parts[i],10);
+      if (n < 9 || n > 126) return null;
+      out += String.fromCharCode(n);
+    }
+    return out;
+  }
+
+  var MORSE = {".-":"A","-...":"B","-.-.":"C","-..":"D",".":"E","..-.":"F","--.":"G","....":"H","..":"I",".---":"J","-.-":"K",".-..":"L","--":"M","-.":"N","---":"O",".--.":"P","--.-":"Q",".-.":"R","...":"S","-":"T","..-":"U","...-":"V",".--":"W","-..-":"X","-.--":"Y","--..":"Z","-----":"0",".----":"1","..---":"2","...--":"3","....-":"4",".....":"5","-....":"6","--...":"7","---..":"8","----.":"9"};
+  function tryMorse(s){
+    if (!/^[.\-\s/|]+$/.test(s.trim()) || !/[.\-]/.test(s)) return null;
+    var words = s.trim().split(/\s*[\/|]\s*|\s{2,}/), out = "";
+    for (var w=0;w<words.length;w++){
+      var letters = words[w].trim().split(/\s+/);
+      for (var i=0;i<letters.length;i++){
+        if (letters[i] === "") continue;
+        var ch = MORSE[letters[i]];
+        if (!ch) return null;
+        out += ch;
+      }
+      if (w < words.length-1) out += " ";
+    }
+    return out.trim() ? out : null;
+  }
+
+  function tryUrl(s){
+    if (s.indexOf("%") === -1) return null;
+    try {
+      var d = decodeURIComponent(s.replace(/\+/g," "));
+      return d === s ? null : d;
+    } catch(e){ return null; }
+  }
+
+  function rotN(s, n){
+    return s.replace(/[a-z]/g, function(c){ return String.fromCharCode((c.charCodeAt(0)-97+n)%26+97); })
+            .replace(/[A-Z]/g, function(c){ return String.fromCharCode((c.charCodeAt(0)-65+n)%26+65); });
+  }
+
+  function rot47(s){
+    var out = "";
+    for (var i=0;i<s.length;i++){
+      var c = s.charCodeAt(i);
+      if (c >= 33 && c <= 126) out += String.fromCharCode(33 + (c - 33 + 47) % 94);
+      else out += s[i];
+    }
+    return out;
+  }
+
+  function atbash(s){
+    return s.replace(/[a-z]/g, function(c){ return String.fromCharCode(122-(c.charCodeAt(0)-97)); })
+            .replace(/[A-Z]/g, function(c){ return String.fromCharCode(90-(c.charCodeAt(0)-65)); });
+  }
+
+  function xorKey(s, k){
+    var out = "";
+    for (var i=0;i<s.length;i++) out += String.fromCharCode(s.charCodeAt(i) ^ k);
+    return out;
+  }
+
+  // ---- Vigenere best effort ----
+  function indexOfCoincidence(letters){
+    var counts = new Array(26).fill(0), n = letters.length;
+    for (var i=0;i<n;i++) counts[letters[i]]++;
+    if (n < 2) return 0;
+    var sum = 0;
+    for (var j=0;j<26;j++) sum += counts[j]*(counts[j]-1);
+    return sum / (n*(n-1));
+  }
+
+  function onlyLetters(s){
+    var arr = [];
+    for (var i=0;i<s.length;i++){
+      var c = s.charCodeAt(i);
+      if (c>=65 && c<=90) arr.push(c-65);
+      else if (c>=97 && c<=122) arr.push(c-97);
+    }
+    return arr;
+  }
+
+  function bestCaesarShiftForColumn(col){
+    var best = 0, bestChi = 1e18;
+    for (var sh=0; sh<26; sh++){
+      var counts = new Array(26).fill(0), n = col.length;
+      for (var i=0;i<n;i++) counts[(col[i]-sh+26)%26]++;
+      var chi = 0;
+      for (var j=0;j<26;j++){
+        var expected = ENG[j]/100*n;
+        var diff = counts[j]-expected;
+        chi += diff*diff/(expected || 0.0001);
+      }
+      if (chi < bestChi){ bestChi = chi; best = sh; }
+    }
+    return best;
+  }
+
+  function vigenere(s){
+    var letters = onlyLetters(s);
+    if (letters.length < 20) return null;
+    // estimate key length: pick length whose average column IoC is closest to English 0.0667
+    var bestLen = 1, bestDelta = 1e9;
+    for (var L=1; L<=Math.min(16, Math.floor(letters.length/3)); L++){
+      var avg = 0;
+      for (var c=0;c<L;c++){
+        var col = [];
+        for (var i=c;i<letters.length;i+=L) col.push(letters[i]);
+        avg += indexOfCoincidence(col);
+      }
+      avg /= L;
+      var delta = Math.abs(avg - 0.0667);
+      if (delta < bestDelta - 0.0005){ bestDelta = delta; bestLen = L; }
+    }
+    if (bestLen < 2) return null;
+    var key = [];
+    for (var c2=0;c2<bestLen;c2++){
+      var col2 = [];
+      for (var i2=c2;i2<letters.length;i2+=bestLen) col2.push(letters[i2]);
+      key.push(bestCaesarShiftForColumn(col2));
+    }
+    var ki = 0, out = "";
+    for (var p=0;p<s.length;p++){
+      var ch = s.charCodeAt(p);
+      if (ch>=65 && ch<=90){ out += String.fromCharCode((ch-65-key[ki%bestLen]+26)%26+65); ki++; }
+      else if (ch>=97 && ch<=122){ out += String.fromCharCode((ch-97-key[ki%bestLen]+26)%26+97); ki++; }
+      else out += s[p];
+    }
+    var keyStr = key.map(function(k){ return String.fromCharCode(65+k); }).join("");
+    return { text: out, key: keyStr };
+  }
+
+  // ---- frequency analysis for substitution hint ----
+  function freqAnalysis(s){
+    var lc = letterCounts(s), total = lc.total;
+    if (total < 1) return null;
+    var rows = [];
+    for (var i=0;i<26;i++){
+      rows.push({ letter:String.fromCharCode(65+i), count:lc.c[i], pct: total ? (lc.c[i]/total*100) : 0 });
+    }
+    rows.sort(function(a,b){ return b.count-a.count; });
+    // bigrams over letters only
+    var clean = s.toUpperCase().replace(/[^A-Z]/g,""), big = {};
+    for (var j=0;j+1<clean.length;j++){
+      var bg = clean.substr(j,2);
+      big[bg] = (big[bg]||0)+1;
+    }
+    var bigArr = Object.keys(big).map(function(k){ return { bg:k, n:big[k] }; });
+    bigArr.sort(function(a,b){ return b.n-a.n; });
+    return { rows: rows.slice(0,8), bigrams: bigArr.slice(0,8), total: total };
+  }
+
+  // ---- collect candidates ----
+  function collect(input){
+    var cands = [];
+    function add(method, key, text){
+      if (text == null || text === "") return;
+      // cap displayed length to keep things sane
+      if (text.length > 4000) text = text.slice(0,4000);
+      cands.push({ method: method, key: key, text: text, score: score(text) });
+    }
+
+    // encodings (each chained one level: also score the decoded value as is)
+    add("base64", null, tryBase64(input));
+    add("base32", null, tryBase32(input));
+    add("hex", null, tryHex(input));
+    add("binary (8 bit)", null, tryBinary(input));
+    add("decimal ASCII", null, tryDecimal(input));
+    add("Morse code", null, tryMorse(input));
+    add("URL encoding", null, tryUrl(input));
+    add("ROT13", "13", rotN(input,13));
+    add("ROT47", null, rot47(input));
+    add("Atbash", null, atbash(input));
+
+    // Caesar all shifts
+    for (var n=1;n<26;n++) add("Caesar / ROT-N", String(n), rotN(input,n));
+
+    // single byte XOR all keys
+    for (var k=1;k<256;k++){
+      var x = xorKey(input,k);
+      // only keep candidates that are mostly printable to avoid noise flood
+      var printable = 0;
+      for (var i=0;i<x.length;i++){ var c=x.charCodeAt(i); if (c>=32&&c<127||c===10||c===9) printable++; }
+      if (x.length && printable/x.length >= 0.9){
+        add("single byte XOR", "0x"+k.toString(16).padStart(2,"0"), x);
+      }
+    }
+
+    // Vigenere best effort
+    var v = vigenere(input);
+    if (v) add("Vigenere (best effort)", v.key, v.text);
+
+    return cands;
+  }
+
+  function esc(s){ return String(s).replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];}); }
+
+  function renderCandidates(cands){
+    cands.sort(function(a,b){ return a.score-b.score; });
+    // de-duplicate identical plaintext, keep best scoring
+    var seen = {}, uniq = [];
+    cands.forEach(function(c){
+      var k = c.text;
+      if (seen[k] !== undefined) return;
+      seen[k] = 1; uniq.push(c);
+    });
+    var top = uniq.slice(0,8);
+    var html = "";
+    top.forEach(function(c, i){
+      var band = englishBand(c.score);
+      var bandLabel = band === "hi" ? "Looks English" : band === "mid" ? "Maybe" : "Low match";
+      html += '<div class="cand'+(i===0?' best':'')+'">';
+      html += '<div class="top">';
+      html += '<span class="rankno">#'+(i+1)+'</span>';
+      html += '<span class="method">'+esc(c.method)+'</span>';
+      if (c.key) html += '<span class="key">key '+esc(c.key)+'</span>';
+      html += '<span class="badge-eng '+band+'">'+bandLabel+'</span>';
+      html += '<span class="score">chi sq '+Math.round(c.score)+'</span>';
+      html += '</div>';
+      html += '<pre>'+esc(c.text)+'</pre>';
+      html += '</div>';
+    });
+    return html;
+  }
+
+  function renderFreq(fa){
+    if (!fa) return "";
+    var html = '<div class="panelblock"><h3>Substitution hint: frequency analysis</h3>';
+    html += '<p class="note">No automatic solve for a general substitution cipher. Map the most frequent letters below to common English letters (E, T, A, O, I, N) and refine. Counts are over '+fa.total+' letters.</p>';
+    html += '<div class="freqgrid">';
+    fa.rows.forEach(function(r){
+      html += '<div class="freqcell"><b>'+r.letter+'</b><span>'+r.count+' ('+r.pct.toFixed(1)+'%)</span></div>';
+    });
+    html += '</div>';
+    if (fa.bigrams.length){
+      html += '<div class="bigrams">';
+      fa.bigrams.forEach(function(b){ html += '<span class="bg"><b>'+b.bg+'</b> &times;'+b.n+'</span>'; });
+      html += '</div>';
+    }
+    html += '</div>';
+    return html;
+  }
+
+  function render(input){
+    var cands = collect(input);
+    var fa = freqAnalysis(input);
+    var html = "";
+
+    if (cands.length){
+      cands.sort(function(a,b){ return a.score-b.score; });
+      var best = cands[0];
+      var band = englishBand(best.score);
+      var verdict = band === "hi"
+        ? "The top candidate reads like English. The method below is the most likely answer."
+        : band === "mid"
+        ? "The top candidate is a partial match. Scan the ranked list, the real answer may sit a row or two down."
+        : "No candidate looks strongly like English. This may be an unsupported cipher, a different language, or already plaintext. The frequency analysis below can still help.";
+      html += '<div class="grade-card">';
+      html += '<div class="grade">'+esc(best.method)+'</div>';
+      html += '<div class="grade-meta"><h2>Best guess: '+esc(best.method)+(best.key?' (key '+esc(best.key)+')':'')+'</h2>';
+      html += '<p>'+verdict+'</p></div></div>';
+      html += '<div class="cands">'+renderCandidates(cands)+'</div>';
+    } else {
+      html += '<div class="empty">No candidate decodings produced. The input may already be plaintext or an unsupported scheme. See the frequency analysis below.</div>';
+    }
+
+    html += renderFreq(fa);
+    return html;
+  }
+
+  function run(){
+    var text = $("#ct").value;
+    if (!text.trim()){ $("#results").innerHTML = '<div class="empty">Paste a ciphertext first.</div>'; return; }
+    $("#results").innerHTML = render(text);
+    $("#results").scrollIntoView({ behavior:"smooth", block:"start" });
+  }
+
+  // ---- examples (invented, harmless plaintext) ----
+  var EXAMPLES = {
+    caesar: rotN("Meet the raven at the old clock tower", 7),  // Caesar shift 7
+    b64: btoa("The treasure is buried under the willow tree"),
+    xor: (function(){ return xorKey("Bring the lantern and the brass key tonight", 0x2a); })()
+  };
+
+  $("#solve").addEventListener("click", run);
+  $("#clear").addEventListener("click", function(){ $("#ct").value=""; $("#results").innerHTML='<div class="empty">Ranked candidate plaintexts will appear here.</div>'; $("#ct").focus(); });
+  document.querySelectorAll(".examples button").forEach(function(b){
+    b.addEventListener("click", function(){ $("#ct").value = EXAMPLES[b.getAttribute("data-ex")]; run(); });
+  });
+  $("#ct").addEventListener("keydown", function(e){ if ((e.metaKey||e.ctrlKey) && e.key==="Enter") run(); });
+})();
+</script>
+</body>
+</html>

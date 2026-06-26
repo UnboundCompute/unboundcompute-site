@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trust center | UnboundCompute</title>
+<meta name="description" content="How UnboundCompute handles authorization, data, and responsible disclosure. Permission first, evidence always.">
+<meta name="theme-color" content="#0a0a0b">
+<link rel="canonical" href="https://unboundcompute.com/trust.html">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a0a0b'/%3E%3Cline x1='16' y1='4' x2='16' y2='28' stroke='%23fb5b46' stroke-width='2' stroke-dasharray='3 3'/%3E%3Ccircle cx='16' cy='16' r='3.4' fill='%23fb5b46'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600&family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,300;1,6..72,400&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0a0b;--bg-2:#070708;--panel:#0e0e10;--ink:#f4f2ec;--ink-hi:#fbf9f3;--ink-soft:#9b988f;--ink-faint:#5e5b54;--line:rgba(244,242,236,.13);--line-2:rgba(244,242,236,.07);--accent:#fb5b46;--accent-line:rgba(251,91,70,.42);--accent-wash:rgba(251,91,70,.12);--on-accent:#1a0c09;--serif:'Newsreader',Georgia,serif;--mono:'JetBrains Mono',ui-monospace,monospace;--sans:'Inter',system-ui,sans-serif;--maxw:880px}
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;line-height:1.62}
+  ::selection{background:var(--accent);color:var(--on-accent)}
+  a{color:inherit;text-decoration:none}
+  nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);background:rgba(10,10,11,.72);border-bottom:1px solid var(--line-2)}
+  .nav-in{max-width:1180px;margin:0 auto;height:66px;padding:0 32px;display:flex;align-items:center;justify-content:space-between}
+  .brand{display:flex;align-items:center;gap:11px;font-family:var(--mono);font-weight:600;font-size:15px}
+  .brand span{width:27px;height:27px;border-radius:7px;border:1px solid var(--accent-line);display:grid;place-items:center}
+  .back{font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);transition:color .15s}
+  .back:hover{color:var(--ink)}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 32px}
+  .head{padding:84px 0 56px;border-bottom:1px solid var(--line)}
+  .eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:24px}
+  h1{font-family:var(--serif);font-weight:300;font-size:clamp(40px,6vw,66px);line-height:1.0;letter-spacing:-.03em;color:var(--ink-hi)}
+  h1 em{font-style:italic;color:var(--accent)}
+  .lede{font-size:19px;color:var(--ink-soft);max-width:54ch;margin-top:26px;line-height:1.55}
+  .body{padding:56px 0 96px}
+  .item{border-top:1px solid var(--line);padding:34px 0;display:grid;grid-template-columns:200px 1fr;gap:32px}
+  @media(max-width:640px){.item{grid-template-columns:1fr;gap:12px}}
+  .item .k{font-family:var(--mono);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ink);padding-top:3px}
+  .item p{font-size:16px;color:var(--ink-soft);max-width:62ch;margin-bottom:14px}
+  .item p:last-child{margin-bottom:0}
+  .item p b{color:var(--ink);font-weight:600}
+  .item em{font-style:normal;color:var(--accent)}
+  .contact{margin-top:46px;border:1px solid var(--line);border-radius:13px;background:var(--panel);padding:30px 28px}
+  .contact p{margin:0 0 8px;color:var(--ink-soft)}
+  .mail{color:var(--accent);font-family:var(--mono);font-size:15px}
+  .note{margin-top:18px;font-family:var(--mono);font-size:11.5px;color:var(--ink-faint)}
+  .uc-word-wrap{position:absolute;left:0;right:0;bottom:0;z-index:0;overflow:hidden;pointer-events:none}
+  .uc-word{display:block;max-width:1180px;margin:0 auto -.16em;padding:0 32px;font-family:var(--serif);font-weight:400;font-size:clamp(42px,11.05vw,130px);line-height:1;letter-spacing:-.015em;color:var(--ink-faint);opacity:.28;white-space:nowrap;user-select:none}
+  .uc-word .b{color:var(--ink-soft)}
+  .uc-word .d{color:var(--accent);font-style:italic;opacity:.82}
+  footer{border-top:1px solid var(--line);position:relative;overflow:hidden}
+  .foot{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:30px 32px 100px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px;font-family:var(--mono);font-size:11px;color:var(--ink-faint)}
+  .foot a{color:var(--ink-faint);transition:color .15s}.foot a:hover{color:var(--ink-soft)}
+  .foot .links{display:flex;gap:22px;flex-wrap:wrap}
+</style>
+</head>
+<body>
+  <nav><div class="nav-in">
+    <a class="brand" href="index.html"><span><svg viewBox="0 0 24 24" fill="none" style="width:15px;height:15px"><line x1="12" y1="3" x2="12" y2="21" stroke="var(--accent)" stroke-width="1.8" stroke-dasharray="2.6 2.6"/><circle cx="12" cy="12" r="3" fill="var(--accent)"/></svg></span>UnboundCompute</a>
+    <a class="back" href="index.html">&larr; Back to home</a>
+  </div></nav>
+
+  <header class="head"><div class="wrap">
+    <p class="eyebrow">Legal / Trust center</p>
+    <h1>Permission first.<br>Evidence <em>always.</em></h1>
+    <p class="lede">UnboundCompute does offensive work, so how we handle authorization, data, and disclosure is part of the product, not an afterthought.</p>
+  </div></header>
+
+  <main class="body"><div class="wrap">
+    <div class="item">
+      <div class="k">Authorized only</div>
+      <div>
+        <p>UnboundCompute runs only against systems a customer is <b>authorized to test</b> and has explicitly placed in scope. Scope and rules of engagement are agreed before any testing begins.</p>
+        <p>We recommend pointing it at a staging or pre-production environment first, so testing happens away from real users and live data.</p>
+      </div>
+    </div>
+    <div class="item">
+      <div class="k">Data we handle</div>
+      <div>
+        <p>To do its work, the system processes the application's requests, responses, and the evidence behind a finding. We aim to handle the <b>minimum</b> needed to reproduce and prove a result.</p>
+        <p>Findings and their evidence are treated as confidential to the customer they belong to and are not shared across customers.</p>
+      </div>
+    </div>
+    <div class="item">
+      <div class="k">How it runs</div>
+      <div>
+        <p>The system follows a <em>governed loop</em>: it designs each test against an authorized baseline, prefers read and verify over destructive actions, and records what it did so any finding can be replayed.</p>
+        <p>A confirmed crossing is delivered as a recorded request, the unexpected response, and a repeatable proof, not as an unverified guess.</p>
+      </div>
+    </div>
+    <div class="item">
+      <div class="k">Responsible disclosure</div>
+      <div>
+        <p>If you believe you have found a security issue in our own website or systems, please tell us before disclosing it publicly, and give us a reasonable chance to fix it. We will work with you in good faith.</p>
+        <p>Report to <a class="mail" href="mailto:riyan@unboundcompute.com">riyan@unboundcompute.com</a>.</p>
+      </div>
+    </div>
+
+    <div class="contact">
+      <p>Security questions, scoping, or disclosure:</p>
+      <p><a class="mail" href="mailto:riyan@unboundcompute.com">riyan@unboundcompute.com</a></p>
+      <p class="note">UnboundCompute is in private access. This page describes our posture and will grow as the product does.</p>
+    </div>
+  </div></main>
+
+  <footer>
+    <div class="uc-word-wrap" aria-hidden="true"><span class="uc-word"><span class="b">Unbound</span>Compute<span class="d">.</span></span></div>
+    <div class="foot">
+    <span>&copy; 2026 UnboundCompute</span>
+    <span class="links"><a href="about.html">About</a><a href="research.html">Research</a><a href="careers.html">Careers</a><a href="design-partners.html">Design partners</a><a href="tools/">Tools</a><a href="trust.html">Trust center</a><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a></span>
+  </div>
+  </footer>
+
+  <!-- Google Analytics 4 / Google Ads / Microsoft Clarity (deferred) -->
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){ dataLayer.push(arguments); }
+    (function () {
+      var loaded = false;
+      function loadAnalytics() {
+        if (loaded) return; loaded = true;
+        gtag('js', new Date());
+        gtag('config', 'G-XCEPB67XE6');
+        gtag('config', 'AW-16469698408');
+        var g = document.createElement('script');
+        g.src = 'https://www.googletagmanager.com/gtag/js?id=G-XCEPB67XE6';
+        g.async = true;
+        document.head.appendChild(g);
+        (function (c, l, a, r, i, t, y) {
+          c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments) };
+          t = l.createElement(r); t.async = 1; t.src = "https://www.clarity.ms/tag/" + i;
+          y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
+        })(window, document, "clarity", "script", "vlzp6fvarw");
+      }
+      if ('requestIdleCallback' in window) requestIdleCallback(loadAnalytics, { timeout: 3000 });
+      else setTimeout(loadAnalytics, 2000);
+    })();
+  </script>
+</body>
+</html>

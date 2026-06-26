@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>OWASP LLM Top 10 Self Assessment Scorecard | UnboundCompute</title>
+<meta name="description" content="Score your LLM application against the OWASP Top 10 for LLM Applications 2025. An honest, interactive self assessment with a readiness grade and a Markdown export. Runs fully in your browser, nothing is sent to any server." />
+<meta name="keywords" content="owasp llm top 10, owasp llm top 10 2025, llm security checklist, ai security assessment, llm application security, prompt injection, excessive agency, llm security scorecard, owasp ai testing guide" />
+<meta name="robots" content="index, follow" />
+<meta name="author" content="UnboundCompute" />
+<meta name="theme-color" content="#0a0a0b" />
+<link rel="canonical" href="https://unboundcompute.com/tools/owasp-llm-top10-scorecard.html" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a0a0b'/%3E%3Cline x1='16' y1='4' x2='16' y2='28' stroke='%23fb5b46' stroke-width='2' stroke-dasharray='3 3'/%3E%3Ccircle cx='16' cy='16' r='3.4' fill='%23fb5b46'/%3E%3C/svg%3E" />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="UnboundCompute" />
+<meta property="og:title" content="OWASP LLM Top 10 Self Assessment Scorecard" />
+<meta property="og:description" content="Score your LLM application against the OWASP Top 10 for LLM Applications 2025. An honest self assessment with a readiness grade. Runs fully in your browser, nothing is sent to any server." />
+<meta property="og:url" content="https://unboundcompute.com/tools/owasp-llm-top10-scorecard.html" />
+<meta property="og:image" content="https://unboundcompute.com/og.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="OWASP LLM Top 10 Self Assessment Scorecard" />
+<meta name="twitter:description" content="Score your LLM application against the OWASP Top 10 for LLM Applications 2025. Runs fully in your browser." />
+<meta name="twitter:image" content="https://unboundcompute.com/og.png" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "OWASP LLM Top 10 Self Assessment Scorecard",
+      "applicationCategory": "SecurityApplication",
+      "operatingSystem": "Web",
+      "browserRequirements": "Requires JavaScript. Runs entirely client side.",
+      "url": "https://unboundcompute.com/tools/owasp-llm-top10-scorecard.html",
+      "description": "A free, interactive self assessment that scores an LLM application against the OWASP Top 10 for LLM Applications 2025. You answer yes, partial, or no to control questions across all ten categories, including prompt injection, sensitive information disclosure, supply chain, data and model poisoning, improper output handling, excessive agency, system prompt leakage, vector and embedding weaknesses, misinformation, and unbounded consumption. The tool produces a per category status, an overall readiness percentage and letter grade, highlights the weakest areas, and exports the completed assessment as Markdown. All scoring happens in the browser.",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "publisher": { "@type": "Organization", "name": "UnboundCompute", "url": "https://unboundcompute.com/" }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is the OWASP Top 10 for LLM Applications?",
+          "acceptedAnswer": { "@type": "Answer", "text": "It is a community list, published by the OWASP GenAI Security Project, of the most critical security risks that affect applications built on large language models. The 2025 edition names ten categories: prompt injection, sensitive information disclosure, supply chain, data and model poisoning, improper output handling, excessive agency, system prompt leakage, vector and embedding weaknesses, misinformation, and unbounded consumption. This scorecard turns each category into honest control questions you answer about your own system." }
+        },
+        {
+          "@type": "Question",
+          "name": "Does this scorecard send my answers anywhere?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. Every question, score, and export is computed in your browser with JavaScript. Your answers are never uploaded, logged, or stored on any server. You can assess a real internal system honestly without the responses leaving your machine. Nothing is even saved between page reloads unless you export it yourself." }
+        },
+        {
+          "@type": "Question",
+          "name": "Is a passing grade a certification that my LLM app is secure?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. This is a self assessment, not a certification, an audit, or a guarantee. The grade only reflects the honesty and completeness of the answers you give. It is meant to surface gaps and start conversations, not to prove a system is safe. A high score on self reported controls is not the same as a tested, verified system. Real assurance comes from hands on testing and review." }
+        },
+        {
+          "@type": "Question",
+          "name": "How is the readiness score calculated?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Each category holds a few control questions. A yes earns the full points for that question, a partial earns half, and a no earns none. The category status is the share of its points you earned, and the overall score is the share across every answered question, shown as a percentage out of one hundred. The letter grade uses A for ninety and above, B for eighty, C for seventy, D for sixty, and F below that." }
+        },
+        {
+          "@type": "Question",
+          "name": "How does this relate to the OWASP AI Testing Guide?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Where it helps, each category notes the matching OWASP AI Testing Guide identifiers, which use the AITG-APP form. Those identifiers point to concrete test procedures for the same risks. This scorecard is the quick self check that helps you decide which of those tests to run next. It is a starting map, not a replacement for running the tests." }
+        }
+      ]
+    }
+  ]
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600&family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0a0b; --bg-2:#070708; --panel:#0e0e10; --panel-2:#131315;
+    --ink:#f4f2ec; --ink-hi:#fbf9f3; --ink-soft:#9b988f; --ink-faint:#5e5b54;
+    --line:rgba(244,242,236,.13); --line-2:rgba(244,242,236,.07);
+    --accent:#fb5b46; --accent-2:#ff7d6b; --accent-wash:rgba(251,91,70,.12); --on-accent:#1a0c09; --accent-line:rgba(251,91,70,.42);
+    --pass:#5fd6a4; --pass-wash:rgba(95,214,164,.1); --warn:#e8b04b; --warn-wash:rgba(232,176,75,.1); --fail:#fb5b46; --fail-wash:rgba(251,91,70,.1); --info:#7c93ff; --info-wash:rgba(124,147,255,.1);
+    --serif:'Newsreader',Georgia,serif; --mono:'JetBrains Mono',ui-monospace,monospace; --sans:'Inter',system-ui,sans-serif;
+    --maxw:920px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;line-height:1.6}
+  ::selection{background:var(--accent);color:var(--on-accent)}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+
+  nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);background:rgba(10,10,11,.72);border-bottom:1px solid var(--line-2)}
+  nav .wrap{height:64px;display:flex;align-items:center;justify-content:space-between}
+  nav a.brand{display:flex;align-items:center;gap:11px;font-family:var(--mono);font-weight:600;font-size:15px;color:var(--ink);letter-spacing:-.01em}
+  nav a.brand:hover{text-decoration:none}
+  nav .badge{width:27px;height:27px;border-radius:7px;border:1px solid var(--accent-line);display:grid;place-items:center}
+  nav a.cta{font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:9px 16px;border-radius:8px;background:var(--accent);color:var(--on-accent)}
+  nav a.cta:hover{filter:brightness(1.08);text-decoration:none}
+
+  header.hero{padding:64px 0 28px}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:18px}
+  h1{font-family:var(--serif);font-weight:400;font-size:clamp(32px,5vw,52px);line-height:1.08;letter-spacing:-.015em;color:var(--ink-hi)}
+  .lede{margin-top:18px;font-size:18px;color:var(--ink-soft);max-width:660px}
+  .privacy{margin-top:18px;display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);border:1px solid var(--line);border-radius:8px;padding:8px 13px;background:var(--panel)}
+  .privacy svg{width:14px;height:14px;flex:none}
+
+  .tool{margin:30px 0 12px}
+  .toolbar{display:flex;gap:11px;flex-wrap:wrap;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:18px;position:sticky;top:72px;z-index:30;backdrop-filter:blur(8px)}
+  button{font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;padding:13px 22px;border-radius:9px;cursor:pointer;border:1px solid var(--line);background:transparent;color:var(--ink);transition:filter .15s,border-color .15s,background .15s}
+  button.primary{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+  button.primary:hover{filter:brightness(1.08)}
+  button.ghost:hover{border-color:var(--accent-line);color:var(--ink-hi)}
+  .hint{font-family:var(--mono);font-size:12px;color:var(--ink-faint);margin-left:auto}
+
+  .cat{border:1px solid var(--line);border-radius:14px;padding:20px 22px;background:var(--panel);margin-bottom:14px}
+  .cat .chead{display:flex;align-items:flex-start;gap:13px;flex-wrap:wrap}
+  .cat .id{font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.04em;color:var(--accent);background:var(--accent-wash);border:1px solid var(--accent-line);border-radius:7px;padding:5px 9px;flex:none}
+  .cat h2{font-family:var(--serif);font-weight:400;font-size:22px;color:var(--ink-hi);letter-spacing:-.01em;line-height:1.2}
+  .cat .desc{margin-top:9px;font-size:14.5px;color:var(--ink-soft)}
+  .cat .cite{margin-top:8px;font-family:var(--mono);font-size:11.5px;color:var(--ink-faint)}
+  .cat .cite code{font-family:var(--mono);font-size:11.5px;background:var(--panel-2);border:1px solid var(--line-2);border-radius:5px;padding:1px 5px;color:var(--ink-soft)}
+  .catstat{margin-left:auto;font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:6px 11px;border-radius:99px;border:1px solid var(--line);color:var(--ink-soft);flex:none}
+  .catstat.pass{color:var(--pass);border-color:var(--pass);background:var(--pass-wash)}
+  .catstat.warn{color:var(--warn);border-color:var(--warn);background:var(--warn-wash)}
+  .catstat.fail{color:var(--fail);border-color:var(--fail);background:var(--fail-wash)}
+  .catstat.none{color:var(--ink-faint)}
+
+  .q{margin-top:15px;padding-top:15px;border-top:1px solid var(--line-2)}
+  .q:first-of-type{border-top:none}
+  .q .qtext{font-size:14.5px;color:var(--ink);margin-bottom:10px}
+  .opts{display:flex;gap:9px;flex-wrap:wrap}
+  .opt{font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:9px 16px;border-radius:8px;cursor:pointer;border:1px solid var(--line);background:var(--bg-2);color:var(--ink-soft);transition:border-color .12s,color .12s,background .12s;user-select:none}
+  .opt:hover{border-color:var(--accent-line);color:var(--ink-hi)}
+  .opt.sel-yes{background:var(--pass-wash);border-color:var(--pass);color:var(--pass)}
+  .opt.sel-partial{background:var(--warn-wash);border-color:var(--warn);color:var(--warn)}
+  .opt.sel-no{background:var(--fail-wash);border-color:var(--fail);color:var(--fail)}
+
+  .grade-card{display:flex;align-items:center;gap:22px;background:var(--panel-2);border:1px solid var(--line);border-radius:16px;padding:22px 24px;margin:0 0 20px}
+  .grade{font-family:var(--serif);font-size:62px;line-height:1;width:96px;height:96px;border-radius:18px;display:grid;place-items:center;flex:none;border:1.5px solid}
+  .grade.g-A,.grade.g-B{color:var(--pass);border-color:var(--pass);background:var(--pass-wash)}
+  .grade.g-C{color:var(--warn);border-color:var(--warn);background:var(--warn-wash)}
+  .grade.g-D,.grade.g-F{color:var(--fail);border-color:var(--fail);background:var(--fail-wash)}
+  .grade.g-na{color:var(--ink-faint);border-color:var(--line);font-size:40px}
+  .grade-meta h2{font-family:var(--serif);font-weight:400;font-size:24px;color:var(--ink-hi);margin-bottom:4px}
+  .grade-meta p{color:var(--ink-soft);font-size:14.5px}
+  .score-bar{height:7px;border-radius:99px;background:var(--line-2);margin-top:12px;overflow:hidden;max-width:340px}
+  .score-bar > i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--accent-2));transition:width .3s}
+  .weak{margin-top:13px;display:flex;flex-direction:column;gap:6px;max-width:520px}
+  .weak div{font-size:13.5px;color:var(--ink-soft)}
+  .weak b{color:var(--ink)}
+
+  .exportbox{margin:18px 0 0;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}
+  .exportbox h3{font-family:var(--mono);font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--accent);margin-bottom:11px}
+  textarea{width:100%;min-height:170px;resize:vertical;background:var(--bg-2);border:1px solid var(--line);border-radius:11px;padding:15px;color:var(--ink);font-family:var(--mono);font-size:12.5px;line-height:1.55;outline:none}
+  textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-wash)}
+  .exportbox .row{display:flex;gap:11px;flex-wrap:wrap;margin-top:13px;align-items:center}
+
+  .prose{padding:44px 0 20px}
+  .prose h2{font-family:var(--serif);font-weight:400;font-size:30px;color:var(--ink-hi);margin:36px 0 14px;letter-spacing:-.01em}
+  .prose h3{font-family:var(--mono);font-size:15px;color:var(--ink-hi);margin:24px 0 8px}
+  .prose p{color:var(--ink-soft);margin-bottom:14px;font-size:16px}
+  .prose ul{color:var(--ink-soft);margin:0 0 14px 20px;font-size:16px}
+  .prose li{margin-bottom:7px}
+  .prose code{font-family:var(--mono);font-size:13.5px;background:var(--panel-2);border:1px solid var(--line-2);border-radius:5px;padding:1px 6px;color:var(--ink)}
+  .related{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:8px}
+  .related a{display:block;border:1px solid var(--line);border-radius:11px;padding:14px 16px;color:var(--ink);font-size:14.5px;background:var(--panel)}
+  .related a:hover{border-color:var(--accent-line);text-decoration:none}
+  .related a span{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:5px}
+
+  footer{border-top:1px solid var(--line-2);margin-top:40px;padding:30px 0;color:var(--ink-faint);font-family:var(--mono);font-size:12.5px}
+  footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px}
+  footer a{color:var(--ink-soft)}
+  @media (max-width:560px){
+    .related{grid-template-columns:1fr}
+    .grade-card{flex-direction:column;align-items:flex-start;gap:16px}
+    .hint{margin-left:0;width:100%}
+    .toolbar{position:static}
+    .catstat{margin-left:0}
+  }
+</style>
+</head>
+<body>
+
+<nav><div class="wrap">
+  <a class="brand" href="https://unboundcompute.com/">
+    <span class="badge"><svg viewBox="0 0 24 24" fill="none" style="width:15px;height:15px"><line x1="12" y1="3" x2="12" y2="21" stroke="var(--accent)" stroke-width="1.8" stroke-dasharray="2.6 2.6"/><circle cx="12" cy="12" r="3" fill="var(--accent)"/></svg></span>
+    UnboundCompute
+  </a>
+  <a class="cta" href="https://unboundcompute.com/#cta">Request access</a>
+</div></nav>
+
+<header class="hero"><div class="wrap">
+  <div class="eyebrow">Free tool</div>
+  <h1>OWASP LLM Top 10 Scorecard</h1>
+  <p class="lede">Answer honest yes, partial, or no control questions across all ten categories of the OWASP Top 10 for LLM Applications 2025. Get a per category status, an overall readiness grade, a view of your weakest areas, and a Markdown export you can drop into a ticket or a review.</p>
+  <div class="privacy">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6l8-4z" stroke="var(--accent)" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Your answers stay on this page. Everything runs in your browser. Nothing is sent to any server.
+  </div>
+</div></header>
+
+<div class="wrap">
+  <div class="tool">
+    <div class="toolbar">
+      <button class="primary" id="export">Build Markdown export</button>
+      <button class="ghost" id="sample">Fill sample answers</button>
+      <button class="ghost" id="reset">Reset</button>
+      <span class="hint" id="progress">0 of 0 answered</span>
+    </div>
+
+    <div class="grade-card" id="gradeCard">
+      <div class="grade g-na" id="gradeLetter">&ndash;</div>
+      <div class="grade-meta">
+        <h2 id="gradeScore">Answer the questions to score</h2>
+        <p id="gradeNote">A yes earns full points, a partial earns half, a no earns none. Skip a question and it is left out of the math.</p>
+        <div class="score-bar"><i id="gradeBar" style="width:0%"></i></div>
+        <div class="weak" id="weakList"></div>
+      </div>
+    </div>
+
+    <div id="cats"></div>
+
+    <div class="exportbox" id="exportBox" style="display:none">
+      <h3>Markdown export</h3>
+      <textarea id="exportText" spellcheck="false" readonly></textarea>
+      <div class="row">
+        <button class="primary" id="copy">Copy</button>
+        <button class="ghost" id="download">Download .md</button>
+        <span class="hint" id="copyHint">Generated locally, never uploaded</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap prose">
+  <h2>What this scorecard is, and what it is not</h2>
+  <p>This is a self assessment. You answer plain questions about your own LLM application and it turns the answers into a readiness grade. That makes it useful for finding gaps and starting a conversation, and it makes it useless as proof of anything. It is not a certification, not an audit, and not a guarantee. The grade only reflects how honestly and completely you answered, so a high score on self reported controls is not the same as a tested system. Treat a weak area as a prompt to go test, not as a finding you have closed.</p>
+  <p>The categories follow the <a href="https://genai.owasp.org/llm-top-10/" rel="noopener" target="_blank">OWASP Top 10 for LLM Applications 2025</a>, published by the OWASP GenAI Security Project. Where it helps, each category notes the matching <a href="https://genai.owasp.org/resource/owasp-ai-testing-guide/" rel="noopener" target="_blank">OWASP AI Testing Guide</a> identifiers, written in the <code>AITG-APP-01</code> form, so you know which concrete test procedure lines up with the gap you just found.</p>
+
+  <h3>The ten categories at a glance</h3>
+  <ul>
+    <li><b>LLM01 Prompt Injection.</b> Untrusted input steers the model into behaviour the application never intended, including text hidden in retrieved documents or images.</li>
+    <li><b>LLM02 Sensitive Information Disclosure.</b> The model reveals secrets, training data, or personal data it should never have surfaced.</li>
+    <li><b>LLM03 Supply Chain.</b> Risk that rides in through third party models, datasets, adapters, and the packages around them.</li>
+    <li><b>LLM04 Data and Model Poisoning.</b> Tampered training, fine tuning, or retrieval data that bends the model toward an attacker goal.</li>
+    <li><b>LLM05 Improper Output Handling.</b> Treating model output as trusted and passing it straight into a browser, a shell, a database, or another system.</li>
+    <li><b>LLM06 Excessive Agency.</b> Too much permission, autonomy, or tool reach granted to the model, so a bad output becomes a real world action.</li>
+    <li><b>LLM07 System Prompt Leakage.</b> Relying on the system prompt to stay secret, when it can leak and may already hold things it should not.</li>
+    <li><b>LLM08 Vector and Embedding Weaknesses.</b> Flaws in how embeddings and vector stores are built and queried in a retrieval system.</li>
+    <li><b>LLM09 Misinformation.</b> Confident, well formed output that is simply wrong, and the overreliance that lets it through.</li>
+    <li><b>LLM10 Unbounded Consumption.</b> Unchecked inference cost, resource use, and abuse such as denial of wallet and model extraction.</li>
+  </ul>
+
+  <h2>How to read the grade</h2>
+  <p>Each category holds a few control questions. A yes earns the full points, a partial earns half, and a no earns none. A category status is the share of its points you earned, and the overall readiness score is the share across every question you answered, shown out of one hundred. The letter grade uses the same banding as the other tools here: A for ninety and above, B for eighty, C for seventy, D for sixty, and F below that. The weakest areas list points you at the categories that lost the most ground, which is usually where the next hour of work pays off most.</p>
+  <p>Honesty is the whole game. A partial is the right answer when a control exists but is inconsistent, untested, or only covers part of the surface. Reaching for yes when you mean partial just hides the gap from yourself. If you want to move from a self check to verified coverage, the kind of reasoning an <a href="https://security.unboundcompute.com/ai-security-testing/" rel="noopener">AI security testing</a> approach brings is what turns a self reported yes into something you can actually trust.</p>
+
+  <h2>Related reading</h2>
+  <div class="related">
+    <a href="https://security.unboundcompute.com/ai-security-testing/"><span>Guide</span>AI security testing</a>
+    <a href="https://security.unboundcompute.com/what-is-web-application-security/"><span>Guide</span>What is web application security</a>
+    <a href="https://security.unboundcompute.com/web-security-glossary/"><span>Reference</span>Web security glossary</a>
+    <a href="https://security.unboundcompute.com/category/access-control/"><span>Deep dive</span>Access control</a>
+  </div>
+
+  <h2>More free tools</h2>
+  <div class="related">
+    <a href="https://unboundcompute.com/tools/prompt-template-injection-linter.html"><span>Free tool</span>Prompt Template Injection Linter</a>
+    <a href="https://unboundcompute.com/tools/mcp-server-security-auditor.html"><span>Free tool</span>MCP Server Security Auditor</a>
+    <a href="https://unboundcompute.com/tools/security-headers-analyzer.html"><span>Free tool</span>Security Headers and CSP Analyzer</a>
+    <a href="https://unboundcompute.com/tools/"><span>Hub</span>All free security tools</a>
+  </div>
+</div>
+
+<footer><div class="wrap">
+  <div>Built by <a href="https://unboundcompute.com/">UnboundCompute</a>, autonomous security research for web apps and APIs.</div>
+  <div><a href="https://unboundcompute.com/#cta">Request access</a></div>
+</div></footer>
+
+<script>
+(function(){
+  "use strict";
+  var $ = function(s){ return document.querySelector(s); };
+
+  // OWASP Top 10 for LLM Applications 2025. Each category carries a plain
+  // description, the matching OWASP AI Testing Guide identifiers where they
+  // help (AITG-APP form), and 2 to 4 honest yes/partial/no control questions.
+  var DATA = [
+    { id:"LLM01", name:"Prompt Injection",
+      desc:"Untrusted input steers the model into doing something the application never intended, whether typed directly or hidden inside a retrieved document, web page, or image.",
+      aitg:["AITG-APP-01"],
+      qs:[
+        "Do you treat all model input, including retrieved documents and tool output, as untrusted rather than as instructions?",
+        "Do you constrain what the model is allowed to do so that injected instructions cannot escalate beyond the user's own permissions?",
+        "Have you tested the application against direct and indirect prompt injection attempts before release?"
+      ]},
+    { id:"LLM02", name:"Sensitive Information Disclosure",
+      desc:"The model surfaces secrets, proprietary data, or personal data that should never have left its boundary, through its answers or its logs.",
+      aitg:["AITG-APP-02","AITG-APP-09"],
+      qs:[
+        "Do you keep secrets, credentials, and personal data out of prompts, context, and training or fine tuning data?",
+        "Do you filter or redact model output to catch sensitive data before it reaches the user?",
+        "Do you scrub prompts and completions from logs, traces, and analytics so they do not become a second copy of the data?"
+      ]},
+    { id:"LLM03", name:"Supply Chain",
+      desc:"Risk that rides in through third party models, datasets, adapters, plugins, and the package ecosystem you assemble the application from.",
+      aitg:["AITG-APP-03"],
+      qs:[
+        "Do you track the provenance and licence of every model, dataset, and adapter you depend on?",
+        "Do you verify the integrity of model weights and packages you pull from external sources before using them?",
+        "Do you scan and pin the third party libraries and plugins around the model the same way you would any other dependency?"
+      ]},
+    { id:"LLM04", name:"Data and Model Poisoning",
+      desc:"Tampered training, fine tuning, or retrieval data that quietly bends the model toward an attacker chosen behaviour or backdoor.",
+      aitg:["AITG-APP-04"],
+      qs:[
+        "Do you validate and vet the data that goes into training, fine tuning, and retrieval rather than trusting it by default?",
+        "Do you control who can contribute to or modify your datasets and embedding sources?",
+        "Do you evaluate models for unexpected or backdoor behaviour before promoting them to production?"
+      ]},
+    { id:"LLM05", name:"Improper Output Handling",
+      desc:"Treating model output as trusted and passing it straight into a browser, a shell, a query, or another system without validation or encoding.",
+      aitg:["AITG-APP-05"],
+      qs:[
+        "Do you validate and encode model output before it reaches a browser, a shell, a database, or another downstream system?",
+        "Do you avoid executing or evaluating model generated code or queries without a sandbox and review?",
+        "Do downstream systems apply their own authorization rather than trusting an action just because the model produced it?"
+      ]},
+    { id:"LLM06", name:"Excessive Agency",
+      desc:"Too much permission, autonomy, or tool reach granted to the model, so a single bad or manipulated output turns into a real world action.",
+      aitg:["AITG-APP-06"],
+      qs:[
+        "Are the model's tools and integrations limited to the minimum functionality each task actually needs?",
+        "Do high impact or irreversible actions require human approval rather than running autonomously?",
+        "Does each tool call run with the user's own permissions instead of a broad shared service identity?",
+        "Can you trace and revoke what an agent did after the fact through logging and an audit trail?"
+      ]},
+    { id:"LLM07", name:"System Prompt Leakage",
+      desc:"Relying on the system prompt staying secret, when it can be coaxed out, and may already hold instructions or data it should not carry.",
+      aitg:["AITG-APP-07"],
+      qs:[
+        "Do you keep secrets, credentials, and connection strings out of the system prompt entirely?",
+        "Do your security controls hold even if the full system prompt becomes public, rather than depending on it staying hidden?",
+        "Do you enforce sensitive rules and authorization outside the model instead of only stating them in the prompt?"
+      ]},
+    { id:"LLM08", name:"Vector and Embedding Weaknesses",
+      desc:"Flaws in how embeddings and vector stores are generated, isolated, and queried in a retrieval augmented system.",
+      aitg:["AITG-APP-08"],
+      qs:[
+        "Do you enforce access controls and tenant isolation on the vector store so retrieval cannot cross user or tenant boundaries?",
+        "Do you vet and sanitize content before it is embedded, so poisoned or hidden text cannot enter the index?",
+        "Do you guard against embedding inversion and leakage that could reconstruct sensitive source data from the vectors?"
+      ]},
+    { id:"LLM09", name:"Misinformation",
+      desc:"Confident, well formed output that is simply wrong or fabricated, and the overreliance that lets people act on it unchecked.",
+      aitg:["AITG-APP-10"],
+      qs:[
+        "Do you ground answers in retrieval or citations rather than letting the model assert facts on its own?",
+        "Do you tell users clearly that output can be wrong and should be verified for consequential decisions?",
+        "Do you keep a human in the loop for high stakes outputs such as medical, legal, financial, or safety decisions?"
+      ]},
+    { id:"LLM10", name:"Unbounded Consumption",
+      desc:"Unchecked inference cost and resource use, including denial of service, denial of wallet, and model extraction through high volume querying.",
+      aitg:["AITG-APP-11"],
+      qs:[
+        "Do you rate limit and quota requests per user and per key to cap inference volume?",
+        "Do you cap input size, output length, and step or tool call counts so a single request cannot run away?",
+        "Do you monitor cost and usage with alerts so a spike or abuse pattern is caught quickly?",
+        "Do you watch for extraction style abuse such as systematic high volume querying that probes the model?"
+      ]}
+  ];
+
+  var SCORE = { yes:1, partial:0.5, no:0 };
+  var LABEL = { yes:"Yes", partial:"Partial", no:"No" };
+  // answers[catIndex][qIndex] = "yes" | "partial" | "no" | undefined
+  var answers = DATA.map(function(c){ return new Array(c.qs.length); });
+
+  function esc(s){ return String(s).replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];}); }
+
+  // Per category result: earned, possible, answered count, pct, status.
+  function catResult(ci){
+    var c = DATA[ci], earned = 0, possible = 0, answered = 0;
+    c.qs.forEach(function(_, qi){
+      var a = answers[ci][qi];
+      if (a === undefined) return;
+      answered++; possible += 1; earned += SCORE[a];
+    });
+    var pct = possible ? Math.round(earned/possible*100) : null;
+    var status = "none";
+    if (pct !== null) status = pct >= 80 ? "pass" : pct >= 50 ? "warn" : "fail";
+    return { earned:earned, possible:possible, answered:answered, total:c.qs.length, pct:pct, status:status };
+  }
+
+  function letterFor(pct){
+    return pct>=90?"A":pct>=80?"B":pct>=70?"C":pct>=60?"D":"F";
+  }
+
+  // Overall result across every answered question.
+  function overall(){
+    var earned = 0, possible = 0, answered = 0, total = 0;
+    DATA.forEach(function(c, ci){
+      c.qs.forEach(function(_, qi){
+        total++;
+        var a = answers[ci][qi];
+        if (a === undefined) return;
+        answered++; possible += 1; earned += SCORE[a];
+      });
+    });
+    var pct = possible ? Math.round(earned/possible*100) : null;
+    return { earned:earned, possible:possible, answered:answered, total:total, pct:pct, letter: pct===null?null:letterFor(pct) };
+  }
+
+  function buildMarkdown(){
+    var ov = overall();
+    var d = new Date();
+    var date = d.toISOString().slice(0,10);
+    var lines = [];
+    lines.push("# OWASP LLM Top 10 Self Assessment");
+    lines.push("");
+    lines.push("Date filled: " + date);
+    lines.push("Standard: OWASP Top 10 for LLM Applications 2025");
+    if (ov.pct === null){
+      lines.push("Overall readiness: not yet scored (no questions answered)");
+    } else {
+      lines.push("Overall readiness: " + ov.pct + " / 100 (grade " + ov.letter + ")");
+      lines.push("Questions answered: " + ov.answered + " of " + ov.total);
+    }
+    lines.push("");
+    lines.push("This is a self assessment to find gaps, not a certification, an audit, or a guarantee.");
+    lines.push("");
+    DATA.forEach(function(c, ci){
+      var r = catResult(ci);
+      var head = "## " + c.id + " " + c.name;
+      if (r.pct !== null) head += " (" + r.pct + "%, " + r.status + ")";
+      else head += " (not answered)";
+      lines.push(head);
+      if (c.aitg && c.aitg.length) lines.push("Testing Guide: " + c.aitg.join(", "));
+      lines.push("");
+      c.qs.forEach(function(q, qi){
+        var a = answers[ci][qi];
+        var mark = a === undefined ? "[ ] (skipped)" : "[" + LABEL[a] + "]";
+        lines.push("- " + mark + " " + q);
+      });
+      lines.push("");
+    });
+    lines.push("Generated client side with the UnboundCompute OWASP LLM Top 10 Scorecard.");
+    lines.push("https://unboundcompute.com/tools/owasp-llm-top10-scorecard.html");
+    return lines.join("\n");
+  }
+
+  function renderCats(){
+    var html = "";
+    DATA.forEach(function(c, ci){
+      var r = catResult(ci);
+      var statTxt = r.pct === null ? (r.answered + "/" + r.total) : (r.pct + "%");
+      html += '<div class="cat" data-ci="'+ci+'">';
+      html += '<div class="chead">';
+      html += '<span class="id">'+esc(c.id)+'</span>';
+      html += '<div style="flex:1;min-width:200px"><h2>'+esc(c.name)+'</h2>';
+      html += '<div class="desc">'+esc(c.desc)+'</div>';
+      if (c.aitg && c.aitg.length){
+        html += '<div class="cite">OWASP AI Testing Guide: '+c.aitg.map(function(x){return '<code>'+esc(x)+'</code>';}).join(" ")+'</div>';
+      }
+      html += '</div>';
+      html += '<span class="catstat '+r.status+'" data-stat="'+ci+'">'+statTxt+'</span>';
+      html += '</div>';
+      c.qs.forEach(function(q, qi){
+        var sel = answers[ci][qi];
+        html += '<div class="q"><div class="qtext">'+esc(q)+'</div><div class="opts">';
+        ["yes","partial","no"].forEach(function(v){
+          var on = sel === v ? ' sel-'+v : '';
+          html += '<button type="button" class="opt'+on+'" data-ci="'+ci+'" data-qi="'+qi+'" data-v="'+v+'">'+LABEL[v]+'</button>';
+        });
+        html += '</div></div>';
+      });
+      html += '</div>';
+    });
+    $("#cats").innerHTML = html;
+  }
+
+  function renderScore(){
+    var ov = overall();
+    $("#progress").textContent = ov.answered + " of " + ov.total + " answered";
+    if (ov.pct === null){
+      $("#gradeLetter").className = "grade g-na";
+      $("#gradeLetter").innerHTML = "&ndash;";
+      $("#gradeScore").textContent = "Answer the questions to score";
+      $("#gradeBar").style.width = "0%";
+      $("#weakList").innerHTML = "";
+      return;
+    }
+    $("#gradeLetter").className = "grade g-"+ov.letter;
+    $("#gradeLetter").textContent = ov.letter;
+    $("#gradeScore").textContent = "Readiness " + ov.pct + " out of 100";
+    $("#gradeNote").textContent = ov.answered + " of " + ov.total + " questions answered. Self assessment only, not a certification or a guarantee.";
+    $("#gradeBar").style.width = ov.pct + "%";
+
+    // Weakest categories: lowest scoring answered ones, worst first.
+    var ranked = [];
+    DATA.forEach(function(c, ci){
+      var r = catResult(ci);
+      if (r.pct !== null) ranked.push({ ci:ci, pct:r.pct, name:c.id+" "+c.name });
+    });
+    ranked.sort(function(a,b){ return a.pct - b.pct; });
+    var weak = ranked.filter(function(x){ return x.pct < 80; }).slice(0,3);
+    var wh = "";
+    if (weak.length){
+      wh += '<div><b>Weakest areas to look at first:</b></div>';
+      weak.forEach(function(x){ wh += '<div>'+esc(x.name)+' &mdash; '+x.pct+'%</div>'; });
+    } else if (ranked.length){
+      wh += '<div>No category is below 80 percent on the questions you answered. Keep the honesty up and verify with real testing.</div>';
+    }
+    $("#weakList").innerHTML = wh;
+  }
+
+  function rerender(){ renderCats(); renderScore(); }
+
+  function onPick(e){
+    var b = e.target.closest(".opt");
+    if (!b) return;
+    var ci = +b.getAttribute("data-ci"), qi = +b.getAttribute("data-qi"), v = b.getAttribute("data-v");
+    answers[ci][qi] = (answers[ci][qi] === v) ? undefined : v;  // toggle off if re-clicked
+    rerender();
+  }
+
+  $("#cats").addEventListener("click", onPick);
+
+  $("#export").addEventListener("click", function(){
+    $("#exportText").value = buildMarkdown();
+    $("#exportBox").style.display = "block";
+    $("#exportBox").scrollIntoView({ behavior:"smooth", block:"start" });
+  });
+
+  $("#copy").addEventListener("click", function(){
+    var t = $("#exportText");
+    t.select();
+    var ok = false;
+    try { ok = document.execCommand("copy"); } catch(e){}
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(t.value).then(function(){}, function(){});
+      ok = true;
+    }
+    $("#copyHint").textContent = ok ? "Copied to clipboard" : "Select the text and copy manually";
+    setTimeout(function(){ $("#copyHint").textContent = "Generated locally, never uploaded"; }, 2200);
+  });
+
+  $("#download").addEventListener("click", function(){
+    var md = $("#exportText").value || buildMarkdown();
+    var blob = new Blob([md], { type:"text/markdown" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    var d = new Date();
+    a.href = url;
+    a.download = "owasp-llm-top10-assessment-" + d.toISOString().slice(0,10) + ".md";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+  });
+
+  $("#sample").addEventListener("click", function(){
+    // A deliberately mixed run so the grade and weak list are illustrative.
+    var pattern = ["yes","partial","no"];
+    DATA.forEach(function(c, ci){
+      c.qs.forEach(function(_, qi){ answers[ci][qi] = pattern[(ci+qi) % 3]; });
+    });
+    rerender();
+  });
+
+  $("#reset").addEventListener("click", function(){
+    answers = DATA.map(function(c){ return new Array(c.qs.length); });
+    $("#exportBox").style.display = "none";
+    $("#exportText").value = "";
+    rerender();
+  });
+
+  // Expose the pure builders for headless self test.
+  if (typeof module !== "undefined" && module.exports){
+    module.exports = { DATA:DATA, SCORE:SCORE, setAnswers:function(a){ answers = a; }, overall:overall, catResult:catResult, buildMarkdown:buildMarkdown, letterFor:letterFor, blankAnswers:function(){ return DATA.map(function(c){ return new Array(c.qs.length); }); } };
+  }
+
+  rerender();
+})();
+</script>
+</body>
+</html>

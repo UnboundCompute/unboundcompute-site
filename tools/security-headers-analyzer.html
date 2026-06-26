@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Security Headers and CSP Analyzer | UnboundCompute</title>
+<meta name="description" content="Paste your HTTP response headers and get a graded, explained security report. Checks HSTS, CSP, X-Frame-Options, and more. Runs fully in your browser." />
+<meta name="keywords" content="security headers checker, security headers analyzer, csp evaluator, content security policy checker, http security headers, hsts checker" />
+<meta name="robots" content="index, follow" />
+<meta name="author" content="UnboundCompute" />
+<meta name="theme-color" content="#0a0a0b" />
+<link rel="canonical" href="https://unboundcompute.com/tools/security-headers-analyzer.html" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a0a0b'/%3E%3Cline x1='16' y1='4' x2='16' y2='28' stroke='%23fb5b46' stroke-width='2' stroke-dasharray='3 3'/%3E%3Ccircle cx='16' cy='16' r='3.4' fill='%23fb5b46'/%3E%3C/svg%3E" />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="UnboundCompute" />
+<meta property="og:title" content="Security Headers and CSP Analyzer" />
+<meta property="og:description" content="Paste your HTTP response headers and get a graded, explained security report. Runs fully in your browser, nothing is sent to any server." />
+<meta property="og:url" content="https://unboundcompute.com/tools/security-headers-analyzer.html" />
+<meta property="og:image" content="https://unboundcompute.com/og.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Security Headers and CSP Analyzer" />
+<meta name="twitter:description" content="Paste your HTTP response headers and get a graded, explained security report. Runs fully in your browser." />
+<meta name="twitter:image" content="https://unboundcompute.com/og.png" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "Security Headers and CSP Analyzer",
+      "applicationCategory": "SecurityApplication",
+      "operatingSystem": "Web",
+      "browserRequirements": "Requires JavaScript. Runs entirely client side.",
+      "url": "https://unboundcompute.com/tools/security-headers-analyzer.html",
+      "description": "A free tool that grades and explains the HTTP security headers of a response. Checks HSTS, Content Security Policy, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy, and cookie flags. All analysis happens in the browser.",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "publisher": { "@type": "Organization", "name": "UnboundCompute", "url": "https://unboundcompute.com/" }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What are HTTP security headers?",
+          "acceptedAnswer": { "@type": "Answer", "text": "HTTP security headers are response headers a server sends that tell the browser how to behave safely, for example which sources may run scripts (Content Security Policy), whether the page may be framed (X-Frame-Options), and whether to force HTTPS (Strict-Transport-Security). They are a cheap and powerful layer of defense in depth against attacks like cross site scripting and clickjacking." }
+        },
+        {
+          "@type": "Question",
+          "name": "Does this security headers checker send my data anywhere?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. The analysis runs entirely in your browser with JavaScript. The headers you paste are never uploaded, logged, or sent to any server, which is why you can safely analyze headers from internal or private systems." }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I get my response headers to paste in?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Run curl -I https://yoursite.com on the command line, or open your browser developer tools, go to the Network tab, click the main document request, and copy the Response Headers. Paste the raw text into the box and analyze." }
+        },
+        {
+          "@type": "Question",
+          "name": "What is a good Content Security Policy?",
+          "acceptedAnswer": { "@type": "Answer", "text": "A strong Content Security Policy avoids unsafe-inline and unsafe-eval in script-src, avoids wildcard sources, sets object-src to none and a restrictive base-uri, and ideally uses nonces or hashes with strict-dynamic. The analyzer flags the common weaknesses that let an attacker bypass a policy." }
+        }
+      ]
+    }
+  ]
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600&family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0a0b; --bg-2:#070708; --panel:#0e0e10; --panel-2:#131315;
+    --ink:#f4f2ec; --ink-hi:#fbf9f3; --ink-soft:#9b988f; --ink-faint:#5e5b54;
+    --line:rgba(244,242,236,.13); --line-2:rgba(244,242,236,.07);
+    --accent:#fb5b46; --accent-2:#ff7d6b; --accent-wash:rgba(251,91,70,.12); --on-accent:#1a0c09; --accent-line:rgba(251,91,70,.42);
+    --pass:#5fd6a4; --pass-wash:rgba(95,214,164,.1); --warn:#e8b04b; --warn-wash:rgba(232,176,75,.1); --fail:#fb5b46; --fail-wash:rgba(251,91,70,.1); --info:#7c93ff; --info-wash:rgba(124,147,255,.1);
+    --serif:'Newsreader',Georgia,serif; --mono:'JetBrains Mono',ui-monospace,monospace; --sans:'Inter',system-ui,sans-serif;
+    --maxw:920px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;line-height:1.6}
+  ::selection{background:var(--accent);color:var(--on-accent)}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+
+  nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);background:rgba(10,10,11,.72);border-bottom:1px solid var(--line-2)}
+  nav .wrap{height:64px;display:flex;align-items:center;justify-content:space-between}
+  nav a.brand{display:flex;align-items:center;gap:11px;font-family:var(--mono);font-weight:600;font-size:15px;color:var(--ink);letter-spacing:-.01em}
+  nav a.brand:hover{text-decoration:none}
+  nav .badge{width:27px;height:27px;border-radius:7px;border:1px solid var(--accent-line);display:grid;place-items:center}
+  nav a.cta{font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:9px 16px;border-radius:8px;background:var(--accent);color:var(--on-accent)}
+  nav a.cta:hover{filter:brightness(1.08);text-decoration:none}
+
+  header.hero{padding:64px 0 28px}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:18px}
+  h1{font-family:var(--serif);font-weight:400;font-size:clamp(32px,5vw,52px);line-height:1.08;letter-spacing:-.015em;color:var(--ink-hi)}
+  .lede{margin-top:18px;font-size:18px;color:var(--ink-soft);max-width:640px}
+  .privacy{margin-top:18px;display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);border:1px solid var(--line);border-radius:8px;padding:8px 13px;background:var(--panel)}
+  .privacy svg{width:14px;height:14px;flex:none}
+
+  .tool{margin:30px 0 12px;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px}
+  label.fld{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:10px}
+  textarea{width:100%;min-height:190px;resize:vertical;background:var(--bg-2);border:1px solid var(--line);border-radius:11px;padding:15px;color:var(--ink);font-family:var(--mono);font-size:13.5px;line-height:1.55;outline:none;transition:border-color .2s,box-shadow .2s}
+  textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-wash)}
+  textarea::placeholder{color:var(--ink-faint)}
+  .row{display:flex;gap:11px;flex-wrap:wrap;margin-top:14px;align-items:center}
+  button{font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;padding:13px 22px;border-radius:9px;cursor:pointer;border:1px solid var(--line);background:transparent;color:var(--ink);transition:filter .15s,border-color .15s,background .15s}
+  button.primary{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+  button.primary:hover{filter:brightness(1.08)}
+  button.ghost:hover{border-color:var(--accent-line);color:var(--ink-hi)}
+  .hint{font-family:var(--mono);font-size:12px;color:var(--ink-faint);margin-left:auto}
+
+  #results{margin-top:8px}
+  .grade-card{display:flex;align-items:center;gap:22px;background:var(--panel-2);border:1px solid var(--line);border-radius:16px;padding:22px 24px;margin:20px 0}
+  .grade{font-family:var(--serif);font-size:62px;line-height:1;width:96px;height:96px;border-radius:18px;display:grid;place-items:center;flex:none;border:1.5px solid}
+  .grade.g-A,.grade.g-B{color:var(--pass);border-color:var(--pass);background:var(--pass-wash)}
+  .grade.g-C{color:var(--warn);border-color:var(--warn);background:var(--warn-wash)}
+  .grade.g-D,.grade.g-F{color:var(--fail);border-color:var(--fail);background:var(--fail-wash)}
+  .grade-meta h2{font-family:var(--serif);font-weight:400;font-size:24px;color:var(--ink-hi);margin-bottom:4px}
+  .grade-meta p{color:var(--ink-soft);font-size:14.5px}
+  .score-bar{height:7px;border-radius:99px;background:var(--line-2);margin-top:12px;overflow:hidden;max-width:340px}
+  .score-bar > i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--accent-2))}
+
+  .checks{display:flex;flex-direction:column;gap:11px}
+  .check{border:1px solid var(--line);border-radius:13px;padding:16px 18px;background:var(--panel)}
+  .check .top{display:flex;align-items:flex-start;gap:13px}
+  .dot{width:20px;height:20px;border-radius:6px;flex:none;display:grid;place-items:center;font-size:13px;font-weight:700;margin-top:1px}
+  .dot.pass{background:var(--pass-wash);color:var(--pass)}
+  .dot.warn{background:var(--warn-wash);color:var(--warn)}
+  .dot.fail{background:var(--fail-wash);color:var(--fail)}
+  .dot.info{background:var(--info-wash);color:var(--info)}
+  .check h3{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--ink-hi);letter-spacing:-.01em}
+  .check .finding{margin-top:5px;font-size:14.5px;color:var(--ink)}
+  .check .why{margin-top:9px;font-size:13.5px;color:var(--ink-soft)}
+  .check .fix{margin-top:9px;font-size:13px;color:var(--ink-soft);font-family:var(--mono);background:var(--bg-2);border:1px solid var(--line-2);border-radius:8px;padding:9px 11px;white-space:pre-wrap;word-break:break-word}
+  .check .more{margin-top:9px;font-size:13px}
+  .sub{margin-top:11px;padding-left:15px;border-left:2px solid var(--line);display:flex;flex-direction:column;gap:7px}
+  .sub div{font-size:13.5px;color:var(--ink-soft)}
+  .sub b{color:var(--ink)}
+  .empty{color:var(--ink-faint);font-family:var(--mono);font-size:13px;text-align:center;padding:30px}
+
+  .prose{padding:44px 0 20px}
+  .prose h2{font-family:var(--serif);font-weight:400;font-size:30px;color:var(--ink-hi);margin:36px 0 14px;letter-spacing:-.01em}
+  .prose h3{font-family:var(--mono);font-size:15px;color:var(--ink-hi);margin:24px 0 8px}
+  .prose p{color:var(--ink-soft);margin-bottom:14px;font-size:16px}
+  .prose ul{color:var(--ink-soft);margin:0 0 14px 20px;font-size:16px}
+  .prose li{margin-bottom:7px}
+  .prose code{font-family:var(--mono);font-size:13.5px;background:var(--panel-2);border:1px solid var(--line-2);border-radius:5px;padding:1px 6px;color:var(--ink)}
+  .related{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:8px}
+  .related a{display:block;border:1px solid var(--line);border-radius:11px;padding:14px 16px;color:var(--ink);font-size:14.5px;background:var(--panel)}
+  .related a:hover{border-color:var(--accent-line);text-decoration:none}
+  .related a span{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:5px}
+
+  footer{border-top:1px solid var(--line-2);margin-top:40px;padding:30px 0;color:var(--ink-faint);font-family:var(--mono);font-size:12.5px}
+  footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px}
+  footer a{color:var(--ink-soft)}
+  @media (max-width:560px){
+    .related{grid-template-columns:1fr}
+    .grade-card{flex-direction:column;align-items:flex-start;gap:16px}
+    .hint{margin-left:0;width:100%}
+  }
+</style>
+</head>
+<body>
+
+<nav><div class="wrap">
+  <a class="brand" href="https://unboundcompute.com/">
+    <span class="badge"><svg viewBox="0 0 24 24" fill="none" style="width:15px;height:15px"><line x1="12" y1="3" x2="12" y2="21" stroke="var(--accent)" stroke-width="1.8" stroke-dasharray="2.6 2.6"/><circle cx="12" cy="12" r="3" fill="var(--accent)"/></svg></span>
+    UnboundCompute
+  </a>
+  <a class="cta" href="https://unboundcompute.com/#cta">Request access</a>
+</div></nav>
+
+<header class="hero"><div class="wrap">
+  <div class="eyebrow">Free tool</div>
+  <h1>Security Headers and CSP Analyzer</h1>
+  <p class="lede">Paste the HTTP response headers from any site and get a graded, plain language report. It checks the headers that matter, then explains what each one does, where it is weak, and exactly how to fix it.</p>
+  <div class="privacy">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6l8-4z" stroke="var(--accent)" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Everything runs in your browser. Nothing is sent to any server.
+  </div>
+</div></header>
+
+<div class="wrap">
+  <div class="tool">
+    <label class="fld" for="hdrs">Paste raw response headers</label>
+    <textarea id="hdrs" spellcheck="false" placeholder="HTTP/2 200&#10;content-type: text/html; charset=utf-8&#10;strict-transport-security: max-age=63072000; includeSubDomains; preload&#10;content-security-policy: default-src 'self'; object-src 'none'&#10;x-content-type-options: nosniff&#10;x-frame-options: DENY&#10;...&#10;&#10;Tip: run  curl -I https://yoursite.com  and paste the output, or copy Response Headers from your browser Network tab."></textarea>
+    <div class="row">
+      <button class="primary" id="analyze">Analyze headers</button>
+      <button class="ghost" id="example">Load example</button>
+      <button class="ghost" id="clear">Clear</button>
+      <span class="hint" id="hint">No data leaves this page</span>
+    </div>
+  </div>
+  <div id="results"><div class="empty">Your graded report will appear here.</div></div>
+</div>
+
+<div class="wrap prose">
+  <h2>What this security headers checker looks at</h2>
+  <p>HTTP security headers are one of the highest leverage defenses you can add to a web application. They cost almost nothing to deploy and they instruct the browser to refuse a whole class of attacks before your code ever runs. This analyzer reads the headers you paste and grades them against the checks that carry real weight, drawing on the <a href="https://owasp.org/www-project-secure-headers/" rel="noopener" target="_blank">OWASP Secure Headers Project</a> and the relevant web platform specifications.</p>
+
+  <h3>Strict-Transport-Security (HSTS)</h3>
+  <p>Forces the browser to use HTTPS for every future request to your domain, which shuts down protocol downgrade and cookie stealing over plain HTTP. A strong value sets a long <code>max-age</code>, adds <code>includeSubDomains</code>, and ideally <code>preload</code>.</p>
+
+  <h3>Content-Security-Policy (CSP)</h3>
+  <p>The single most important and most misconfigured header. A good policy controls which sources may run scripts, which is your strongest in browser brake on <a href="https://security.unboundcompute.com/what-is-xss-and-how-does-it-work/" rel="noopener">cross site scripting</a>. The analyzer parses your policy directive by directive and flags the patterns that let an attacker walk straight through it, such as <code>unsafe-inline</code>, <code>unsafe-eval</code>, and wildcard sources.</p>
+
+  <h3>X-Frame-Options and frame-ancestors</h3>
+  <p>Decide whether your pages can be loaded inside a frame on another site. Without one of these, an attacker can overlay your page invisibly and trick a user into clicking, the attack known as clickjacking. Modern policy uses the CSP <code>frame-ancestors</code> directive, with <code>X-Frame-Options</code> as a fallback for old browsers.</p>
+
+  <h3>X-Content-Type-Options, Referrer-Policy, and Permissions-Policy</h3>
+  <p><code>X-Content-Type-Options: nosniff</code> stops the browser from guessing a response is a script when it should not be. <code>Referrer-Policy</code> controls how much of your URL leaks to other sites and is a quiet but real privacy lever, in the same family as the data exposure covered in <a href="https://security.unboundcompute.com/how-browser-fingerprinting-works/" rel="noopener">how browser fingerprinting works</a>. <code>Permissions-Policy</code> turns off browser features like the camera or geolocation that your site does not use.</p>
+
+  <h3>Cookie flags and information disclosure</h3>
+  <p>The tool also inspects any <code>Set-Cookie</code> headers for the <code>Secure</code>, <code>HttpOnly</code>, and <code>SameSite</code> flags, because a session cookie that scripts can read or that rides over plain HTTP undoes a lot of the protection above. It is the same parent domain trust that makes a <a href="https://security.unboundcompute.com/what-is-subdomain-takeover/" rel="noopener">subdomain takeover</a> so damaging. Finally it notes headers like <code>Server</code> and <code>X-Powered-By</code> that hand an attacker your exact software versions for free.</p>
+
+  <h2>How to read the grade</h2>
+  <p>Each graded header contributes a weighted share of a score out of one hundred. A pass earns the full weight, a weak configuration earns part of it, and a missing critical header earns none. The letter is a quick signal, not a verdict. A real assessment looks at how the headers interact with your application, which is the kind of judgement a signature scanner cannot make and an <a href="https://security.unboundcompute.com/ai-security-testing/" rel="noopener">AI security testing</a> approach is built for. Headers are defense in depth. They reduce the blast radius of a bug, they do not replace fixing the bug.</p>
+
+  <h2>Related reading</h2>
+  <div class="related">
+    <a href="https://security.unboundcompute.com/what-is-xss-and-how-does-it-work/"><span>Deep dive</span>What is XSS and how does it work</a>
+    <a href="https://security.unboundcompute.com/what-is-subdomain-takeover/"><span>Deep dive</span>What is subdomain takeover</a>
+    <a href="https://security.unboundcompute.com/what-is-csrf/"><span>Deep dive</span>What is CSRF</a>
+    <a href="https://security.unboundcompute.com/web-security-glossary/"><span>Reference</span>Web security glossary</a>
+  </div>
+
+  <h2>More free tools</h2>
+  <div class="related">
+    <a href="https://unboundcompute.com/tools/csp-generator.html"><span>Free tool</span>Content Security Policy Generator</a>
+    <a href="https://unboundcompute.com/tools/cookie-security-auditor.html"><span>Free tool</span>Cookie Security Auditor</a>
+    <a href="https://unboundcompute.com/tools/jwt-security-inspector.html"><span>Free tool</span>JWT Security Inspector</a>
+    <a href="https://unboundcompute.com/tools/cors-misconfiguration-checker.html"><span>Free tool</span>CORS Misconfiguration Checker</a>
+      <a href="https://unboundcompute.com/tools/"><span>All tools</span>Free security tools hub</a>
+  </div>
+</div>
+
+<footer><div class="wrap">
+  <div>Built by <a href="https://unboundcompute.com/">UnboundCompute</a>, autonomous security research for web apps and APIs.</div>
+  <div><a href="https://unboundcompute.com/#cta">Request access</a></div>
+</div></footer>
+
+<script>
+(function(){
+  "use strict";
+  var $ = function(s){ return document.querySelector(s); };
+
+  var EXAMPLE = [
+    "HTTP/2 200",
+    "content-type: text/html; charset=utf-8",
+    "server: nginx/1.21.0",
+    "x-powered-by: Express",
+    "strict-transport-security: max-age=86400",
+    "content-security-policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.example.com *; style-src 'self' 'unsafe-inline'",
+    "x-content-type-options: nosniff",
+    "set-cookie: sessionid=abc123; Path=/",
+    "referrer-policy: unsafe-url"
+  ].join("\n");
+
+  function parse(text){
+    var lines = text.split(/\r?\n/), map = {}, cookies = [];
+    for (var i=0;i<lines.length;i++){
+      var line = lines[i];
+      var idx = line.indexOf(":");
+      if (idx < 1) continue;                 // skip status line and blanks
+      var name = line.slice(0,idx).trim().toLowerCase();
+      var val  = line.slice(idx+1).trim();
+      if (!name) continue;
+      if (name === "set-cookie"){ cookies.push(val); continue; }
+      if (map[name] === undefined) map[name] = val;
+      else map[name] += ", " + val;          // fold repeats
+    }
+    return { map: map, cookies: cookies };
+  }
+
+  // status: pass | warn | fail | info. weight 0 => advisory (not graded).
+  function buildChecks(h){
+    var m = h.map, c = h.cookies, checks = [];
+    var BLOG = "https://security.unboundcompute.com/";
+
+    // 1. HSTS
+    (function(){
+      var v = m["strict-transport-security"], weight = 18;
+      if (!v){ checks.push({w:weight,s:"fail",h:"Strict-Transport-Security",f:"Missing. The browser is not told to force HTTPS, so a network attacker can downgrade a request to plain HTTP.",fix:"strict-transport-security: max-age=63072000; includeSubDomains; preload",why:"Without HSTS a single HTTP request can be intercepted and used to strip TLS or steal cookies."}); return; }
+      var age = /max-age=(\d+)/i.exec(v), secs = age ? parseInt(age[1],10) : 0;
+      var subs = /includesubdomains/i.test(v);
+      if (secs < 15768000){ checks.push({w:weight,s:"warn",h:"Strict-Transport-Security",f:"Present but max-age is short ("+secs+" seconds). Aim for at least six months, ideally two years.",fix:"strict-transport-security: max-age=63072000; includeSubDomains; preload",why:"A short max-age leaves a recurring window where the browser will still try HTTP."}); return; }
+      if (!subs){ checks.push({w:weight,s:"warn",h:"Strict-Transport-Security",f:"Present with a strong max-age, but missing includeSubDomains, so subdomains are not protected.",fix:"strict-transport-security: max-age=63072000; includeSubDomains; preload",why:"An unprotected subdomain can be used to set or read cookies for the parent domain."}); return; }
+      checks.push({w:weight,s:"pass",h:"Strict-Transport-Security",f:"Strong. Long max-age with includeSubDomains.",why:"HTTPS is enforced for the domain and its subdomains."});
+    })();
+
+    // 2. CSP (with sub analysis)
+    (function(){
+      var weight = 25;
+      var ro = m["content-security-policy-report-only"];
+      var v = m["content-security-policy"];
+      if (!v && ro){ checks.push({w:weight,s:"warn",h:"Content-Security-Policy",f:"Only a Report-Only policy is set. It is monitored but NOT enforced, so it blocks nothing.",fix:"Promote your policy to the enforcing Content-Security-Policy header once you have tuned it.",why:"Report-Only is for testing. Attackers are not stopped by a policy that only reports.",link:BLOG+"what-is-xss-and-how-does-it-work/",linkText:"How XSS works"}); return; }
+      if (!v){ checks.push({w:weight,s:"fail",h:"Content-Security-Policy",f:"Missing. There is no policy restricting where scripts may load from, so an injected script runs freely.",fix:"content-security-policy: default-src 'self'; object-src 'none'; base-uri 'self'; script-src 'self'",why:"CSP is your strongest in browser defense against cross site scripting. Without it, one injection is enough.",link:BLOG+"what-is-xss-and-how-does-it-work/",linkText:"How XSS works"}); return; }
+
+      var dirs = {};
+      v.split(";").forEach(function(part){
+        part = part.trim(); if (!part) return;
+        var sp = part.split(/\s+/), name = sp.shift().toLowerCase();
+        dirs[name] = sp.map(function(x){ return x.toLowerCase(); });
+      });
+      var script = dirs["script-src"] || dirs["default-src"] || [];
+      var subs = [], penalty = 0;
+      var hasNonceOrHash = script.some(function(s){ return s.indexOf("'nonce-")===0 || s.indexOf("'sha")===0; });
+      function flag(t){ subs.push(t); }
+
+      if (!dirs["default-src"] && !dirs["script-src"]){ flag("No default-src or script-src directive, so script loading is not restricted at all."); penalty += 3; }
+      if (script.indexOf("'unsafe-inline'") > -1 && !hasNonceOrHash){ flag("script-src allows 'unsafe-inline', which lets injected inline scripts execute. This is the most common way a CSP is defeated."); penalty += 3; }
+      else if (script.indexOf("'unsafe-inline'") > -1 && hasNonceOrHash){ flag("script-src has 'unsafe-inline' alongside a nonce or hash. Modern browsers ignore unsafe-inline when a nonce is present, but old browsers honor it."); penalty += 1; }
+      if (script.indexOf("'unsafe-eval'") > -1){ flag("script-src allows 'unsafe-eval', which permits eval and similar dynamic code execution."); penalty += 2; }
+      if (script.indexOf("*") > -1){ flag("script-src contains a wildcard *, allowing scripts from any origin."); penalty += 3; }
+      var httpWild = script.some(function(s){ return s === "http:" || s === "https:" || s === "data:"; });
+      if (httpWild){ flag("script-src allows a broad scheme source like https: or data:, which is close to allowing anything."); penalty += 2; }
+      if (!dirs["object-src"] && !(dirs["default-src"] && dirs["default-src"].indexOf("'none'")>-1)){ flag("No object-src 'none'. Legacy plugin vectors are not closed."); penalty += 1; }
+      if (!dirs["base-uri"]){ flag("No base-uri directive. An injected <base> tag can hijack relative script URLs."); penalty += 1; }
+
+      var status, finding;
+      if (penalty === 0){ status="pass"; finding="A restrictive policy with no obvious bypass."; }
+      else if (penalty <= 2){ status="warn"; finding="A policy is set but has minor weaknesses worth tightening."; }
+      else { status="fail"; finding="The policy is present but contains weaknesses an attacker can use to bypass it."; }
+      checks.push({w:weight,s:status,h:"Content-Security-Policy",f:finding,subs:subs,
+        fix:"Prefer nonces or hashes with 'strict-dynamic'. Drop 'unsafe-inline' and 'unsafe-eval', remove wildcards, set object-src 'none' and base-uri 'self'.",
+        why:"CSP is the difference between an injected script running and being blocked.",
+        link:BLOG+"what-is-xss-and-how-does-it-work/",linkText:"How XSS works"});
+    })();
+
+    // 3. X-Frame-Options / frame-ancestors
+    (function(){
+      var weight = 15, xfo = m["x-frame-options"], csp = m["content-security-policy"] || "";
+      var fa = /frame-ancestors/i.test(csp);
+      if (fa){ checks.push({w:weight,s:"pass",h:"Clickjacking protection",f:"CSP frame-ancestors is set, the modern way to control framing.",why:"Attackers cannot frame your page to overlay it for a clickjacking attack."}); return; }
+      if (xfo){
+        if (/deny|sameorigin/i.test(xfo)){ checks.push({w:weight,s:"pass",h:"Clickjacking protection",f:"X-Frame-Options is "+xfo+". Framing is restricted.",why:"Your page cannot be framed by an arbitrary attacker site.",fix:"For modern browsers also add: content-security-policy: frame-ancestors 'self'"}); return; }
+        checks.push({w:weight,s:"warn",h:"Clickjacking protection",f:"X-Frame-Options is set to an unusual value ("+xfo+"). Use DENY or SAMEORIGIN.",fix:"x-frame-options: DENY",why:"An invalid value may be ignored, leaving the page frameable."}); return;
+      }
+      checks.push({w:weight,s:"fail",h:"Clickjacking protection",f:"Missing. Neither X-Frame-Options nor CSP frame-ancestors is set, so your page can be framed and overlaid.",fix:"content-security-policy: frame-ancestors 'self'\nx-frame-options: DENY",why:"Without it an attacker can invisibly frame your page and trick users into clicking, which is clickjacking."});
+    })();
+
+    // 4. X-Content-Type-Options
+    (function(){
+      var weight = 12, v = m["x-content-type-options"];
+      if (v && /nosniff/i.test(v)){ checks.push({w:weight,s:"pass",h:"X-Content-Type-Options",f:"Set to nosniff.",why:"The browser will not second guess your declared content types."}); return; }
+      checks.push({w:weight,s:"fail",h:"X-Content-Type-Options",f:"Missing. The browser may sniff a response and treat it as a different, more dangerous type.",fix:"x-content-type-options: nosniff",why:"MIME sniffing can turn an uploaded file or text response into an executable script."});
+    })();
+
+    // 5. Referrer-Policy
+    (function(){
+      var weight = 10, v = m["referrer-policy"];
+      if (!v){ checks.push({w:weight,s:"warn",h:"Referrer-Policy",f:"Missing. The browser default leaks the full URL to other sites on cross origin requests.",fix:"referrer-policy: strict-origin-when-cross-origin",why:"URLs often carry tokens or identifiers you do not want sent to third parties."}); return; }
+      if (/unsafe-url/i.test(v)){ checks.push({w:weight,s:"fail",h:"Referrer-Policy",f:"Set to unsafe-url, which sends the full URL even to insecure destinations.",fix:"referrer-policy: strict-origin-when-cross-origin",why:"This is the most leaky setting and exposes full URLs over the network."}); return; }
+      checks.push({w:weight,s:"pass",h:"Referrer-Policy",f:"Set to "+v+".",why:"Referrer leakage to other sites is controlled."});
+    })();
+
+    // 6. Permissions-Policy
+    (function(){
+      var weight = 8, v = m["permissions-policy"] || m["feature-policy"];
+      if (!v){ checks.push({w:weight,s:"warn",h:"Permissions-Policy",f:"Missing. Powerful browser features are not explicitly restricted.",fix:"permissions-policy: camera=(), microphone=(), geolocation=()",why:"Turning off features you do not use shrinks what injected code or a third party frame can reach."}); return; }
+      checks.push({w:weight,s:"pass",h:"Permissions-Policy",f:"Set. Browser features are restricted.",why:"Unused capabilities like camera or geolocation are denied."});
+    })();
+
+    // 7. Cross-Origin-Opener-Policy
+    (function(){
+      var weight = 6, v = m["cross-origin-opener-policy"];
+      if (v && /same-origin/i.test(v)){ checks.push({w:weight,s:"pass",h:"Cross-Origin-Opener-Policy",f:"Set to "+v+".",why:"Your window is isolated from cross origin openers, part of defense against side channel leaks."}); return; }
+      checks.push({w:weight,s:"warn",h:"Cross-Origin-Opener-Policy",f:"Missing. The page is not process isolated from windows that open it.",fix:"cross-origin-opener-policy: same-origin",why:"COOP plus COEP enable cross origin isolation, which hardens against speculative execution leaks."});
+    })();
+
+    // ADVISORY: information disclosure (not graded heavily, w:6 with penalty)
+    (function(){
+      var weight = 6, leaks = [];
+      ["server","x-powered-by","x-aspnet-version","x-aspnetmvc-version"].forEach(function(k){
+        if (m[k] && /\d/.test(m[k])) leaks.push(k+": "+m[k]);
+        else if (m[k] && (k==="x-powered-by")) leaks.push(k+": "+m[k]);
+      });
+      if (leaks.length){ checks.push({w:weight,s:"warn",h:"Information disclosure",f:"These headers reveal your software stack: "+leaks.join("  |  "),fix:"Remove or blank Server version, X-Powered-By, and X-AspNet-Version headers.",why:"Exact versions let an attacker look up known vulnerabilities for your stack without any probing."}); return; }
+      checks.push({w:weight,s:"pass",h:"Information disclosure",f:"No obvious version banner headers found.",why:"You are not handing out your exact software versions."});
+    })();
+
+    // ADVISORY: cookies (not graded; w:0)
+    if (c.length){
+      var subs = c.map(function(raw){
+        var nm = (raw.split("=")[0]||"cookie").trim();
+        var miss = [];
+        if (!/;\s*secure/i.test(raw)) miss.push("Secure");
+        if (!/;\s*httponly/i.test(raw)) miss.push("HttpOnly");
+        if (!/;\s*samesite/i.test(raw)) miss.push("SameSite");
+        return miss.length ? ("<b>"+nm+"</b> is missing "+miss.join(", ")+".") : ("<b>"+nm+"</b> sets Secure, HttpOnly, and SameSite. Good.");
+      });
+      var anyMiss = c.some(function(raw){ return !/;\s*secure/i.test(raw) || !/;\s*httponly/i.test(raw) || !/;\s*samesite/i.test(raw); });
+      checks.push({w:0,s:anyMiss?"warn":"info",h:"Set-Cookie flags (advisory)",f:"Cookie security flags. Missing Secure lets a cookie ride over HTTP, missing HttpOnly lets scripts read it, missing SameSite weakens CSRF defense.",subs:subs,why:"A session cookie readable by JavaScript or sent over plain HTTP undermines the headers above.",link:BLOG+"what-is-csrf/",linkText:"How CSRF and SameSite relate"});
+    }
+
+    return checks;
+  }
+
+  function grade(checks){
+    var earned = 0, possible = 0;
+    checks.forEach(function(ch){
+      if (!ch.w) return;
+      possible += ch.w;
+      earned += ch.s === "pass" ? ch.w : ch.s === "warn" ? ch.w*0.5 : 0;
+    });
+    var pct = possible ? Math.round(earned/possible*100) : 0;
+    var letter = pct>=90?"A":pct>=80?"B":pct>=70?"C":pct>=60?"D":"F";
+    return { pct: pct, letter: letter };
+  }
+
+  function esc(s){ return String(s).replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];}); }
+
+  function render(checks){
+    var g = grade(checks);
+    var sum = { pass:0, warn:0, fail:0 };
+    checks.forEach(function(c){ if (c.w && sum[c.s]!==undefined) sum[c.s]++; });
+    var html = "";
+    html += '<div class="grade-card">';
+    html += '<div class="grade g-'+g.letter+'">'+g.letter+'</div>';
+    html += '<div class="grade-meta"><h2>Score '+g.pct+' out of 100</h2>';
+    html += '<p>'+sum.pass+' strong, '+sum.warn+' to improve, '+sum.fail+' missing or weak. Headers are defense in depth, not a substitute for fixing the underlying bug.</p>';
+    html += '<div class="score-bar"><i style="width:'+g.pct+'%"></i></div></div></div>';
+
+    html += '<div class="checks">';
+    checks.forEach(function(c){
+      var sym = c.s==="pass"?"&#10003;":c.s==="warn"?"!":c.s==="fail"?"&#10007;":"i";
+      html += '<div class="check"><div class="top"><span class="dot '+c.s+'">'+sym+'</span><div style="flex:1">';
+      html += '<h3>'+esc(c.h)+'</h3>';
+      html += '<div class="finding">'+esc(c.f)+'</div>';
+      if (c.subs && c.subs.length){
+        html += '<div class="sub">';
+        c.subs.forEach(function(s){ html += '<div>'+s+'</div>'; });   // subs may contain <b>
+        html += '</div>';
+      }
+      if (c.why) html += '<div class="why">'+esc(c.why)+'</div>';
+      if (c.fix && c.s !== "pass") html += '<div class="fix">'+esc(c.fix)+'</div>';
+      if (c.link) html += '<div class="more"><a href="'+c.link+'" rel="noopener">'+esc(c.linkText||"Learn more")+' &rarr;</a></div>';
+      html += '</div></div></div>';
+    });
+    html += '</div>';
+    return html;
+  }
+
+  function run(){
+    var text = $("#hdrs").value.trim();
+    if (!text){ $("#results").innerHTML = '<div class="empty">Paste some response headers first.</div>'; return; }
+    var parsed = parse(text);
+    if (Object.keys(parsed.map).length === 0 && parsed.cookies.length === 0){
+      $("#results").innerHTML = '<div class="empty">No headers found. Use the form Name: value, one per line.</div>'; return;
+    }
+    $("#results").innerHTML = render(buildChecks(parsed));
+    $("#results").scrollIntoView({ behavior:"smooth", block:"start" });
+  }
+
+  $("#analyze").addEventListener("click", run);
+  $("#example").addEventListener("click", function(){ $("#hdrs").value = EXAMPLE; run(); });
+  $("#clear").addEventListener("click", function(){ $("#hdrs").value=""; $("#results").innerHTML='<div class="empty">Your graded report will appear here.</div>'; $("#hdrs").focus(); });
+  $("#hdrs").addEventListener("keydown", function(e){ if ((e.metaKey||e.ctrlKey) && e.key==="Enter") run(); });
+})();
+</script>
+</body>
+</html>

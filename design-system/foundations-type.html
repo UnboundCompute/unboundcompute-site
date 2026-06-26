@@ -1,0 +1,29 @@
+<!-- @dsCard group="Foundations" -->
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+<title>Typography</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;600&family=JetBrains+Mono:wght@500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0a0b;--ink:#f4f2ec;--ink-hi:#fbf9f3;--ink-soft:#9b988f;--ink-faint:#5e5b54;--line:rgba(244,242,236,.13);--accent:#fb5b46;}
+  *{margin:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;padding:56px}
+  .kick{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+  h1{font-weight:600;font-size:22px;letter-spacing:-.02em;margin-bottom:40px}
+  .row{display:grid;grid-template-columns:150px 1fr;gap:32px;padding:24px 0;border-top:1px solid var(--line);align-items:baseline}
+  .tag{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.08em;line-height:1.6}
+  .display{font-family:'Newsreader',serif;font-weight:400;font-size:60px;letter-spacing:-.03em;line-height:.98;color:var(--ink-hi)}
+  .display em{font-style:italic;color:var(--accent)}
+  .h2{font-family:'Newsreader',serif;font-weight:400;font-size:36px;letter-spacing:-.022em;color:var(--ink-hi)}
+  .h3{font-family:'Newsreader',serif;font-weight:500;font-size:23px}
+  .body{font-size:16px;line-height:1.62;color:var(--ink-soft);max-width:54ch}
+  .label{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+</style></head>
+<body>
+  <p class="kick">Foundations</p>
+  <h1>Typography — serif display, mono structure, sans body</h1>
+  <div class="row"><div class="tag">Display<br>Newsreader 400</div><div class="display">Find the line. <em>Cross it.</em></div></div>
+  <div class="row"><div class="tag">Heading<br>Newsreader 400</div><div class="h2">Scanners fire payloads.</div></div>
+  <div class="row"><div class="tag">Subhead<br>Newsreader 500</div><div class="h3">Prove it, or drop it</div></div>
+  <div class="row"><div class="tag">Body<br>Inter 450</div><div class="body">It learns the boundaries your app trusts, crosses the ones that should not hold, and proves every finding with hard evidence.</div></div>
+  <div class="row"><div class="tag">Label<br>JetBrains Mono</div><div class="label">&sect; 02 — How it works</div></div>
+</body></html>

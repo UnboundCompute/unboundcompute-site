@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>CSP Evaluator and Auditor | UnboundCompute</title>
+<meta name="description" content="Paste a Content Security Policy header and get a security graded audit. Flags unsafe-inline, unsafe-eval, wildcard sources, a missing object-src and base-uri, and known bypass gadget domains that host JSONP or AngularJS. Runs fully in your browser." />
+<meta name="keywords" content="csp evaluator, content security policy auditor, csp bypass, unsafe-inline, strict-dynamic, csp checker, script-src audit, csp linter, csp nonce" />
+<meta name="robots" content="index, follow" />
+<meta name="author" content="UnboundCompute" />
+<meta name="theme-color" content="#0a0a0b" />
+<link rel="canonical" href="https://unboundcompute.com/tools/csp-evaluator.html" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a0a0b'/%3E%3Cline x1='16' y1='4' x2='16' y2='28' stroke='%23fb5b46' stroke-width='2' stroke-dasharray='3 3'/%3E%3Ccircle cx='16' cy='16' r='3.4' fill='%23fb5b46'/%3E%3C/svg%3E" />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="UnboundCompute" />
+<meta property="og:title" content="CSP Evaluator and Auditor" />
+<meta property="og:description" content="Audit a Content Security Policy for bypasses and weaknesses. Runs fully in your browser, nothing is sent to any server." />
+<meta property="og:url" content="https://unboundcompute.com/tools/csp-evaluator.html" />
+<meta property="og:image" content="https://unboundcompute.com/og.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="CSP Evaluator and Auditor" />
+<meta name="twitter:description" content="Audit a Content Security Policy for bypasses and weaknesses. Runs fully in your browser." />
+<meta name="twitter:image" content="https://unboundcompute.com/og.png" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "CSP Evaluator and Auditor",
+      "applicationCategory": "SecurityApplication",
+      "operatingSystem": "Web",
+      "browserRequirements": "Requires JavaScript. Runs entirely client side.",
+      "url": "https://unboundcompute.com/tools/csp-evaluator.html",
+      "description": "A free tool that parses a Content Security Policy header and grades it for safety. Flags unsafe-inline and unsafe-eval, wildcard and scheme only sources, a missing object-src and base-uri, an absent default-src fallback, and allowlisted domains that are known CSP bypass gadgets because they host JSONP endpoints or old AngularJS. All analysis happens in the browser.",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "publisher": { "@type": "Organization", "name": "UnboundCompute", "url": "https://unboundcompute.com/" }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What does this CSP evaluator check?",
+          "acceptedAnswer": { "@type": "Answer", "text": "It parses the directives in a Content Security Policy and grades the ones that decide whether the policy actually stops cross site scripting. It looks hardest at script-src: unsafe-inline without a nonce or hash, unsafe-eval, a wildcard or scheme only source, and a missing fallback. It also checks for object-src, base-uri, default-src, and frame-ancestors, and it flags allowlisted domains that are documented CSP bypass gadgets." }
+        },
+        {
+          "@type": "Question",
+          "name": "Does this tool send my policy anywhere?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. The parsing and every check run entirely in your browser with JavaScript. The policy you paste is never uploaded, logged, or sent to any server, so you can audit a production policy without it leaving your machine." }
+        },
+        {
+          "@type": "Question",
+          "name": "What is a CSP bypass gadget?",
+          "acceptedAnswer": { "@type": "Answer", "text": "A bypass gadget is a host you allowlisted that an attacker can abuse to run script even though your policy looks restrictive. The classic cases are domains that serve a JSONP endpoint, where a callback parameter reflects attacker chosen JavaScript, and domains that host an old AngularJS build, where a sandbox escape turns an allowed script into arbitrary execution. If such a host sits in your script-src, the allowlist no longer protects you, which is why a nonce based policy with strict-dynamic is safer than an allowlist." }
+        },
+        {
+          "@type": "Question",
+          "name": "Why does the tool prefer a nonce and strict-dynamic over an allowlist?",
+          "acceptedAnswer": { "@type": "Answer", "text": "A host allowlist is hard to keep safe because one gadget domain anywhere in the list can defeat the whole policy, and large content delivery networks are easy to host a gadget on. A per response nonce paired with strict-dynamic ignores the allowlist and trusts only the scripts your server marked, so adding a content delivery network no longer widens the attack surface. The tool rewards a policy built that way." }
+        },
+        {
+          "@type": "Question",
+          "name": "Can a CSP replace fixing the underlying cross site scripting?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. A Content Security Policy is a second layer that limits the damage when an injection slips through. It is not a substitute for output encoding and safe templating. Treat a strong policy as defense in depth, not as a reason to stop fixing the bugs that let script in." }
+        }
+      ]
+    }
+  ]
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600&family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0a0b; --bg-2:#070708; --panel:#0e0e10; --panel-2:#131315;
+    --ink:#f4f2ec; --ink-hi:#fbf9f3; --ink-soft:#9b988f; --ink-faint:#5e5b54;
+    --line:rgba(244,242,236,.13); --line-2:rgba(244,242,236,.07);
+    --accent:#fb5b46; --accent-2:#ff7d6b; --accent-wash:rgba(251,91,70,.12); --on-accent:#1a0c09; --accent-line:rgba(251,91,70,.42);
+    --pass:#5fd6a4; --pass-wash:rgba(95,214,164,.1); --warn:#e8b04b; --warn-wash:rgba(232,176,75,.1); --fail:#fb5b46; --fail-wash:rgba(251,91,70,.1); --info:#7c93ff; --info-wash:rgba(124,147,255,.1);
+    --serif:'Newsreader',Georgia,serif; --mono:'JetBrains Mono',ui-monospace,monospace; --sans:'Inter',system-ui,sans-serif;
+    --maxw:920px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;line-height:1.6}
+  ::selection{background:var(--accent);color:var(--on-accent)}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+
+  nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);background:rgba(10,10,11,.72);border-bottom:1px solid var(--line-2)}
+  nav .wrap{height:64px;display:flex;align-items:center;justify-content:space-between}
+  nav a.brand{display:flex;align-items:center;gap:11px;font-family:var(--mono);font-weight:600;font-size:15px;color:var(--ink);letter-spacing:-.01em}
+  nav a.brand:hover{text-decoration:none}
+  nav .badge{width:27px;height:27px;border-radius:7px;border:1px solid var(--accent-line);display:grid;place-items:center}
+  nav a.cta{font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:9px 16px;border-radius:8px;background:var(--accent);color:var(--on-accent)}
+  nav a.cta:hover{filter:brightness(1.08);text-decoration:none}
+
+  header.hero{padding:64px 0 28px}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:18px}
+  h1{font-family:var(--serif);font-weight:400;font-size:clamp(32px,5vw,52px);line-height:1.08;letter-spacing:-.015em;color:var(--ink-hi)}
+  .lede{margin-top:18px;font-size:18px;color:var(--ink-soft);max-width:660px}
+  .privacy{margin-top:18px;display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);border:1px solid var(--line);border-radius:8px;padding:8px 13px;background:var(--panel)}
+  .privacy svg{width:14px;height:14px;flex:none}
+
+  .tool{margin:30px 0 12px;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px}
+  label.fld{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:10px}
+  textarea{width:100%;min-height:150px;resize:vertical;background:var(--bg-2);border:1px solid var(--line);border-radius:11px;padding:15px;color:var(--ink);font-family:var(--mono);font-size:13.5px;line-height:1.55;outline:none;transition:border-color .2s,box-shadow .2s;word-break:break-all}
+  textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-wash)}
+  textarea::placeholder{color:var(--ink-faint)}
+  .row{display:flex;gap:11px;flex-wrap:wrap;margin-top:14px;align-items:center}
+  button{font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;padding:13px 22px;border-radius:9px;cursor:pointer;border:1px solid var(--line);background:transparent;color:var(--ink);transition:filter .15s,border-color .15s,background .15s}
+  button.primary{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+  button.primary:hover{filter:brightness(1.08)}
+  button.ghost:hover{border-color:var(--accent-line);color:var(--ink-hi)}
+  .hint{font-family:var(--mono);font-size:12px;color:var(--ink-faint);margin-left:auto}
+
+  #results{margin-top:8px}
+  .decoded{display:grid;grid-template-columns:1fr;gap:12px;margin:20px 0}
+  .seg{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:16px 18px;min-width:0}
+  .seg h3{font-family:var(--mono);font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+  .seg .dirs{display:flex;flex-direction:column;gap:7px}
+  .seg .dirs div{font-family:var(--mono);font-size:13px;color:var(--ink-soft);word-break:break-all;overflow-wrap:anywhere}
+  .seg .dirs b{color:var(--ink)}
+  .seg .err{color:var(--fail);font-family:var(--mono);font-size:13px}
+
+  .grade-card{display:flex;align-items:center;gap:22px;background:var(--panel-2);border:1px solid var(--line);border-radius:16px;padding:22px 24px;margin:20px 0}
+  .grade{font-family:var(--serif);font-size:62px;line-height:1;width:96px;height:96px;border-radius:18px;display:grid;place-items:center;flex:none;border:1.5px solid}
+  .grade.g-A,.grade.g-B{color:var(--pass);border-color:var(--pass);background:var(--pass-wash)}
+  .grade.g-C{color:var(--warn);border-color:var(--warn);background:var(--warn-wash)}
+  .grade.g-D,.grade.g-F{color:var(--fail);border-color:var(--fail);background:var(--fail-wash)}
+  .grade-meta h2{font-family:var(--serif);font-weight:400;font-size:24px;color:var(--ink-hi);margin-bottom:4px}
+  .grade-meta p{color:var(--ink-soft);font-size:14.5px}
+  .score-bar{height:7px;border-radius:99px;background:var(--line-2);margin-top:12px;overflow:hidden;max-width:340px}
+  .score-bar > i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--accent-2))}
+
+  .checks{display:flex;flex-direction:column;gap:11px}
+  .check{border:1px solid var(--line);border-radius:13px;padding:16px 18px;background:var(--panel)}
+  .check .top{display:flex;align-items:flex-start;gap:13px}
+  .dot{width:20px;height:20px;border-radius:6px;flex:none;display:grid;place-items:center;font-size:13px;font-weight:700;margin-top:1px}
+  .dot.pass{background:var(--pass-wash);color:var(--pass)}
+  .dot.warn{background:var(--warn-wash);color:var(--warn)}
+  .dot.fail{background:var(--fail-wash);color:var(--fail)}
+  .dot.info{background:var(--info-wash);color:var(--info)}
+  .check h3{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--ink-hi);letter-spacing:-.01em}
+  .check .finding{margin-top:5px;font-size:14.5px;color:var(--ink)}
+  .check .why{margin-top:9px;font-size:13.5px;color:var(--ink-soft)}
+  .check .fix{margin-top:9px;font-size:13px;color:var(--ink-soft);font-family:var(--mono);background:var(--bg-2);border:1px solid var(--line-2);border-radius:8px;padding:9px 11px;white-space:pre-wrap;word-break:break-word}
+  .check .more{margin-top:9px;font-size:13px}
+  .sub{margin-top:11px;padding-left:15px;border-left:2px solid var(--line);display:flex;flex-direction:column;gap:7px}
+  .sub div{font-size:13.5px;color:var(--ink-soft)}
+  .sub b{color:var(--ink)}
+  .empty{color:var(--ink-faint);font-family:var(--mono);font-size:13px;text-align:center;padding:30px}
+
+  .prose{padding:44px 0 20px}
+  .prose h2{font-family:var(--serif);font-weight:400;font-size:30px;color:var(--ink-hi);margin:36px 0 14px;letter-spacing:-.01em}
+  .prose h3{font-family:var(--mono);font-size:15px;color:var(--ink-hi);margin:24px 0 8px}
+  .prose p{color:var(--ink-soft);margin-bottom:14px;font-size:16px}
+  .prose ul{color:var(--ink-soft);margin:0 0 14px 20px;font-size:16px}
+  .prose li{margin-bottom:7px}
+  .prose code{font-family:var(--mono);font-size:13.5px;background:var(--panel-2);border:1px solid var(--line-2);border-radius:5px;padding:1px 6px;color:var(--ink)}
+  .related{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:8px}
+  .related a{display:block;border:1px solid var(--line);border-radius:11px;padding:14px 16px;color:var(--ink);font-size:14.5px;background:var(--panel)}
+  .related a:hover{border-color:var(--accent-line);text-decoration:none}
+  .related a span{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:5px}
+
+  footer{border-top:1px solid var(--line-2);margin-top:40px;padding:30px 0;color:var(--ink-faint);font-family:var(--mono);font-size:12.5px}
+  footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px}
+  footer a{color:var(--ink-soft)}
+  @media (max-width:560px){
+    .related{grid-template-columns:1fr}
+    .grade-card{flex-direction:column;align-items:flex-start;gap:16px}
+    .hint{margin-left:0;width:100%}
+  }
+</style>
+</head>
+<body>
+
+<nav><div class="wrap">
+  <a class="brand" href="https://unboundcompute.com/">
+    <span class="badge"><svg viewBox="0 0 24 24" fill="none" style="width:15px;height:15px"><line x1="12" y1="3" x2="12" y2="21" stroke="var(--accent)" stroke-width="1.8" stroke-dasharray="2.6 2.6"/><circle cx="12" cy="12" r="3" fill="var(--accent)"/></svg></span>
+    UnboundCompute
+  </a>
+  <a class="cta" href="https://unboundcompute.com/#cta">Request access</a>
+</div></nav>
+
+<header class="hero"><div class="wrap">
+  <div class="eyebrow">Free tool</div>
+  <h1>CSP Evaluator</h1>
+  <p class="lede">Paste a Content Security Policy header and read a graded audit. It flags <code>unsafe-inline</code> and <code>unsafe-eval</code>, wildcard and scheme only sources, a missing <code>object-src</code> and <code>base-uri</code>, an absent fallback, and the allowlisted domains that are known bypass gadgets because they host a JSONP endpoint or an old AngularJS build.</p>
+  <div class="privacy">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6l8-4z" stroke="var(--accent)" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Your policy is parsed locally. Everything runs in your browser. Nothing is sent to any server.
+  </div>
+</div></header>
+
+<div class="wrap">
+  <div class="tool">
+    <label class="fld" for="csp">Paste a Content Security Policy</label>
+    <textarea id="csp" spellcheck="false" placeholder="default-src 'self'; script-src 'nonce-r4nd0m' 'strict-dynamic'; object-src 'none'; base-uri 'none'&#10;&#10;A full Content-Security-Policy: header line is fine, the directive name is stripped automatically. The policy is parsed locally and never sent anywhere."></textarea>
+    <div class="row">
+      <button class="primary" id="analyze">Audit policy</button>
+      <button class="ghost" id="weak">Load weak example</button>
+      <button class="ghost" id="strong">Load strong example</button>
+      <button class="ghost" id="clear">Clear</button>
+      <span class="hint" id="hint">No data leaves this page</span>
+    </div>
+  </div>
+  <div id="results"><div class="empty">Your parsed policy and graded report will appear here.</div></div>
+</div>
+
+<div class="wrap prose">
+  <h2>What this CSP evaluator checks</h2>
+  <p>A Content Security Policy is a header that tells the browser which sources it may load script, style, frames, and other content from. Done well, it is the second line of defense against cross site scripting: even if an attacker injects markup, the browser refuses to run script the policy did not bless. Done poorly, it is a long string that looks protective while letting the same injection straight through. This tool parses each directive and audits the parts that decide which of those two you have, drawing on the model in the <a href="https://www.w3.org/TR/CSP3/" rel="noopener" target="_blank">CSP Level 3 specification</a> and the strict policy guidance from <a href="https://web.dev/articles/strict-csp" rel="noopener" target="_blank">web.dev</a>.</p>
+
+  <h3>The script-src safety check</h3>
+  <p>Most of the grade rides on <code>script-src</code>, because that is the directive that decides whether injected script runs. The tool fails a policy that keeps <code>unsafe-inline</code> with no nonce or hash to neutralize it, since that single keyword undoes the whole point of the policy. It flags <code>unsafe-eval</code>, which keeps string to code paths open. It fails a wildcard, a bare <code>https:</code> scheme, or a <code>data:</code> source in <code>script-src</code>, because each one lets an attacker host script almost anywhere. If neither <code>script-src</code> nor <code>default-src</code> is present, there is no script restriction at all, which the tool treats as a failure.</p>
+
+  <h3>Nonces, hashes, and strict-dynamic</h3>
+  <p>A strong policy stops listing hosts and instead trusts only the scripts your server marked for that one response. A per response <code>nonce-</code> value, or a <code>sha256-</code> hash of an inline script, tells the browser exactly what to run. Pairing that with <code>strict-dynamic</code> tells the browser to ignore the host allowlist and let an already trusted script load the ones it needs. The tool recognizes all three and rewards them, because a nonce based policy with <code>strict-dynamic</code> is far harder to bypass than a list of allowed domains.</p>
+
+  <h3>Known bypass gadgets in the allowlist</h3>
+  <p>This is the part that separates an audit from a plain linter. Some widely allowlisted domains are documented bypass gadgets: they serve a JSONP endpoint whose callback parameter reflects attacker chosen JavaScript, or they host an old AngularJS build whose template sandbox can be escaped into arbitrary execution. If one of these sits in your <code>script-src</code>, an attacker who can inject a script tag pointed at that allowed host runs code despite the policy. The tool carries a small curated list of such hosts and flags any that appear in your allowlist, because a single gadget can defeat an otherwise careful policy.</p>
+
+  <h3>object-src, base-uri, and the supporting directives</h3>
+  <p>A few directives matter even when <code>script-src</code> looks clean. A missing or open <code>object-src</code> lets a legacy plugin element become a script execution path, so the strong default is <code>object-src 'none'</code>. A missing <code>base-uri</code> lets an injected <code>base</code> tag rewrite where every relative script URL resolves, which can quietly redirect a nonce protected script to an attacker host, so the strong default is <code>base-uri 'none'</code> or <code>'self'</code>. A <code>default-src</code> is the fallback the browser uses for any directive you did not set, and <code>frame-ancestors</code> controls who may frame your page, which is the clickjacking boundary that the older <code>X-Frame-Options</code> header also covers.</p>
+
+  <h2>How to read the grade</h2>
+  <p>Each graded check contributes a weighted share of a score out of one hundred. A pass earns its full weight, a weak setting earns part of it, and a dangerous one earns none. The grade is a fast signal about the policy as text, not a verdict on the whole site, because a policy is only as good as how completely it is deployed and whether report only mode is hiding violations you never see. Judging whether a policy actually holds means understanding what the page loads and how an attacker would probe it, which is the kind of context an <a href="https://security.unboundcompute.com/ai-security-testing/" rel="noopener">AI security testing</a> approach reasons about rather than pattern matching one header. For the wider set of injection boundaries attackers push on, see the <a href="https://security.unboundcompute.com/category/access-control/" rel="noopener">access control</a> writing.</p>
+
+  <h2>Related reading</h2>
+  <div class="related">
+    <a href="https://security.unboundcompute.com/what-is-web-application-security/"><span>Guide</span>What is web application security</a>
+    <a href="https://security.unboundcompute.com/what-is-csrf/"><span>Deep dive</span>What is CSRF</a>
+    <a href="https://security.unboundcompute.com/ai-security-testing/"><span>Guide</span>AI security testing</a>
+    <a href="https://security.unboundcompute.com/web-security-glossary/"><span>Reference</span>Web security glossary</a>
+  </div>
+
+  <h2>More free tools</h2>
+  <div class="related">
+    <a href="https://unboundcompute.com/tools/csp-generator.html"><span>Free tool</span>Content Security Policy Generator</a>
+    <a href="https://unboundcompute.com/tools/security-headers-analyzer.html"><span>Free tool</span>Security Headers and CSP Analyzer</a>
+    <a href="https://unboundcompute.com/tools/cookie-security-auditor.html"><span>Free tool</span>Cookie Security Auditor</a>
+    <a href="https://unboundcompute.com/tools/"><span>Free tools</span>All free security tools</a>
+  </div>
+</div>
+
+<footer><div class="wrap">
+  <div>Built by <a href="https://unboundcompute.com/">UnboundCompute</a>, autonomous security research for web apps and APIs.</div>
+  <div><a href="https://unboundcompute.com/#cta">Request access</a></div>
+</div></footer>
+
+<script>
+(function(){
+  "use strict";
+  var $ = function(s){ return document.querySelector(s); };
+
+  var WEAK_EXAMPLE = "default-src *; script-src 'unsafe-inline' 'unsafe-eval' https: ajax.googleapis.com";
+  var STRONG_EXAMPLE = "default-src 'self'; script-src 'nonce-r4nd0m' 'strict-dynamic'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'";
+
+  // Curated, widely documented bypass gadget hosts: domains that serve a JSONP
+  // endpoint or host an old AngularJS build, both of which turn an allowlisted
+  // host into arbitrary script execution. Matched by suffix so a subdomain hits.
+  var GADGETS = [
+    "ajax.googleapis.com","www.google.com","google.com","googleapis.com",
+    "cdnjs.cloudflare.com","cdn.jsdelivr.net","ajax.aspnetcdn.com",
+    "yandex.st","api.bootstrapcdn.com","maxcdn.bootstrapcdn.com","cdn.rawgit.com"
+  ];
+
+  function esc(s){ return String(s).replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];}); }
+
+  // Parse a policy string into { order:[...names], map:{name:[values]} }.
+  function parseCsp(raw){
+    raw = (raw||"").trim().replace(/^content-security-policy(-report-only)?\s*:\s*/i,"");
+    var res = { raw:raw, order:[], map:{} };
+    if (!raw){ res.fatal = "Paste a policy first."; return res; }
+    raw.split(";").forEach(function(seg){
+      seg = seg.trim();
+      if (!seg) return;
+      var bits = seg.split(/\s+/);
+      var name = (bits.shift()||"").toLowerCase();
+      if (!name) return;
+      if (!res.map[name]){ res.order.push(name); res.map[name] = []; }
+      bits.forEach(function(v){ if (v) res.map[name].push(v); });
+    });
+    if (!res.order.length){ res.fatal = "No directives found. A policy looks like: default-src 'self'; script-src 'self'"; return res; }
+    return res;
+  }
+
+  function has(arr, token){
+    token = token.toLowerCase();
+    return (arr||[]).some(function(v){ return v.toLowerCase() === token; });
+  }
+  function someStartsWith(arr, prefix){
+    prefix = prefix.toLowerCase();
+    return (arr||[]).some(function(v){ return v.toLowerCase().indexOf(prefix) === 0; });
+  }
+
+  // Strip quotes and scheme, return a bare host for gadget matching, or null.
+  function hostOf(src){
+    var s = src.replace(/^['"]|['"]$/g,"");
+    if (/^'/.test(src) || /^[a-z-]+:$/i.test(s)) return null;        // keyword or bare scheme
+    s = s.replace(/^[a-z][a-z0-9+.-]*:\/\//i,"");                     // strip scheme://
+    s = s.replace(/[\/:].*$/,"");                                     // strip path / port
+    s = s.replace(/^\*\./,"");                                        // *.example -> example
+    return s.toLowerCase() || null;
+  }
+  function gadgetHit(src){
+    var h = hostOf(src);
+    if (!h) return null;
+    for (var i=0;i<GADGETS.length;i++){
+      var g = GADGETS[i];
+      if (h === g || h.length > g.length && h.slice(-(g.length+1)) === "."+g) return g;
+    }
+    return null;
+  }
+
+  // status: pass | warn | fail | info. weight 0 => advisory (not graded).
+  function buildChecks(p){
+    var checks = [], m = p.map;
+    var scriptSrc = m["script-src"], defaultSrc = m["default-src"];
+    var effScript = scriptSrc || defaultSrc;          // the list the browser uses for script
+
+    // 1. script-src safety (high weight)
+    (function(){
+      var weight = 30;
+      if (!scriptSrc && !defaultSrc){
+        checks.push({w:weight,s:"fail",h:"script-src safety",f:"Neither script-src nor default-src is set, so there is no restriction on where script may load from. The policy does nothing to stop injected script.",fix:"Set script-src to a nonce based source such as: script-src 'nonce-<random>' 'strict-dynamic'",why:"With no script restriction and no fallback, a cross site scripting payload runs exactly as if there were no policy at all."});
+        return;
+      }
+      var src = effScript, via = scriptSrc ? "script-src" : "default-src (fallback)";
+      var problems = [];
+      var hasNonceOrHash = someStartsWith(src,"'nonce-") || someStartsWith(src,"'sha256-") || someStartsWith(src,"'sha384-") || someStartsWith(src,"'sha512-");
+      if (has(src,"'unsafe-inline'") && !hasNonceOrHash){
+        problems.push("<b>'unsafe-inline'</b> is present with no nonce or hash to cancel it, so any injected inline script runs.");
+      }
+      if (has(src,"'unsafe-eval'")){
+        problems.push("<b>'unsafe-eval'</b> keeps string to code paths like eval open, which many injection payloads rely on.");
+      }
+      if (has(src,"*")){ problems.push("<b>*</b> allows script from any host."); }
+      if (has(src,"https:") || has(src,"http:")){ problems.push("A bare scheme source (<b>"+(has(src,"https:")?"https:":"http:")+"</b>) allows script from any host on that scheme."); }
+      if (has(src,"data:")){ problems.push("<b>data:</b> in a script source lets an attacker inline a whole script as a data URL."); }
+
+      if (problems.length){
+        checks.push({w:weight,s:"fail",h:"script-src safety",f:"The effective script source ("+via+") has openings that let injected script run.",subs:problems,fix:"Drop the wildcard, scheme, and unsafe keywords. Use: script-src 'nonce-<random>' 'strict-dynamic'",why:"script-src is the directive that decides whether a cross site scripting payload executes. One of these openings is usually enough to render the rest of the policy decorative.",link:"https://security.unboundcompute.com/web-security-glossary/",linkText:"More policy terms"});
+        return;
+      }
+      if (has(src,"'unsafe-inline'") && hasNonceOrHash){
+        checks.push({w:weight,s:"pass",h:"script-src safety",f:"'unsafe-inline' is present but a nonce or hash is too, and a browser that understands nonces ignores 'unsafe-inline'. The keyword is kept as a fallback for very old browsers.",why:"When a nonce or hash is present, modern browsers drop 'unsafe-inline', so this is the standard backward compatible shape."});
+        return;
+      }
+      checks.push({w:weight,s:"pass",h:"script-src safety",f:"The effective script source ("+via+") has no wildcard, bare scheme, data URL, or unguarded unsafe keyword.",why:"A tight script source is the core of a policy that actually blocks injected script."});
+    })();
+
+    // 2. nonce / hash / strict-dynamic recognition
+    (function(){
+      var weight = 14, src = effScript || [];
+      var hasNonce = someStartsWith(src,"'nonce-");
+      var hasHash = someStartsWith(src,"'sha256-") || someStartsWith(src,"'sha384-") || someStartsWith(src,"'sha512-");
+      var hasSd = has(src,"'strict-dynamic'");
+      if (!effScript){ checks.push({w:0,s:"info",h:"Nonce, hash, and strict-dynamic",f:"No effective script source to inspect for a nonce or hash.",why:"A nonce or hash based policy is the strongest shape, but it only applies once a script source exists."}); return; }
+      if (hasNonce || hasHash){
+        var bits = [];
+        if (hasNonce) bits.push("a per response <b>'nonce-'</b> value");
+        if (hasHash) bits.push("an inline script <b>hash</b>");
+        if (hasSd) bits.push("<b>'strict-dynamic'</b>, which ignores the host allowlist and trusts only marked scripts");
+        checks.push({w:weight,s:"pass",h:"Nonce, hash, and strict-dynamic",f:"The policy uses "+bits.join(", ")+". This is the strong, allowlist independent shape.",why:"Trusting only the scripts your server marked, rather than a list of hosts, removes the gadget risk that allowlists carry."});
+        return;
+      }
+      if (hasSd){
+        checks.push({w:weight,s:"warn",h:"Nonce, hash, and strict-dynamic",f:"'strict-dynamic' is present but there is no nonce or hash for it to extend, so in modern browsers it can disable the host allowlist without granting any trusted root script.",fix:"Add a per response nonce: script-src 'nonce-<random>' 'strict-dynamic'",why:"'strict-dynamic' works by propagating trust from a script that a nonce or hash already trusted. Without one it has nothing to propagate from."});
+        return;
+      }
+      checks.push({w:weight,s:"warn",h:"Nonce, hash, and strict-dynamic",f:"The script source relies on a host allowlist with no nonce, hash, or 'strict-dynamic'. An allowlist is workable but easy to weaken with one gadget host.",fix:"Move to: script-src 'nonce-<random>' 'strict-dynamic'",why:"A nonce based policy is far harder to bypass than a list of allowed domains, because adding a content delivery network no longer widens the attack surface."});
+    })();
+
+    // 3. Known bypass gadgets in the allowlist (the differentiator)
+    (function(){
+      var weight = 16, src = effScript || [], hits = [], seen = {};
+      src.forEach(function(v){
+        var g = gadgetHit(v);
+        if (g && !seen[v]){ seen[v] = 1; hits.push("<b>"+esc(v)+"</b> matches the known gadget host <b>"+esc(g)+"</b>, which has hosted a JSONP endpoint or an old AngularJS build."); }
+      });
+      if (!effScript){ checks.push({w:0,s:"info",h:"Known bypass gadgets",f:"No effective script source to scan for gadget hosts.",why:"Gadget hosts only matter inside a script allowlist."}); return; }
+      var hasNonce = someStartsWith(src,"'nonce-") || someStartsWith(src,"'sha256-") || someStartsWith(src,"'sha384-") || someStartsWith(src,"'sha512-");
+      var hasSd = has(src,"'strict-dynamic'");
+      if (hits.length){
+        var neutralized = hasNonce && hasSd;
+        checks.push({
+          w:weight, s: neutralized ? "warn" : "fail",
+          h:"Known bypass gadgets",
+          f: neutralized
+            ? "Your allowlist contains a known bypass gadget. With 'strict-dynamic' and a nonce, a modern browser ignores the host list, so the gadget is mostly neutralized, but it still helps script in older browsers that honor the allowlist."
+            : "Your allowlist contains a host that is a documented CSP bypass gadget. An attacker who can inject a script tag pointed at it runs code despite the policy.",
+          subs:hits,
+          fix:"Remove the gadget host and move to a nonce based policy: script-src 'nonce-<random>' 'strict-dynamic'",
+          why:"A bypass gadget hosts JSONP or AngularJS, so an allowed script tag pointed at it reflects or executes attacker chosen JavaScript. A single gadget can defeat an otherwise careful allowlist.",
+          link:"https://security.unboundcompute.com/web-security-glossary/", linkText:"More on CSP bypasses"
+        });
+        return;
+      }
+      checks.push({w:weight,s:"pass",h:"Known bypass gadgets",f:"No host in the script allowlist matches the curated list of known JSONP or AngularJS bypass gadgets.",why:"Keeping documented gadget hosts out of the allowlist closes the most common way a restrictive looking policy is defeated."});
+    })();
+
+    // 4. object-src
+    (function(){
+      var weight = 10, obj = m["object-src"] || (defaultSrc ? null : undefined);
+      var eff = m["object-src"] || defaultSrc;
+      if (!eff){
+        checks.push({w:weight,s:"fail",h:"object-src",f:"No object-src and no default-src fallback, so legacy plugin elements are unrestricted. That is a known script execution path.",fix:"Add: object-src 'none'",why:"A plugin element loaded from an attacker source can execute, which sidesteps a careful script-src entirely."});
+        return;
+      }
+      if (has(eff,"'none'")){
+        checks.push({w:weight,s:"pass",h:"object-src",f:"object-src is set to 'none', so plugin elements cannot load anything.",why:"'none' closes the legacy plugin execution path completely."});
+        return;
+      }
+      if (has(eff,"*") || someStartsWith(eff,"http")){
+        checks.push({w:weight,s:"warn",h:"object-src",f:"The effective object-src allows external sources. Plugin content is a legacy execution surface that is almost never needed.",fix:"Set: object-src 'none'",why:"Unless you genuinely embed plugin content, 'none' is the safe default and removes the surface."});
+        return;
+      }
+      checks.push({w:weight,s:"pass",h:"object-src",f:"The effective object-src is restricted to "+esc((eff||[]).join(" "))+".",why:"A restricted object-src keeps the legacy plugin path closed."});
+    })();
+
+    // 5. base-uri
+    (function(){
+      var weight = 9, base = m["base-uri"];
+      if (!base){
+        checks.push({w:weight,s:"fail",h:"base-uri",f:"No base-uri directive. An injected base tag can rewrite where every relative script URL resolves, which can redirect a nonce protected script to an attacker host.",fix:"Add: base-uri 'none'",why:"base-uri does not fall back to default-src, so it is unset unless you set it explicitly. Leaving it open undermines an otherwise strong script source."});
+        return;
+      }
+      if (has(base,"'none'") || has(base,"'self'")){
+        checks.push({w:weight,s:"pass",h:"base-uri",f:"base-uri is restricted to "+esc(base.join(" "))+", so an injected base tag cannot relocate relative script URLs.",why:"Pinning base-uri closes the base tag injection path that can hijack relative script loads."});
+        return;
+      }
+      checks.push({w:weight,s:"warn",h:"base-uri",f:"base-uri is set but not restricted to 'none' or 'self' ("+esc(base.join(" "))+"). Confirm the allowed origins cannot be used to relocate relative script URLs.",fix:"Prefer: base-uri 'none'",why:"A loose base-uri still leaves room for a base tag to point relative scripts at an unexpected origin."});
+    })();
+
+    // 6. default-src fallback
+    (function(){
+      var weight = 7;
+      if (defaultSrc){
+        checks.push({w:weight,s:"pass",h:"default-src fallback",f:"default-src is set ("+esc(defaultSrc.join(" "))+"), so any directive you did not specify falls back to it instead of being unrestricted.",why:"A default-src catches the fetch directives you forgot, which is a safer baseline than leaving them open."});
+        return;
+      }
+      checks.push({w:weight,s:"warn",h:"default-src fallback",f:"No default-src. Every fetch directive you did not set explicitly is unrestricted rather than falling back to a baseline.",fix:"Add a baseline: default-src 'self'",why:"Without a fallback, a directive you forgot is wide open. Note that base-uri and frame-ancestors never fall back to default-src and must be set on their own."});
+    })();
+
+    // 7. frame-ancestors (advisory)
+    (function(){
+      var fa = m["frame-ancestors"];
+      if (fa){
+        if (has(fa,"'none'") || has(fa,"'self'")){
+          checks.push({w:5,s:"pass",h:"frame-ancestors",f:"frame-ancestors is restricted to "+esc(fa.join(" "))+", which controls who may frame the page and covers clickjacking.",why:"frame-ancestors is the modern clickjacking control and supersedes X-Frame-Options where both are present."});
+        } else {
+          checks.push({w:5,s:"warn",h:"frame-ancestors",f:"frame-ancestors is set but allows external framing ("+esc(fa.join(" "))+"). Confirm every listed origin should be able to frame this page.",fix:"If the page should not be framed: frame-ancestors 'none'",why:"Any origin allowed to frame the page can attempt a clickjacking overlay against it."});
+        }
+        return;
+      }
+      checks.push({w:0,s:"info",h:"frame-ancestors",f:"No frame-ancestors directive. This is the clickjacking boundary. It may be acceptable if an X-Frame-Options header covers it, but frame-ancestors is the modern control.",why:"Without frame-ancestors and without X-Frame-Options, any site can frame this page, which enables clickjacking."});
+    })();
+
+    // 8. report-uri / report-to (advisory)
+    (function(){
+      var ru = m["report-uri"], rt = m["report-to"];
+      if (ru || rt){
+        checks.push({w:0,s:"info",h:"Violation reporting",f:"The policy sends violation reports"+(rt?" via report-to":"")+(ru?(rt?" and report-uri":" via report-uri"):"")+". That helps you catch breakage and probing in production.",why:"Reporting turns a policy into a feedback loop, but make sure you actually read the reports."});
+        return;
+      }
+      checks.push({w:0,s:"info",h:"Violation reporting",f:"No report-uri or report-to. Adding one lets the browser tell you when the policy blocks something, which is useful while tightening a policy.",why:"Reports surface both real breakage and attacker probing without weakening the policy."});
+    })();
+
+    return checks;
+  }
+
+  function grade(checks){
+    var earned = 0, possible = 0;
+    checks.forEach(function(ch){
+      if (!ch.w) return;
+      possible += ch.w;
+      earned += ch.s === "pass" ? ch.w : ch.s === "warn" ? ch.w*0.5 : ch.s === "info" ? ch.w : 0;
+    });
+    var pct = possible ? Math.round(earned/possible*100) : 0;
+    var letter = pct>=90?"A":pct>=80?"B":pct>=70?"C":pct>=60?"D":"F";
+    return { pct: pct, letter: letter };
+  }
+
+  function renderParsed(p){
+    var html = '<div class="decoded"><div class="seg"><h3>Parsed directives</h3><div class="dirs">';
+    p.order.forEach(function(name){
+      var vals = p.map[name];
+      html += '<div><b>'+esc(name)+'</b> '+esc(vals.length ? vals.join(" ") : "(no value)")+'</div>';
+    });
+    html += '</div></div></div>';
+    return html;
+  }
+
+  function render(p, checks){
+    var html = renderParsed(p);
+    var g = grade(checks);
+    var sum = { pass:0, warn:0, fail:0 };
+    checks.forEach(function(c){ if (c.w && sum[c.s]!==undefined) sum[c.s]++; });
+
+    html += '<div class="grade-card">';
+    html += '<div class="grade g-'+g.letter+'">'+g.letter+'</div>';
+    html += '<div class="grade-meta"><h2>Score '+g.pct+' out of 100</h2>';
+    html += '<p>'+sum.pass+' strong, '+sum.warn+' to improve, '+sum.fail+' dangerous. This audits the policy as text. It cannot see how completely the policy is deployed.</p>';
+    html += '<div class="score-bar"><i style="width:'+g.pct+'%"></i></div></div></div>';
+
+    html += '<div class="checks">';
+    checks.forEach(function(c){
+      var sym = c.s==="pass"?"&#10003;":c.s==="warn"?"!":c.s==="fail"?"&#10007;":"i";
+      html += '<div class="check"><div class="top"><span class="dot '+c.s+'">'+sym+'</span><div style="flex:1">';
+      html += '<h3>'+esc(c.h)+'</h3>';
+      html += '<div class="finding">'+esc(c.f)+'</div>';
+      if (c.subs && c.subs.length){
+        html += '<div class="sub">';
+        c.subs.forEach(function(s){ html += '<div>'+s+'</div>'; });   // subs may contain <b>
+        html += '</div>';
+      }
+      if (c.why) html += '<div class="why">'+esc(c.why)+'</div>';
+      if (c.fix && c.s !== "pass") html += '<div class="fix">'+esc(c.fix)+'</div>';
+      if (c.link) html += '<div class="more"><a href="'+c.link+'" rel="noopener">'+esc(c.linkText||"Learn more")+' &rarr;</a></div>';
+      html += '</div></div></div>';
+    });
+    html += '</div>';
+    return html;
+  }
+
+  function run(){
+    var text = $("#csp").value;
+    var p = parseCsp(text);
+    if (p.fatal){ $("#results").innerHTML = '<div class="empty">'+esc(p.fatal)+'</div>'; return; }
+    var checks = buildChecks(p);
+    $("#results").innerHTML = render(p, checks);
+    $("#results").scrollIntoView({ behavior:"smooth", block:"start" });
+  }
+
+  $("#analyze").addEventListener("click", run);
+  $("#weak").addEventListener("click", function(){ $("#csp").value = WEAK_EXAMPLE; run(); });
+  $("#strong").addEventListener("click", function(){ $("#csp").value = STRONG_EXAMPLE; run(); });
+  $("#clear").addEventListener("click", function(){ $("#csp").value=""; $("#results").innerHTML='<div class="empty">Your parsed policy and graded report will appear here.</div>'; $("#csp").focus(); });
+  $("#csp").addEventListener("keydown", function(e){ if ((e.metaKey||e.ctrlKey) && e.key==="Enter") run(); });
+
+  // Exposed for headless self test only; harmless in the browser.
+  if (typeof window !== "undefined"){ window.__cspEval = { parseCsp:parseCsp, buildChecks:buildChecks, grade:grade, WEAK_EXAMPLE:WEAK_EXAMPLE, STRONG_EXAMPLE:STRONG_EXAMPLE }; }
+})();
+</script>
+</body>
+</html>

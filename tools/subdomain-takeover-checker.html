@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Subdomain Takeover Fingerprint Checker | UnboundCompute</title>
+<meta name="description" content="Paste the CNAME target a subdomain points at and the error page you see, then match both against a built in fingerprint list for known dangling third party services. Runs fully in your browser." />
+<meta name="keywords" content="subdomain takeover, dangling dns, cname takeover, takeover fingerprint, subdomain takeover checker, can i take over xyz, dangling cname, subdomain security" />
+<meta name="robots" content="index, follow" />
+<meta name="author" content="UnboundCompute" />
+<meta name="theme-color" content="#0a0a0b" />
+<link rel="canonical" href="https://unboundcompute.com/tools/subdomain-takeover-checker.html" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a0a0b'/%3E%3Cline x1='16' y1='4' x2='16' y2='28' stroke='%23fb5b46' stroke-width='2' stroke-dasharray='3 3'/%3E%3Ccircle cx='16' cy='16' r='3.4' fill='%23fb5b46'/%3E%3C/svg%3E" />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="UnboundCompute" />
+<meta property="og:title" content="Subdomain Takeover Fingerprint Checker" />
+<meta property="og:description" content="Match a CNAME target and an error page against a built in fingerprint list for known dangling services. Runs fully in your browser, nothing is sent to any server." />
+<meta property="og:url" content="https://unboundcompute.com/tools/subdomain-takeover-checker.html" />
+<meta property="og:image" content="https://unboundcompute.com/og.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Subdomain Takeover Fingerprint Checker" />
+<meta name="twitter:description" content="Match a CNAME target and an error page against a built in fingerprint list for known dangling services. Runs fully in your browser." />
+<meta name="twitter:image" content="https://unboundcompute.com/og.png" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "Subdomain Takeover Fingerprint Checker",
+      "applicationCategory": "SecurityApplication",
+      "operatingSystem": "Web",
+      "browserRequirements": "Requires JavaScript. Runs entirely client side.",
+      "url": "https://unboundcompute.com/tools/subdomain-takeover-checker.html",
+      "description": "A free tool that matches a CNAME or ALIAS target and an error page you paste against a built in fingerprint list of known third party services. It tells you when the pair looks like a claimable dangling resource, when only the service is identified, and when nothing matches. It does not contact your domain. All matching happens in the browser.",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "publisher": { "@type": "Organization", "name": "UnboundCompute", "url": "https://unboundcompute.com/" }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is a subdomain takeover?",
+          "acceptedAnswer": { "@type": "Answer", "text": "A subdomain takeover happens when a DNS record on your domain still points at a third party resource that has been deleted or was never claimed. An attacker registers that resource on the same provider, and because your DNS still routes traffic there, the subdomain now serves content the attacker controls. It is a real subdomain on your domain, which makes it useful for phishing, for stealing cookies scoped to the parent domain, and for abusing redirect and login flows." }
+        },
+        {
+          "@type": "Question",
+          "name": "How does this checker work?",
+          "acceptedAnswer": { "@type": "Answer", "text": "It does fingerprint matching on data you paste. You give it the CNAME or ALIAS target that a subdomain points at, and the error text you see when you visit the subdomain. The tool compares the target against a built in list of known provider host patterns and compares the error text against documented dangling resource messages. When both line up, it reports a likely claimable state with the service name and the matched fingerprint." }
+        },
+        {
+          "@type": "Question",
+          "name": "Does this tool scan my domain?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. It never makes a DNS query or an HTTP request. A browser page cannot resolve your DNS or fetch your subdomain across origins, and doing real reconnaissance would need a server. This tool only matches the text you paste against its built in fingerprint reference, so nothing about your domain leaves your machine." }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I fix a subdomain takeover?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Remove the dangling DNS record so the subdomain no longer points at an unclaimed resource, or reclaim and verify the resource on the provider so it is yours again. Then audit the rest of your zone for other records that point at deleted services, and keep DNS cleanup tied to the process that decommissions any hosted asset." }
+        }
+      ]
+    }
+  ]
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600&family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0a0b; --bg-2:#070708; --panel:#0e0e10; --panel-2:#131315;
+    --ink:#f4f2ec; --ink-hi:#fbf9f3; --ink-soft:#9b988f; --ink-faint:#5e5b54;
+    --line:rgba(244,242,236,.13); --line-2:rgba(244,242,236,.07);
+    --accent:#fb5b46; --accent-2:#ff7d6b; --accent-wash:rgba(251,91,70,.12); --on-accent:#1a0c09; --accent-line:rgba(251,91,70,.42);
+    --pass:#5fd6a4; --pass-wash:rgba(95,214,164,.1); --warn:#e8b04b; --warn-wash:rgba(232,176,75,.1); --fail:#fb5b46; --fail-wash:rgba(251,91,70,.1); --info:#7c93ff; --info-wash:rgba(124,147,255,.1);
+    --serif:'Newsreader',Georgia,serif; --mono:'JetBrains Mono',ui-monospace,monospace; --sans:'Inter',system-ui,sans-serif;
+    --maxw:920px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;line-height:1.6}
+  ::selection{background:var(--accent);color:var(--on-accent)}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+
+  nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);background:rgba(10,10,11,.72);border-bottom:1px solid var(--line-2)}
+  nav .wrap{height:64px;display:flex;align-items:center;justify-content:space-between}
+  nav a.brand{display:flex;align-items:center;gap:11px;font-family:var(--mono);font-weight:600;font-size:15px;color:var(--ink);letter-spacing:-.01em}
+  nav a.brand:hover{text-decoration:none}
+  nav .badge{width:27px;height:27px;border-radius:7px;border:1px solid var(--accent-line);display:grid;place-items:center}
+  nav a.cta{font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:9px 16px;border-radius:8px;background:var(--accent);color:var(--on-accent)}
+  nav a.cta:hover{filter:brightness(1.08);text-decoration:none}
+
+  header.hero{padding:64px 0 28px}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:18px}
+  h1{font-family:var(--serif);font-weight:400;font-size:clamp(32px,5vw,52px);line-height:1.08;letter-spacing:-.015em;color:var(--ink-hi)}
+  .lede{margin-top:18px;font-size:18px;color:var(--ink-soft);max-width:660px}
+  .privacy{margin-top:18px;display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);border:1px solid var(--line);border-radius:8px;padding:8px 13px;background:var(--panel)}
+  .privacy svg{width:14px;height:14px;flex:none}
+
+  .tool{margin:30px 0 12px;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px}
+  label.fld{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:10px}
+  input[type=text]{width:100%;background:var(--bg-2);border:1px solid var(--line);border-radius:11px;padding:14px 15px;color:var(--ink);font-family:var(--mono);font-size:13.5px;line-height:1.55;outline:none;transition:border-color .2s,box-shadow .2s;word-break:break-all}
+  input[type=text]:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-wash)}
+  input[type=text]::placeholder{color:var(--ink-faint)}
+  textarea{width:100%;min-height:130px;resize:vertical;background:var(--bg-2);border:1px solid var(--line);border-radius:11px;padding:15px;color:var(--ink);font-family:var(--mono);font-size:13.5px;line-height:1.55;outline:none;transition:border-color .2s,box-shadow .2s;word-break:break-word}
+  textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-wash)}
+  textarea::placeholder{color:var(--ink-faint)}
+  .gap{margin-top:18px}
+  .row{display:flex;gap:11px;flex-wrap:wrap;margin-top:14px;align-items:center}
+  button{font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;padding:13px 22px;border-radius:9px;cursor:pointer;border:1px solid var(--line);background:transparent;color:var(--ink);transition:filter .15s,border-color .15s,background .15s}
+  button.primary{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+  button.primary:hover{filter:brightness(1.08)}
+  button.ghost:hover{border-color:var(--accent-line);color:var(--ink-hi)}
+  .hint{font-family:var(--mono);font-size:12px;color:var(--ink-faint);margin-left:auto}
+
+  .honesty{margin:18px 0 0;display:flex;align-items:flex-start;gap:10px;font-family:var(--mono);font-size:12.5px;line-height:1.55;color:var(--ink-soft);border:1px solid var(--line);border-radius:11px;padding:13px 15px;background:var(--panel-2)}
+  .honesty svg{width:15px;height:15px;flex:none;margin-top:2px}
+
+  #results{margin-top:8px}
+
+  .grade-card{display:flex;align-items:center;gap:22px;background:var(--panel-2);border:1px solid var(--line);border-radius:16px;padding:22px 24px;margin:20px 0}
+  .grade{font-family:var(--serif);font-size:24px;line-height:1.05;width:150px;min-height:96px;border-radius:18px;display:grid;place-items:center;flex:none;border:1.5px solid;text-align:center;padding:10px}
+  .grade.g-fail{color:var(--fail);border-color:var(--fail);background:var(--fail-wash)}
+  .grade.g-warn{color:var(--warn);border-color:var(--warn);background:var(--warn-wash)}
+  .grade.g-info{color:var(--info);border-color:var(--info);background:var(--info-wash)}
+  .grade.g-pass{color:var(--pass);border-color:var(--pass);background:var(--pass-wash)}
+  .grade-meta h2{font-family:var(--serif);font-weight:400;font-size:24px;color:var(--ink-hi);margin-bottom:4px}
+  .grade-meta p{color:var(--ink-soft);font-size:14.5px}
+
+  .checks{display:flex;flex-direction:column;gap:11px}
+  .check{border:1px solid var(--line);border-radius:13px;padding:16px 18px;background:var(--panel)}
+  .check .top{display:flex;align-items:flex-start;gap:13px}
+  .dot{width:20px;height:20px;border-radius:6px;flex:none;display:grid;place-items:center;font-size:13px;font-weight:700;margin-top:1px}
+  .dot.pass{background:var(--pass-wash);color:var(--pass)}
+  .dot.warn{background:var(--warn-wash);color:var(--warn)}
+  .dot.fail{background:var(--fail-wash);color:var(--fail)}
+  .dot.info{background:var(--info-wash);color:var(--info)}
+  .check h3{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--ink-hi);letter-spacing:-.01em}
+  .check .finding{margin-top:5px;font-size:14.5px;color:var(--ink)}
+  .check .why{margin-top:9px;font-size:13.5px;color:var(--ink-soft)}
+  .check .fix{margin-top:9px;font-size:13px;color:var(--ink-soft);font-family:var(--mono);background:var(--bg-2);border:1px solid var(--line-2);border-radius:8px;padding:9px 11px;white-space:pre-wrap;word-break:break-word}
+  .check .more{margin-top:9px;font-size:13px}
+  .sub{margin-top:11px;padding-left:15px;border-left:2px solid var(--line);display:flex;flex-direction:column;gap:7px}
+  .sub div{font-size:13.5px;color:var(--ink-soft)}
+  .sub b{color:var(--ink)}
+  .sub code{font-family:var(--mono);font-size:12.5px;background:var(--bg-2);border:1px solid var(--line-2);border-radius:5px;padding:1px 5px;color:var(--ink)}
+  .empty{color:var(--ink-faint);font-family:var(--mono);font-size:13px;text-align:center;padding:30px}
+
+  .prose{padding:44px 0 20px}
+  .prose h2{font-family:var(--serif);font-weight:400;font-size:30px;color:var(--ink-hi);margin:36px 0 14px;letter-spacing:-.01em}
+  .prose h3{font-family:var(--mono);font-size:15px;color:var(--ink-hi);margin:24px 0 8px}
+  .prose p{color:var(--ink-soft);margin-bottom:14px;font-size:16px}
+  .prose ul{color:var(--ink-soft);margin:0 0 14px 20px;font-size:16px}
+  .prose li{margin-bottom:7px}
+  .prose code{font-family:var(--mono);font-size:13.5px;background:var(--panel-2);border:1px solid var(--line-2);border-radius:5px;padding:1px 6px;color:var(--ink)}
+  .related{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:8px}
+  .related a{display:block;border:1px solid var(--line);border-radius:11px;padding:14px 16px;color:var(--ink);font-size:14.5px;background:var(--panel)}
+  .related a:hover{border-color:var(--accent-line);text-decoration:none}
+  .related a span{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:5px}
+
+  footer{border-top:1px solid var(--line-2);margin-top:40px;padding:30px 0;color:var(--ink-faint);font-family:var(--mono);font-size:12.5px}
+  footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px}
+  footer a{color:var(--ink-soft)}
+  @media (max-width:560px){
+    .related{grid-template-columns:1fr}
+    .grade-card{flex-direction:column;align-items:flex-start;gap:16px}
+    .grade{width:100%}
+    .hint{margin-left:0;width:100%}
+  }
+</style>
+</head>
+<body>
+
+<nav><div class="wrap">
+  <a class="brand" href="https://unboundcompute.com/">
+    <span class="badge"><svg viewBox="0 0 24 24" fill="none" style="width:15px;height:15px"><line x1="12" y1="3" x2="12" y2="21" stroke="var(--accent)" stroke-width="1.8" stroke-dasharray="2.6 2.6"/><circle cx="12" cy="12" r="3" fill="var(--accent)"/></svg></span>
+    UnboundCompute
+  </a>
+  <a class="cta" href="https://unboundcompute.com/#cta">Request access</a>
+</div></nav>
+
+<header class="hero"><div class="wrap">
+  <div class="eyebrow">Free tool</div>
+  <h1>Subdomain Takeover Fingerprint Checker</h1>
+  <p class="lede">Paste the CNAME or ALIAS target a subdomain points at, and the error page you see when you visit it. This tool matches both against a built in fingerprint list of well known third party services and tells you when the pair looks like a claimable dangling resource. It does not contact your domain.</p>
+  <div class="privacy">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6l8-4z" stroke="var(--accent)" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Everything runs in your browser. Nothing you paste is sent to any server.
+  </div>
+</div></header>
+
+<div class="wrap">
+  <div class="tool">
+    <label class="fld" for="cname">CNAME or ALIAS target the subdomain points at</label>
+    <input type="text" id="cname" spellcheck="false" placeholder="myapp.github.io   or   acme.s3.amazonaws.com   or   acme.herokudns.com" />
+    <div class="gap"></div>
+    <label class="fld" for="body">Response body or error text you see when you visit the subdomain</label>
+    <textarea id="body" spellcheck="false" placeholder="Paste the page text or error message you see in the browser. Either field alone is enough, but giving both lets the tool confirm a finding."></textarea>
+    <div class="row">
+      <button class="primary" id="analyze">Match fingerprints</button>
+      <button class="ghost" id="example">Load example</button>
+      <button class="ghost" id="clear">Clear</button>
+      <span class="hint" id="hint">No data leaves this page</span>
+    </div>
+    <div class="honesty">
+      <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="var(--accent)" stroke-width="1.6"/><line x1="12" y1="11" x2="12" y2="16" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="8" r="1" fill="var(--accent)"/></svg>
+      <span>This is a fingerprint reference, not a scanner. It does not resolve DNS or fetch your subdomain. A match is a strong hint, not proof. Always confirm whether the backing resource is actually registerable before you act, and only test assets you are authorized to test.</span>
+    </div>
+  </div>
+  <div id="results"><div class="empty">Your fingerprint findings will appear here.</div></div>
+</div>
+
+<div class="wrap prose">
+  <h2>How a subdomain takeover happens</h2>
+  <p>Most teams park subdomains on third party platforms. A docs site lives on a static host, a status page lives on a status provider, a marketing landing page lives on a website builder. You point a subdomain at the provider with a CNAME or ALIAS record, the provider serves it, and everyone moves on. The trouble starts when the hosted asset is deleted but the DNS record is left behind. Now you have a dangling record: a name on your domain that still routes to a provider slot nobody owns.</p>
+  <p>An attacker who notices that dangling record registers the same resource on the provider, often by claiming the exact host name your record points at. Because your DNS still routes traffic to the provider, and the provider now hands that slot to the attacker, your subdomain serves whatever they upload. No DNS spoofing, no certificate trickery, just a reclaimed slot on a shared platform. The community maintained <a href="https://github.com/EdOverflow/can-i-take-over-xyz" rel="noopener" target="_blank">can i take over xyz</a> list catalogs which providers are vulnerable, which are fixed, and which are conditional, and the fingerprint database in this tool draws on that public knowledge.</p>
+
+  <h3>Why a taken over subdomain matters</h3>
+  <p>The damage is larger than a defaced page because the subdomain is genuinely yours. Visitors trust it, and so do parts of your own stack. An attacker can stand up a convincing phishing page on a name that carries your brand. They can read or set cookies scoped to the parent domain when those cookies are not locked down, which bleeds into session handling across your apps. They can register the subdomain as an allowed redirect or origin in an OAuth or single sign on flow and quietly intercept tokens. A name you forgot becomes attacker controlled real estate inside your trust boundary.</p>
+
+  <h3>How this checker matches fingerprints</h3>
+  <p>Two signals usually identify a takeover. The first is the host the subdomain points at: a CNAME ending in a known provider suffix such as <code>github.io</code>, <code>s3.amazonaws.com</code>, or <code>herokudns.com</code> tells you which platform is in play. The second is the error the provider returns for an unclaimed slot, a recognizable string such as <code>There isn't a GitHub Pages site here.</code> or <code>NoSuchBucket</code>. This tool compares the CNAME you paste against a list of provider host patterns and compares the error text you paste against documented dangling state messages. When a CNAME pattern and a matching dangling fingerprint line up, the slot is very likely claimable. When only one matches, the tool says so and tells you what to check next.</p>
+  <p>Because the matching is text against a built in list, the result is only as complete as that list. A clean result means nothing in the database matched, not that the subdomain is safe. New providers appear, error pages change, and some services only allow a takeover under narrow conditions. Treat a match as a lead to verify, the way an <a href="https://security.unboundcompute.com/ai-security-testing/" rel="noopener">AI security testing</a> approach reasons about a finding rather than trusting a single pattern.</p>
+
+  <h3>How to prevent and fix it</h3>
+  <p>The durable fix is to keep DNS and hosted assets in step. When you decommission an asset on a provider, delete the DNS record that points at it in the same change, not later. Audit your zones for records that resolve to third party hosts and confirm each one still maps to a resource you own and have verified. For platforms that support it, claim and verify the resource so no one else can register it under your name. Then monitor: watch for new dangling records and for provider error pages appearing on names that should be live. The broader practice of pinning what your domain trusts is the same instinct that drives the rest of <a href="https://security.unboundcompute.com/what-is-web-application-security/" rel="noopener">web application security</a>.</p>
+  <ul>
+    <li>Remove the dangling DNS record so the subdomain stops pointing at an unclaimed slot.</li>
+    <li>Or reclaim and verify the resource on the provider so it belongs to you again.</li>
+    <li>Tie DNS cleanup to the workflow that tears down any hosted asset.</li>
+    <li>Inventory every subdomain that points at a third party host and recheck it on a schedule.</li>
+  </ul>
+
+  <h2>Related reading</h2>
+  <div class="related">
+    <a href="https://security.unboundcompute.com/what-is-subdomain-takeover/"><span>Deep dive</span>What is subdomain takeover</a>
+    <a href="https://security.unboundcompute.com/what-is-web-application-security/"><span>Guide</span>What is web application security</a>
+    <a href="https://security.unboundcompute.com/web-security-glossary/"><span>Reference</span>Web security glossary</a>
+    <a href="https://security.unboundcompute.com/ai-security-testing/"><span>Guide</span>AI security testing</a>
+  </div>
+
+  <h2>More free tools</h2>
+  <div class="related">
+    <a href="https://unboundcompute.com/tools/security-headers-analyzer.html"><span>Free tool</span>Security Headers and CSP Analyzer</a>
+    <a href="https://unboundcompute.com/tools/cors-misconfiguration-checker.html"><span>Free tool</span>CORS Misconfiguration Checker</a>
+    <a href="https://unboundcompute.com/tools/cookie-security-auditor.html"><span>Free tool</span>Cookie Security Auditor</a>
+      <a href="https://unboundcompute.com/tools/"><span>All tools</span>Free security tools hub</a>
+  </div>
+</div>
+
+<footer><div class="wrap">
+  <div>Built by <a href="https://unboundcompute.com/">UnboundCompute</a>, autonomous security research for web apps and APIs.</div>
+  <div><a href="https://unboundcompute.com/#cta">Request access</a></div>
+</div></footer>
+
+<script>
+(function(){
+  "use strict";
+  var $ = function(s){ return document.querySelector(s); };
+
+  function esc(s){ return String(s).replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];}); }
+
+  // Fingerprint database. Each service lists provider host patterns for the
+  // CNAME or ALIAS target, the documented response strings a dangling slot
+  // returns, a takeover status, a confidence note, and a remediation line.
+  //   status: "vulnerable"  resource can typically be claimed when dangling
+  //           "edge"        conditional or has been fixed, treat with care
+  //           "not-vulnerable" recognizable but not generally claimable
+  // cnamePatterns and bodyFingerprints are matched as case insensitive substrings.
+  var DB = [
+    { service:"GitHub Pages", status:"vulnerable",
+      cnamePatterns:[".github.io",".github.com"],
+      bodyFingerprints:["There isn't a GitHub Pages site here.","For root URLs (like http://example.com/) you must provide an index.html file"],
+      note:"A dangling Pages CNAME is generally claimable by adding the name to an attacker owned repository.",
+      fix:"Remove the CNAME record, or add the custom domain back to a repository you control." },
+
+    { service:"Amazon S3", status:"vulnerable",
+      cnamePatterns:[".s3.amazonaws.com",".s3-website",".s3.","s3.amazonaws.com"],
+      bodyFingerprints:["NoSuchBucket","The specified bucket does not exist"],
+      note:"A deleted bucket name can usually be re registered in the same region, reclaiming the slot.",
+      fix:"Delete the DNS record, or recreate the bucket under the same name in your own account." },
+
+    { service:"Heroku", status:"edge",
+      cnamePatterns:[".herokuapp.com",".herokudns.com",".herokussl.com"],
+      bodyFingerprints:["No such app","no-such-app","Heroku | No such app","There's nothing here, yet."],
+      note:"Often claimable, but Heroku has tightened custom domain handling, so confirm the app name is actually free before acting.",
+      fix:"Remove the dangling record, or add the domain back to a Heroku app you own." },
+
+    { service:"Shopify", status:"edge",
+      cnamePatterns:[".myshopify.com",".shopify.com"],
+      bodyFingerprints:["Sorry, this shop is currently unavailable","Only one step left!"],
+      note:"Conditional. Shopify requires domain verification for many takeovers, so this is not always claimable.",
+      fix:"Remove the record, or reconnect the domain to your Shopify store." },
+
+    { service:"Surge.sh", status:"vulnerable",
+      cnamePatterns:[".surge.sh"],
+      bodyFingerprints:["project not found"],
+      note:"An unclaimed Surge project name can typically be published to by anyone.",
+      fix:"Remove the CNAME, or publish to the project name from your own Surge account." },
+
+    { service:"Bitbucket", status:"vulnerable",
+      cnamePatterns:[".bitbucket.io"],
+      bodyFingerprints:["Repository not found","The page you have requested does not exist"],
+      note:"A dangling Bitbucket Pages name can usually be claimed via a matching repository.",
+      fix:"Remove the record, or recreate the repository that backs the custom domain." },
+
+    { service:"Ghost", status:"edge",
+      cnamePatterns:[".ghost.io"],
+      bodyFingerprints:["The thing you were looking for is no longer here, or never was"],
+      note:"Conditional on the publication name being available on Ghost Pro.",
+      fix:"Remove the record, or reconnect the domain to your Ghost publication." },
+
+    { service:"WP Engine", status:"vulnerable",
+      cnamePatterns:[".wpengine.com"],
+      bodyFingerprints:["The site you were looking for couldn't be found"],
+      note:"A dangling WP Engine install reference can be claimable when the install name is free.",
+      fix:"Remove the record, or map the domain to an install you control." },
+
+    { service:"Pantheon", status:"edge",
+      cnamePatterns:[".pantheonsite.io"],
+      bodyFingerprints:["The gods are wise, but do not know of the site which you seek.","404 error unknown site!"],
+      note:"Conditional. Pantheon binds domains to sites, so confirm the site slot is actually open.",
+      fix:"Remove the record, or attach the domain to a Pantheon site you own." },
+
+    { service:"Netlify", status:"edge",
+      cnamePatterns:[".netlify.app",".netlify.com"],
+      bodyFingerprints:["Not Found - Request ID","Not found - Request ID"],
+      note:"Conditional. Netlify guards many custom domains, so a generic Not Found is not on its own proof.",
+      fix:"Remove the record, or reconnect the domain to a Netlify site you own." },
+
+    { service:"Readme.io", status:"edge",
+      cnamePatterns:[".readme.io",".readme.com"],
+      bodyFingerprints:["Project doesnt exist... yet!"],
+      note:"Conditional on the project subdomain being available.",
+      fix:"Remove the record, or reclaim the project on Readme." },
+
+    { service:"Help Scout", status:"edge",
+      cnamePatterns:[".helpscoutdocs.com"],
+      bodyFingerprints:["No settings were found for this company:"],
+      note:"Conditional and historically patched, treat a match as a lead to verify.",
+      fix:"Remove the record, or reconnect the docs site to your Help Scout account." },
+
+    { service:"Statuspage", status:"edge",
+      cnamePatterns:[".statuspage.io"],
+      bodyFingerprints:["You are being redirected.","This page is not available"],
+      note:"Conditional. Statuspage custom domains are tied to an account, so verify availability.",
+      fix:"Remove the record, or attach the domain to your Statuspage page." },
+
+    { service:"Tilda", status:"edge",
+      cnamePatterns:[".tilda.ws"],
+      bodyFingerprints:["Please renew your subscription","Domain has been assigned"],
+      note:"Conditional on the Tilda project state, confirm before acting.",
+      fix:"Remove the record, or reconnect the domain to your Tilda project." },
+
+    { service:"Webflow", status:"edge",
+      cnamePatterns:[".webflow.io"],
+      bodyFingerprints:["The page you are looking for doesn't exist or has been moved."],
+      note:"Conditional. Webflow verifies custom domains, so this generic string is low confidence on its own.",
+      fix:"Remove the record, or reconnect the domain to your Webflow project." },
+
+    { service:"Zendesk", status:"edge",
+      cnamePatterns:[".zendesk.com"],
+      bodyFingerprints:["Help Center Closed","Sorry, We Couldn't Find That Page","this help center no longer exists"],
+      note:"Conditional and largely fixed by host mapping checks, treat as a lead.",
+      fix:"Remove the record, or reconnect the host mapping in Zendesk." },
+
+    { service:"Unbounce", status:"edge",
+      cnamePatterns:[".unbouncepages.com"],
+      bodyFingerprints:["The requested URL was not found on this server."],
+      note:"Conditional. The error string is generic, so confirm the page slot is open.",
+      fix:"Remove the record, or reconnect the domain to your Unbounce page." },
+
+    { service:"Fastly", status:"edge",
+      cnamePatterns:[".fastly.net"],
+      bodyFingerprints:["Fastly error: unknown domain","Please check that this domain has been added to a service"],
+      note:"Conditional. Fastly requires the domain on a service, which limits when this is claimable.",
+      fix:"Remove the record, or add the domain to a Fastly service you own." },
+
+    { service:"Amazon CloudFront", status:"edge",
+      cnamePatterns:[".cloudfront.net"],
+      bodyFingerprints:["The request could not be satisfied","ERROR: The request could not be satisfied"],
+      note:"Ambiguous. This error appears for many reasons and CloudFront alternate domain checks limit takeover, so this is low confidence.",
+      fix:"Remove the record, or add the alternate domain name to a distribution you own." },
+
+    { service:"Microsoft Azure", status:"edge",
+      cnamePatterns:[".azurewebsites.net",".cloudapp.net",".trafficmanager.net",".azureedge.net",".blob.core.windows.net"],
+      bodyFingerprints:["404 Web Site not found","Error 404 - Web app not found"],
+      note:"Conditional. Many Azure resource names can be re registered when freed, but some now require verification.",
+      fix:"Remove the record, or recreate the Azure resource under the same name in your subscription." },
+
+    { service:"Google Cloud Storage", status:"edge",
+      cnamePatterns:[".storage.googleapis.com","c.storage.googleapis.com"],
+      bodyFingerprints:["NoSuchBucket","The specified bucket does not exist."],
+      note:"Conditional. Bucket names are global, so a freed name may be claimable, but domain mapped buckets need verification.",
+      fix:"Remove the record, or recreate the bucket under the same name in your project." },
+
+    { service:"Tumblr", status:"edge",
+      cnamePatterns:[".tumblr.com","domains.tumblr.com"],
+      bodyFingerprints:["Whatever you were looking for doesn't currently exist at this address.","There's nothing here.","404 Blog is not found"],
+      note:"Conditional. Tumblr custom domain handling has changed, so confirm the blog name is free.",
+      fix:"Remove the record, or reconnect the domain to a Tumblr blog you own." },
+
+    { service:"WordPress.com", status:"not-vulnerable",
+      cnamePatterns:[".wordpress.com"],
+      bodyFingerprints:["Do you want to register","is no longer available"],
+      note:"Recognizable but generally not claimable, since WordPress.com maps custom domains to verified accounts.",
+      fix:"Remove the record if the site is gone, or reconnect the domain to your WordPress.com account." },
+
+    { service:"Generic 404 (unknown service)", status:"edge",
+      cnamePatterns:[],
+      bodyFingerprints:["<h1>Error 404</h1>","<h1>404 Not Found</h1>","404 Not Found"],
+      note:"Very low confidence. A bare 404 matches almost anything and is not evidence of a takeover by itself.",
+      fix:"Identify the provider from the CNAME target before drawing any conclusion." }
+  ];
+
+  var EXAMPLE = { cname:"myapp.github.io", body:"There isn't a GitHub Pages site here." };
+
+  function low(s){ return String(s||"").toLowerCase(); }
+
+  // Match the pasted CNAME and body against the database.
+  // Returns { cnameHits:[{svc,pattern}], bodyHits:[{svc,fingerprint}] }.
+  function matchAll(cname, body){
+    var c = low(cname.trim()), b = low(body);
+    var cnameHits = [], bodyHits = [];
+    DB.forEach(function(svc){
+      svc.cnamePatterns.forEach(function(p){
+        if (c && low(p) && c.indexOf(low(p)) !== -1) cnameHits.push({ svc:svc, pattern:p });
+      });
+      svc.bodyFingerprints.forEach(function(fp){
+        if (b && low(fp) && b.indexOf(low(fp)) !== -1) bodyHits.push({ svc:svc, fingerprint:fp });
+      });
+    });
+    return { cnameHits:cnameHits, bodyHits:bodyHits };
+  }
+
+  function statusWord(s){
+    return s==="vulnerable" ? "documented as claimable when dangling"
+         : s==="edge" ? "conditional or has been fixed"
+         : "recognizable but not generally claimable";
+  }
+
+  // Decide the verdict from the matches. Returns the data render() needs.
+  function analyze(cname, body){
+    var m = matchAll(cname, body);
+    var cnameHits = m.cnameHits, bodyHits = m.bodyHits;
+
+    // A "confirmed" pair: the same service matched by both CNAME and body,
+    // where the body fingerprint indicates a dangling state.
+    var paired = null;
+    cnameHits.forEach(function(ch){
+      bodyHits.forEach(function(bh){
+        if (!paired && bh.svc === ch.svc) paired = { svc:ch.svc, pattern:ch.pattern, fingerprint:bh.fingerprint };
+      });
+    });
+
+    var verdict, klass, summary, checks = [];
+
+    if (paired){
+      var claimable = paired.svc.status === "vulnerable";
+      verdict = claimable ? "Likely claimable" : "Service identified";
+      klass = claimable ? "fail" : "warn";
+      summary = "Both the CNAME and the error page match " + paired.svc.service + ".";
+      checks.push({
+        s: claimable ? "fail" : "warn",
+        h: paired.svc.service + ": CNAME and fingerprint both match",
+        f: "The target you pasted points at " + paired.svc.service + " and the error text matches a known dangling state for it. This pairing is the classic signature of a claimable slot.",
+        subs: [
+          "Matched CNAME pattern: <code>" + esc(paired.pattern) + "</code>",
+          "Matched body fingerprint: <code>" + esc(paired.fingerprint) + "</code>",
+          "Documented status: <b>" + esc(statusWord(paired.svc.status)) + "</b>",
+          "Confidence note: " + esc(paired.svc.note)
+        ],
+        why: claimable
+          ? "When the slot for this provider is dangling and unclaimed, an attacker can usually register it and serve content on your subdomain."
+          : "This provider only allows a takeover under specific conditions, so confirm the resource is actually free before treating it as claimable.",
+        fix: paired.svc.fix,
+        link:"https://security.unboundcompute.com/what-is-subdomain-takeover/", linkText:"What is subdomain takeover"
+      });
+    } else if (cnameHits.length){
+      verdict = "Service identified";
+      klass = "warn";
+      var names = uniqueNames(cnameHits.map(function(h){ return h.svc.service; }));
+      summary = "The CNAME points at a third party service (" + names.join(", ") + "), but no dangling fingerprint matched.";
+      cnameHits.forEach(function(h){
+        checks.push({
+          s:"warn",
+          h: h.svc.service + ": third party service in use",
+          f: "The target points at " + h.svc.service + ". A takeover is only possible if the underlying resource is unclaimed. Right now the error text you pasted did not match a known dangling state for this provider.",
+          subs: [
+            "Matched CNAME pattern: <code>" + esc(h.pattern) + "</code>",
+            "Documented status: <b>" + esc(statusWord(h.svc.status)) + "</b>",
+            "Confidence note: " + esc(h.svc.note)
+          ],
+          why:"Check whether the slot on " + h.svc.service + " is still owned by you. Visit the subdomain and compare the page against this provider's dangling message, then confirm whether the resource can be re registered.",
+          fix: h.svc.fix
+        });
+      });
+    } else if (bodyHits.length){
+      verdict = "Service identified";
+      klass = "info";
+      var bnames = uniqueNames(bodyHits.map(function(h){ return h.svc.service; }));
+      summary = "An error fingerprint matched (" + bnames.join(", ") + "), but no CNAME was given to confirm.";
+      bodyHits.forEach(function(h){
+        checks.push({
+          s:"info",
+          h: h.svc.service + ": error fingerprint matched",
+          f: "The error text resembles a known dangling page for " + h.svc.service + ". Paste the CNAME or ALIAS target the subdomain points at to confirm the provider.",
+          subs: [
+            "Matched body fingerprint: <code>" + esc(h.fingerprint) + "</code>",
+            "Documented status: <b>" + esc(statusWord(h.svc.status)) + "</b>",
+            "Confidence note: " + esc(h.svc.note)
+          ],
+          why:"A fingerprint on its own can be coincidental. Confirming the CNAME target ties the error to a specific provider slot.",
+          fix: h.svc.fix
+        });
+      });
+    } else {
+      verdict = "No fingerprint match";
+      klass = "info";
+      summary = "Nothing you pasted matched the built in fingerprint list.";
+      checks.push({
+        s:"info",
+        h:"No fingerprint matched",
+        f:"Neither the CNAME nor the error text matched anything in this database. That is not proof the subdomain is safe.",
+        why:"This list is not exhaustive. New providers appear, error pages change, and many takeovers depend on conditions a text match cannot see. Confirm the subdomain by checking whether the resource it points at is actually owned and claimed.",
+        fix:"Inventory every subdomain that points at a third party host and verify each one maps to a resource you control."
+      });
+    }
+
+    return { verdict:verdict, klass:klass, summary:summary, checks:checks };
+  }
+
+  function uniqueNames(arr){
+    var seen = {}, out = [];
+    arr.forEach(function(n){ if (!seen[n]){ seen[n]=1; out.push(n); } });
+    return out;
+  }
+
+  function render(r){
+    var html = "";
+    html += '<div class="grade-card">';
+    html += '<div class="grade g-'+r.klass+'">'+esc(r.verdict)+'</div>';
+    html += '<div class="grade-meta"><h2>'+esc(r.verdict)+'</h2>';
+    html += '<p>'+esc(r.summary)+' This is a fingerprint match on the data you pasted. It does not contact your domain. Confirm any finding before you act.</p>';
+    html += '</div></div>';
+
+    html += '<div class="checks">';
+    r.checks.forEach(function(c){
+      var sym = c.s==="pass"?"&#10003;":c.s==="warn"?"!":c.s==="fail"?"&#10007;":"i";
+      html += '<div class="check"><div class="top"><span class="dot '+c.s+'">'+sym+'</span><div style="flex:1">';
+      html += '<h3>'+esc(c.h)+'</h3>';
+      html += '<div class="finding">'+esc(c.f)+'</div>';
+      if (c.subs && c.subs.length){
+        html += '<div class="sub">';
+        c.subs.forEach(function(s){ html += '<div>'+s+'</div>'; });   // subs may contain markup
+        html += '</div>';
+      }
+      if (c.why) html += '<div class="why">'+esc(c.why)+'</div>';
+      if (c.fix) html += '<div class="fix">'+esc(c.fix)+'</div>';
+      if (c.link) html += '<div class="more"><a href="'+c.link+'" rel="noopener">'+esc(c.linkText||"Learn more")+' &rarr;</a></div>';
+      html += '</div></div></div>';
+    });
+    html += '</div>';
+    return html;
+  }
+
+  function run(){
+    var cname = $("#cname").value, body = $("#body").value;
+    if (!cname.trim() && !body.trim()){
+      $("#results").innerHTML = '<div class="empty">Paste a CNAME target, an error page, or both to begin.</div>';
+      return;
+    }
+    var r = analyze(cname, body);
+    $("#results").innerHTML = render(r);
+    $("#results").scrollIntoView({ behavior:"smooth", block:"start" });
+  }
+
+  $("#analyze").addEventListener("click", run);
+  $("#example").addEventListener("click", function(){ $("#cname").value = EXAMPLE.cname; $("#body").value = EXAMPLE.body; run(); });
+  $("#clear").addEventListener("click", function(){ $("#cname").value=""; $("#body").value=""; $("#results").innerHTML='<div class="empty">Your fingerprint findings will appear here.</div>'; $("#cname").focus(); });
+  $("#cname").addEventListener("keydown", function(e){ if ((e.metaKey||e.ctrlKey) && e.key==="Enter") run(); });
+  $("#body").addEventListener("keydown", function(e){ if ((e.metaKey||e.ctrlKey) && e.key==="Enter") run(); });
+
+  // Expose internals for headless testing without affecting the page.
+  if (typeof window !== "undefined"){ window.__STC__ = { DB:DB, matchAll:matchAll, analyze:analyze, EXAMPLE:EXAMPLE }; }
+})();
+</script>
+</body>
+</html>

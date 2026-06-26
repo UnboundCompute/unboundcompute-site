@@ -1,0 +1,39 @@
+/* UnboundCompute — design tokens
+   Grounded in the anti-AI-slop principles distilled from XBOW, Oxide, Fly, Resend, Basecamp:
+   one accent, monochrome base, one opinionated type voice, restraint over decoration. */
+:root {
+  /* surface — true neutral near-black, not "techy" blue-black */
+  --bg: #0a0a0b;
+  --bg-2: #070708;
+  --panel: #0e0e10;
+  --panel-2: #131315;
+
+  /* ink — warm bone, high contrast for headlines */
+  --ink: #f4f2ec;
+  --ink-hi: #fbf9f3;
+  --ink-soft: #9b988f;
+  --ink-faint: #5e5b54;
+  --line: rgba(244,242,236,0.13);
+  --line-2: rgba(244,242,236,0.07);
+
+  /* the ONE accent — breach red. used with intent, never as decoration */
+  --accent: #fb5b46;
+  --accent-2: #ff7d6b;
+  --accent-wash: rgba(251,91,70,0.12);
+  --hold: #8f8b80;   /* neutral: a boundary that held */
+
+  /* type voices — serif display, mono structure, sans body */
+  --serif: 'Newsreader', Georgia, serif;
+  --mono: 'JetBrains Mono', ui-monospace, monospace;
+  --sans: 'Inter', system-ui, sans-serif;
+
+  /* type scale */
+  --t-display: clamp(46px, 6.5vw, 88px);
+  --t-h2: clamp(34px, 5vw, 58px);
+  --t-h3: 26px;
+  --t-body: 16px;
+  --t-label: 12px;
+
+  --radius: 16px;
+  --maxw: 1180px;
+}

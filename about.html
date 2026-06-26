@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>About | UnboundCompute</title>
+<meta name="description" content="UnboundCompute builds an autonomous security researcher that reasons about your application, crosses the boundaries that should hold, and proves every finding.">
+<meta name="theme-color" content="#0a0a0b">
+<link rel="canonical" href="https://unboundcompute.com/about.html">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a0a0b'/%3E%3Cline x1='16' y1='4' x2='16' y2='28' stroke='%23fb5b46' stroke-width='2' stroke-dasharray='3 3'/%3E%3Ccircle cx='16' cy='16' r='3.4' fill='%23fb5b46'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600&family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,300;1,6..72,400&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0a0b;--bg-2:#070708;--panel:#0e0e10;--ink:#f4f2ec;--ink-hi:#fbf9f3;--ink-soft:#9b988f;--ink-faint:#5e5b54;--line:rgba(244,242,236,.13);--line-2:rgba(244,242,236,.07);--accent:#fb5b46;--accent-line:rgba(251,91,70,.42);--accent-wash:rgba(251,91,70,.12);--on-accent:#1a0c09;--serif:'Newsreader',Georgia,serif;--mono:'JetBrains Mono',ui-monospace,monospace;--sans:'Inter',system-ui,sans-serif;--maxw:880px}
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;line-height:1.62}
+  ::selection{background:var(--accent);color:var(--on-accent)}
+  a{color:inherit;text-decoration:none}
+  nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);background:rgba(10,10,11,.72);border-bottom:1px solid var(--line-2)}
+  .nav-in{max-width:1180px;margin:0 auto;height:66px;padding:0 32px;display:flex;align-items:center;justify-content:space-between}
+  .brand{display:flex;align-items:center;gap:11px;font-family:var(--mono);font-weight:600;font-size:15px}
+  .brand span{width:27px;height:27px;border-radius:7px;border:1px solid var(--accent-line);display:grid;place-items:center}
+  .back{font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);transition:color .15s}
+  .back:hover{color:var(--ink)}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 32px}
+  .head{padding:84px 0 56px;border-bottom:1px solid var(--line)}
+  .eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:24px}
+  h1{font-family:var(--serif);font-weight:300;font-size:clamp(40px,6vw,66px);line-height:1.0;letter-spacing:-.03em;color:var(--ink-hi)}
+  h1 em{font-style:italic;color:var(--accent)}
+  .lede{font-size:19px;color:var(--ink-soft);max-width:54ch;margin-top:26px;line-height:1.55}
+  .body{padding:64px 0 96px}
+  .body h2{font-family:var(--serif);font-weight:400;font-size:28px;letter-spacing:-.015em;color:var(--ink-hi);margin:48px 0 16px}
+  .body h2:first-child{margin-top:0}
+  .body p{font-size:17px;color:var(--ink-soft);max-width:64ch;margin-bottom:18px}
+  .body p b,.body p strong{color:var(--ink);font-weight:600}
+  .body em{font-style:normal;color:var(--accent)}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin:30px 0}
+  @media(max-width:640px){.grid{grid-template-columns:1fr}}
+  .pr{border-top:1px solid var(--line);padding-top:22px}
+  .pr .n{font-family:var(--mono);font-size:11px;color:var(--accent);letter-spacing:.1em;display:block;margin-bottom:12px}
+  .pr h3{font-family:var(--serif);font-weight:500;font-size:20px;color:var(--ink-hi);margin-bottom:8px}
+  .pr p{font-size:15px;line-height:1.55;margin:0}
+  .contact{margin-top:44px;border:1px solid var(--line);border-radius:13px;background:var(--panel);padding:30px 28px}
+  .contact p{margin:0 0 14px}
+  .cta-link{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:13px 22px;border-radius:9px;background:var(--accent);color:var(--on-accent)}
+  .uc-word-wrap{position:absolute;left:0;right:0;bottom:0;z-index:0;overflow:hidden;pointer-events:none}
+  .uc-word{display:block;max-width:1180px;margin:0 auto -.16em;padding:0 32px;font-family:var(--serif);font-weight:400;font-size:clamp(42px,11.05vw,130px);line-height:1;letter-spacing:-.015em;color:var(--ink-faint);opacity:.28;white-space:nowrap;user-select:none}
+  .uc-word .b{color:var(--ink-soft)}
+  .uc-word .d{color:var(--accent);font-style:italic;opacity:.82}
+  footer{border-top:1px solid var(--line);position:relative;overflow:hidden}
+  .foot{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:30px 32px 100px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px;font-family:var(--mono);font-size:11px;color:var(--ink-faint)}
+  .foot a{color:var(--ink-faint);transition:color .15s}.foot a:hover{color:var(--ink-soft)}
+  .foot .links{display:flex;gap:22px;flex-wrap:wrap}
+</style>
+</head>
+<body>
+  <nav><div class="nav-in">
+    <a class="brand" href="index.html"><span><svg viewBox="0 0 24 24" fill="none" style="width:15px;height:15px"><line x1="12" y1="3" x2="12" y2="21" stroke="var(--accent)" stroke-width="1.8" stroke-dasharray="2.6 2.6"/><circle cx="12" cy="12" r="3" fill="var(--accent)"/></svg></span>UnboundCompute</a>
+    <a class="back" href="index.html">&larr; Back to home</a>
+  </div></nav>
+
+  <header class="head"><div class="wrap">
+    <p class="eyebrow">Company / About</p>
+    <h1>We build the researcher,<br>not the <em>checklist.</em></h1>
+    <p class="lede">UnboundCompute is an autonomous security researcher for the software teams ship. It learns how an application is meant to behave, then puts the boundaries it trusts under real pressure.</p>
+  </div></header>
+
+  <main class="body"><div class="wrap">
+    <h2>Why we exist</h2>
+    <p>Most security tooling looks for patterns it already knows. Scanners fire a fixed list of payloads, and a yearly pentest is a snapshot that ages the moment it ends. Meanwhile the bugs that actually hurt are rarely a missing input filter. They are a <em>line the application assumes will hold</em>, and you have to understand the application to know where that line is.</p>
+    <p>We started UnboundCompute to close that gap with a system that reasons about <b>your</b> product the way a strong human researcher would, continuously, and proves what it finds instead of guessing.</p>
+
+    <h2>What we believe</h2>
+    <div class="grid">
+      <div class="pr"><span class="n">01</span><h3>Understanding beats signatures</h3><p>A finding worth your time comes from understanding features, roles, and trust boundaries, not from matching a template.</p></div>
+      <div class="pr"><span class="n">02</span><h3>Proof, or it does not ship</h3><p>Every reported crossing rests on a recorded request and a repeatable contradiction. If it cannot be proven, it is not a finding.</p></div>
+      <div class="pr"><span class="n">03</span><h3>Permission is the first rule</h3><p>Offensive work is only legitimate inside an authorized scope. That principle is built into how the product runs.</p></div>
+      <div class="pr"><span class="n">04</span><h3>Findings should outlive the report</h3><p>A confirmed crossing becomes a repeatable test, so a fix stays fixed instead of quietly regressing.</p></div>
+    </div>
+
+    <h2>Where we are</h2>
+    <p>UnboundCompute is in private access while we work with a small number of early teams. If that sounds like you, we would like to hear from you.</p>
+
+    <div class="contact">
+      <p>Request access, or just say hello.</p>
+      <a class="cta-link" href="index.html#cta">Request access &rarr;</a>
+    </div>
+  </div></main>
+
+  <footer>
+    <div class="uc-word-wrap" aria-hidden="true"><span class="uc-word"><span class="b">Unbound</span>Compute<span class="d">.</span></span></div>
+    <div class="foot">
+    <span>&copy; 2026 UnboundCompute</span>
+    <span class="links"><a href="about.html">About</a><a href="research.html">Research</a><a href="careers.html">Careers</a><a href="design-partners.html">Design partners</a><a href="tools/">Tools</a><a href="trust.html">Trust center</a><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a></span>
+  </div>
+  </footer>
+
+  <!-- Google Analytics 4 / Google Ads / Microsoft Clarity (deferred) -->
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){ dataLayer.push(arguments); }
+    (function () {
+      var loaded = false;
+      function loadAnalytics() {
+        if (loaded) return; loaded = true;
+        gtag('js', new Date());
+        gtag('config', 'G-XCEPB67XE6');
+        gtag('config', 'AW-16469698408');
+        var g = document.createElement('script');
+        g.src = 'https://www.googletagmanager.com/gtag/js?id=G-XCEPB67XE6';
+        g.async = true;
+        document.head.appendChild(g);
+        (function (c, l, a, r, i, t, y) {
+          c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments) };
+          t = l.createElement(r); t.async = 1; t.src = "https://www.clarity.ms/tag/" + i;
+          y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
+        })(window, document, "clarity", "script", "vlzp6fvarw");
+      }
+      if ('requestIdleCallback' in window) requestIdleCallback(loadAnalytics, { timeout: 3000 });
+      else setTimeout(loadAnalytics, 2000);
+    })();
+  </script>
+</body>
+</html>

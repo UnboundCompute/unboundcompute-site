@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Primary SEO -->
+<title>UnboundCompute | Autonomous Security Research for Web Apps and APIs</title>
+<meta name="description" content="UnboundCompute is an autonomous security researcher for the software you ship. It learns the boundaries your product trusts, crosses the ones that should not hold, and proves every finding with hard evidence." />
+<meta name="keywords" content="autonomous security, AI security research, AI penetration testing, web application security, API security, trust boundary, broken access control, offensive security, autonomous pentest" />
+<meta name="robots" content="index, follow" />
+<meta name="author" content="UnboundCompute" />
+<meta name="theme-color" content="#0a0a0b" />
+<link rel="canonical" href="https://unboundcompute.com/" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a0a0b'/%3E%3Cline x1='16' y1='4' x2='16' y2='28' stroke='%23fb5b46' stroke-width='2' stroke-dasharray='3 3'/%3E%3Ccircle cx='16' cy='16' r='3.4' fill='%23fb5b46'/%3E%3C/svg%3E" />
+
+<!-- Open Graph -->
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="UnboundCompute" />
+<meta property="og:title" content="UnboundCompute | Autonomous Security Research for Web Apps and APIs" />
+<meta property="og:description" content="An autonomous security researcher that learns the boundaries your product trusts, crosses the ones that should not hold, and proves every finding with hard evidence." />
+<meta property="og:url" content="https://unboundcompute.com/" />
+<meta property="og:image" content="https://unboundcompute.com/og.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="UnboundCompute | Autonomous Security Research" />
+<meta name="twitter:description" content="An autonomous security researcher for web apps and APIs. It crosses the line your app trusts, then proves it with hard evidence." />
+<meta name="twitter:image" content="https://unboundcompute.com/og.png" />
+
+<!-- Structured data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "name": "UnboundCompute",
+      "url": "https://unboundcompute.com/",
+      "description": "Autonomous security research for web apps and APIs."
+    },
+    {
+      "@type": "SoftwareApplication",
+      "name": "UnboundCompute",
+      "applicationCategory": "SecurityApplication",
+      "operatingSystem": "Web",
+      "url": "https://unboundcompute.com/",
+      "description": "An autonomous security researcher for the software you ship. It learns the boundaries your product trusts, crosses the ones that should not hold, and proves every finding with hard evidence."
+    }
+  ]
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600&family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,300;1,6..72,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0a0b; --bg-2:#070708; --panel:#0e0e10; --panel-2:#131315;
+    --ink:#f4f2ec; --ink-hi:#fbf9f3; --ink-soft:#9b988f; --ink-faint:#5e5b54;
+    --line:rgba(244,242,236,.13); --line-2:rgba(244,242,236,.07);
+    --accent:#fb5b46; --accent-2:#ff7d6b; --accent-wash:rgba(251,91,70,.12); --on-accent:#1a0c09; --accent-line:rgba(251,91,70,.42);
+    --hold:#8f8b80;
+    --serif:'Newsreader',Georgia,serif; --mono:'JetBrains Mono',ui-monospace,monospace; --sans:'Inter',system-ui,sans-serif;
+    --maxw:1180px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;overflow-x:hidden}
+  ::selection{background:var(--accent);color:var(--on-accent)}
+  a{color:inherit;text-decoration:none}
+  .uc-grain{position:fixed;inset:0;z-index:9000;pointer-events:none;mix-blend-mode:soft-light;opacity:.4;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+  /* waitlist form */
+  #waitlist-form{display:flex;gap:10px;max-width:470px;margin:0 auto;flex-wrap:wrap;justify-content:center}
+  #wl-email{flex:1;min-width:240px;background:rgba(244,242,236,.04);border:1px solid var(--line);border-radius:9px;padding:15px 16px;color:var(--ink);font-size:15px;font-family:var(--sans);outline:none;transition:border-color .2s,box-shadow .2s}
+  #wl-email:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-wash)}
+  #wl-email::placeholder{color:var(--ink-faint)}
+  #wl-submit{font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:15px 26px;border-radius:9px;background:var(--accent);color:var(--on-accent);border:none;cursor:pointer;transition:filter .15s}
+  #wl-submit:hover{filter:brightness(1.08)}
+  #wl-submit:disabled{opacity:.7;cursor:default}
+  #wl-msg{margin-top:16px;font-family:var(--mono);font-size:13px;min-height:18px;color:var(--ink-faint)}
+  #wl-msg.ok{color:var(--accent)}
+  #wl-msg.err{color:var(--accent-2)}
+  @media (max-width:520px){#waitlist-form{flex-direction:column}}
+
+  /* hero signature loop; base inline = resolved 'proven' state */
+  @keyframes uc-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.82)}}
+  [data-motion="off"] [data-anim]{animation:none!important}
+  @media (prefers-reduced-motion: reduce){[data-anim]{animation:none!important}}
+
+  .uc-word-wrap{position:absolute;left:0;right:0;bottom:0;z-index:0;overflow:hidden;pointer-events:none}
+  .uc-word{display:block;max-width:var(--maxw);margin:0 auto -.16em;padding:0 32px;font-family:var(--serif);font-weight:400;font-size:clamp(46px,11.05vw,132px);line-height:1;letter-spacing:-.015em;color:var(--ink-faint);opacity:.3;white-space:nowrap;user-select:none}
+  .uc-word .b{color:var(--ink-soft)}
+  .uc-word .d{color:var(--accent);font-style:italic;opacity:.85}
+  @media (max-width:900px){
+    header [style*="grid-template-columns:1.04fr"]{grid-template-columns:1fr!important;gap:48px!important}
+    section [style*="grid-template-columns:1fr 1fr"]{grid-template-columns:1fr!important}
+    section [style*="grid-template-columns:.92fr"]{grid-template-columns:1fr!important}
+    section [style*="grid-template-columns:repeat(3,1fr)"]{grid-template-columns:1fr 1fr!important}
+    footer [style*="grid-template-columns:1.4fr"]{grid-template-columns:1fr 1fr!important;gap:32px!important}
+  }
+  @media (max-width:560px){
+    section [style*="grid-template-columns:repeat(3,1fr)"]{grid-template-columns:1fr!important}
+    nav [style*="display:flex;gap:30px"] a:not([style*="background:var(--accent)"]){display:none}
+  }
+</style>
+</head>
+<body>
+
+<div data-uc-root style="position:relative">
+  <canvas data-uc-bg style="position:fixed;inset:0;width:100vw;height:100vh;z-index:0;pointer-events:none"></canvas>
+  <div class="uc-grain" data-grain-layer></div>
+
+  <div data-uc-content style="position:relative;z-index:1">
+  <!-- ===================== NAV ===================== -->
+  <nav style="position:sticky;top:0;z-index:8000;backdrop-filter:blur(14px);background:rgba(10,10,11,.72);border-bottom:1px solid var(--line-2)">
+    <div style="max-width:var(--maxw);margin:0 auto;height:66px;padding:0 32px;display:flex;align-items:center;justify-content:space-between">
+      <a href="#top" style="display:flex;align-items:center;gap:11px;font-family:var(--mono);font-weight:600;font-size:15px;letter-spacing:-.01em">
+        <span style="width:27px;height:27px;border-radius:7px;border:1px solid var(--accent-line);display:grid;place-items:center">
+          <svg viewBox="0 0 24 24" fill="none" style="width:15px;height:15px"><line x1="12" y1="3" x2="12" y2="21" stroke="var(--accent)" stroke-width="1.8" stroke-dasharray="2.6 2.6"/><circle cx="12" cy="12" r="3" fill="var(--accent)"/></svg>
+        </span>UnboundCompute</a>
+      <div style="display:flex;gap:30px;align-items:center;font-size:14px;color:var(--ink-soft)">
+        <a href="#capabilities" style="transition:color .15s" style-hover="color:var(--ink)">Capabilities</a>
+        <a href="#proof" style="transition:color .15s" style-hover="color:var(--ink)">Proof</a>
+        <a href="app.html" style="transition:color .15s" style-hover="color:var(--ink)">Demo</a>
+        <a href="tools/" style="transition:color .15s" style-hover="color:var(--ink)">Tools</a>
+        <a href="#cta" style="font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;background:var(--accent);color:var(--on-accent);padding:10px 17px;border-radius:8px;transition:filter .15s" style-hover="filter:brightness(1.08)">Request access</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ===================== HERO ===================== -->
+  <header id="top" style="position:relative;background-image:radial-gradient(1100px 720px at 86% -10%,var(--accent-wash),transparent 56%)">
+    <div style="max-width:var(--maxw);margin:0 auto;padding:84px 32px 88px;display:grid;grid-template-columns:1.04fr .96fr;gap:64px;align-items:center">
+      <div style="position:relative">
+        <svg viewBox="0 0 12 12" style="position:absolute;left:-14px;top:-30px;width:11px;height:11px;color:var(--ink-faint)"><path d="M6 0V12M0 6H12" stroke="currentColor" stroke-width="1"/></svg>
+        <p style="display:inline-flex;align-items:center;gap:10px;font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:26px">
+          <span data-anim style="width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px var(--accent);animation:uc-pulse 2.4s ease-in-out infinite"></span>
+          <span style="color:var(--ink-faint)">[</span> Autonomous offensive security <span style="color:var(--ink-faint)">]</span>
+        </p>
+        <h1 style="font-family:var(--serif);font-weight:400;font-size:clamp(46px,5.8vw,78px);line-height:.98;letter-spacing:-.03em;color:var(--ink-hi);margin-bottom:26px">Thinks like an<br><em style="font-style:italic;color:var(--accent)">attacker.</em><br>Proves like an <em style="font-style:italic;color:var(--ink-hi)">auditor.</em></h1>
+        <p style="font-size:18px;color:var(--ink-soft);max-width:45ch;line-height:1.58;margin-bottom:32px">An autonomous security researcher for the software you ship. It learns the boundaries your product trusts, crosses the ones that should not hold, and proves every finding with hard evidence.</p>
+        <div style="display:flex;gap:13px;margin-bottom:34px;flex-wrap:wrap">
+          <a href="#cta" style="font-family:var(--mono);font-size:12.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:14px 22px;border-radius:9px;background:var(--accent);color:var(--on-accent);transition:filter .15s" style-hover="filter:brightness(1.08)">Request access</a>
+          <a href="#proof" style="font-family:var(--mono);font-size:12.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:14px 22px;border-radius:9px;border:1px solid var(--line);color:var(--ink);transition:border-color .15s,background .15s" style-hover="border-color:var(--ink-soft);background:var(--panel)">See the proof</a>
+          <a href="app.html" style="font-family:var(--mono);font-size:12.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:14px 22px;border-radius:9px;border:1px solid var(--line);color:var(--ink);transition:border-color .15s,background .15s" style-hover="border-color:var(--ink-soft);background:var(--panel)">Explore the console</a>
+        </div>
+        <div style="display:flex;gap:26px;font-family:var(--mono);font-size:11.5px;color:var(--ink-faint);letter-spacing:.04em;border-top:1px solid var(--line-2);padding-top:18px;flex-wrap:wrap">
+          <span><span style="color:var(--ink-soft)">scope</span> &nbsp;your software</span>
+          <span><span style="color:var(--ink-soft)">mode</span> &nbsp;continuous</span>
+          <span><span style="color:var(--ink-soft)">output</span> &nbsp;proven findings</span>
+        </div>
+      </div>
+
+      <!-- live boundary panel -->
+      <div style="position:relative;border:1px solid var(--line);border-radius:14px;background:var(--panel);overflow:hidden;box-shadow:0 50px 120px -46px rgba(0,0,0,.94)">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:13px 16px;border-bottom:1px solid var(--line-2);font-family:var(--mono);font-size:11px">
+          <span style="color:var(--ink-soft)">app.example.com / refunds</span>
+          <span data-uc-status style="text-transform:uppercase;letter-spacing:.1em;font-size:10px;color:var(--ink-soft)">&#9675; probing</span>
+        </div>
+        <div style="position:relative;height:298px">
+          <canvas data-uc-hero style="position:absolute;inset:0;width:100%;height:100%"></canvas>
+          <div style="position:absolute;left:20px;top:18px;font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-soft);pointer-events:none">owner<span style="display:block;margin-top:6px;color:var(--ink-faint);text-transform:none;letter-spacing:0">refund &middot; allowed</span></div>
+          <div style="position:absolute;right:20px;top:18px;text-align:right;font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink);pointer-events:none">another user<span style="display:block;margin-top:6px;color:var(--ink-faint);text-transform:none;letter-spacing:0">should be denied</span></div>
+        </div>
+        <div style="padding:14px 16px;border-top:1px solid var(--line-2);font-family:var(--mono);font-size:12px;color:var(--ink-soft)"><span style="color:var(--accent)">crosses it</span> &middot; refund issued for an order it does not own &middot; 200</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===================== PROBLEM ===================== -->
+  <section style="border-top:1px solid var(--line)">
+    <div style="max-width:var(--maxw);margin:0 auto;padding:96px 32px;display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:end">
+      <div>
+        <p style="font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:28px">01 / The gap</p>
+        <h2 style="font-family:var(--serif);font-weight:300;font-size:clamp(38px,5vw,60px);line-height:1.02;letter-spacing:-.025em;color:var(--ink-hi)">Boundaries fail<br><em style="font-style:italic;color:var(--accent)">silently.</em></h2>
+      </div>
+      <div style="padding-bottom:8px">
+        <p style="font-size:18px;color:var(--ink-soft);line-height:1.62;max-width:48ch">Scanners match payloads against a checklist. Pentests are a snapshot that ages the moment they end. Meanwhile your app ships new logic every day, and the boundaries that quietly stop trusting the wrong request are the ones nobody tests.</p>
+        <p style="font-size:18px;color:var(--ink);line-height:1.62;max-width:48ch;margin-top:18px">UnboundCompute reasons about <em style="font-style:normal;color:var(--accent)">your</em> application, not a generic list, so it finds the crossing that matters and shows you it is real.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PROOF ===================== -->
+  <section id="proof" style="border-top:1px solid var(--line)">
+    <div style="max-width:var(--maxw);margin:0 auto;padding:96px 32px;display:grid;grid-template-columns:.92fr 1.08fr;gap:60px;align-items:center">
+      <div style="position:relative">
+        <svg viewBox="0 0 12 12" style="position:absolute;left:-2px;top:-34px;width:11px;height:11px;color:var(--ink-faint)"><path d="M6 0V12M0 6H12" stroke="currentColor" stroke-width="1"/></svg>
+        <p style="font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:24px">02 / Evidence</p>
+        <h2 style="font-family:var(--serif);font-weight:300;font-size:clamp(38px,5vw,60px);line-height:1.0;letter-spacing:-.025em;color:var(--ink-hi);margin-bottom:22px">Every finding,<br><em style="font-style:italic;color:var(--accent)">proven.</em></h2>
+        <p style="font-size:17px;color:var(--ink-soft);line-height:1.6;max-width:42ch;margin-bottom:26px">No guessing at severity, no "likely exploitable." Each report is a recorded request, the response that should never have come back, and a replay your engineers can run themselves.</p>
+        <div style="display:flex;flex-direction:column;gap:14px;font-family:var(--mono);font-size:13px;color:var(--ink)">
+          <div style="display:flex;gap:12px;align-items:baseline"><span style="color:var(--accent)">&rarr;</span> Recorded request and response, verbatim</div>
+          <div style="display:flex;gap:12px;align-items:baseline"><span style="color:var(--accent)">&rarr;</span> Replayed against an authorized baseline</div>
+          <div style="display:flex;gap:12px;align-items:baseline"><span style="color:var(--accent)">&rarr;</span> Exported as a repeatable test for CI</div>
+        </div>
+      </div>
+      <!-- evidence sheet -->
+      <div style="border:1px solid var(--line);border-radius:12px;background:var(--panel);overflow:hidden;box-shadow:0 40px 100px -50px rgba(0,0,0,.9)">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:13px 16px;border-bottom:1px solid var(--line-2);font-family:var(--mono);font-size:11px;color:var(--ink-soft)"><span>finding &middot; UC-0428</span><span style="color:var(--accent);text-transform:uppercase;letter-spacing:.1em;font-size:9.5px">&#9679; broken access control</span></div>
+        <div style="padding:18px 16px;font-family:var(--mono);font-size:12.5px;line-height:1.85;color:var(--ink)">
+          <div style="color:var(--ink-faint)"># as another user, should be denied</div>
+          <div><span style="color:var(--accent)">POST</span> /api/orders/4471/refund</div>
+          <div style="color:var(--ink-soft)">authorization: Bearer &lt;user-b&gt;</div>
+          <div style="height:10px"></div>
+          <div style="color:var(--ink-faint)"># response</div>
+          <div><span style="background:var(--accent);color:var(--on-accent);padding:1px 7px;border-radius:4px;font-weight:600">200 OK</span> &nbsp;refund issued &middot; $1,200.00</div>
+          <div style="color:var(--ink-soft)">order.owner &ne; caller</div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:13px 16px;border-top:1px solid var(--line-2);font-family:var(--mono);font-size:11px;color:var(--ink-soft);flex-wrap:wrap;gap:8px"><span>baseline (owner): <span style="color:var(--ink)">200</span> &nbsp;&middot;&nbsp; this caller should: <span style="color:var(--accent)">403</span></span><span style="border:1px solid var(--accent-line);color:var(--accent);border-radius:5px;padding:4px 9px;text-transform:uppercase;letter-spacing:.08em;font-size:9.5px">replay &#8635;</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== CAPABILITIES ===================== -->
+  <section id="capabilities" style="border-top:1px solid var(--line)">
+    <div style="max-width:var(--maxw);margin:0 auto;padding:96px 32px">
+      <div style="display:flex;justify-content:space-between;align-items:end;margin-bottom:46px;flex-wrap:wrap;gap:16px">
+        <div>
+          <p style="font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:14px">03 / What it crosses</p>
+          <h2 style="font-family:var(--serif);font-weight:300;font-size:clamp(34px,4.4vw,52px);line-height:1.03;letter-spacing:-.025em;color:var(--ink-hi);max-width:20ch">The boundaries a checklist walks past.</h2>
+        </div>
+        <p style="font-family:var(--mono);font-size:12px;color:var(--ink-faint);max-width:26ch;line-height:1.6;text-align:right">Six classes it reasons through, not a signature it matches.</p>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px">
+        <div style="border:1px solid var(--line);border-radius:13px;background:var(--panel);padding:22px 20px;transition:border-color .18s,transform .18s" style-hover="border-color:var(--accent-line);transform:translateY(-3px)">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px"><span style="font-family:var(--mono);font-size:11.5px;color:var(--accent);letter-spacing:.06em">A01</span><span style="position:relative;display:inline-block;width:40px;height:22px"><span style="position:absolute;left:50%;top:0;bottom:0;width:1.5px;transform:translateX(-50%);background-image:repeating-linear-gradient(var(--accent) 0 4px,transparent 4px 8px);opacity:.8"></span><span style="position:absolute;top:50%;left:74%;width:8px;height:8px;border-radius:50%;transform:translate(-50%,-50%);background:var(--accent);box-shadow:0 0 0 3px var(--accent-wash)"></span></span></div>
+          <h3 style="font-size:17.5px;color:var(--ink-hi);margin-bottom:8px;font-weight:500">Broken access control</h3>
+          <p style="font-size:14px;color:var(--ink-soft);line-height:1.5">Acting as another tenant, owner, or role, and getting a 200 that proves it.</p>
+        </div>
+        <div style="border:1px solid var(--line);border-radius:13px;background:var(--panel);padding:22px 20px;transition:border-color .18s,transform .18s" style-hover="border-color:var(--accent-line);transform:translateY(-3px)">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px"><span style="font-family:var(--mono);font-size:11.5px;color:var(--accent);letter-spacing:.06em">A02</span><span style="position:relative;display:inline-block;width:40px;height:22px"><span style="position:absolute;left:50%;top:0;bottom:0;width:1.5px;transform:translateX(-50%);background-image:repeating-linear-gradient(var(--accent) 0 4px,transparent 4px 8px);opacity:.8"></span><span style="position:absolute;top:50%;left:74%;width:8px;height:8px;border-radius:50%;transform:translate(-50%,-50%);background:var(--accent);box-shadow:0 0 0 3px var(--accent-wash)"></span></span></div>
+          <h3 style="font-size:17.5px;color:var(--ink-hi);margin-bottom:8px;font-weight:500">Insecure object references</h3>
+          <p style="font-size:14px;color:var(--ink-soft);line-height:1.5">Walking identifiers to read or mutate records that belong to someone else.</p>
+        </div>
+        <div style="border:1px solid var(--line);border-radius:13px;background:var(--panel);padding:22px 20px;transition:border-color .18s,transform .18s" style-hover="border-color:var(--accent-line);transform:translateY(-3px)">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px"><span style="font-family:var(--mono);font-size:11.5px;color:var(--accent);letter-spacing:.06em">A03</span><span style="position:relative;display:inline-block;width:40px;height:22px"><span style="position:absolute;left:50%;top:0;bottom:0;width:1.5px;transform:translateX(-50%);background-image:repeating-linear-gradient(var(--accent) 0 4px,transparent 4px 8px);opacity:.8"></span><span style="position:absolute;top:50%;left:74%;width:8px;height:8px;border-radius:50%;transform:translate(-50%,-50%);background:var(--accent);box-shadow:0 0 0 3px var(--accent-wash)"></span></span></div>
+          <h3 style="font-size:17.5px;color:var(--ink-hi);margin-bottom:8px;font-weight:500">Business logic abuse</h3>
+          <p style="font-size:14px;color:var(--ink-soft);line-height:1.5">Refunds, discounts, quotas and workflows bent past what the rules intend.</p>
+        </div>
+        <div style="border:1px solid var(--line);border-radius:13px;background:var(--panel);padding:22px 20px;transition:border-color .18s,transform .18s" style-hover="border-color:var(--accent-line);transform:translateY(-3px)">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px"><span style="font-family:var(--mono);font-size:11.5px;color:var(--accent);letter-spacing:.06em">A04</span><span style="position:relative;display:inline-block;width:40px;height:22px"><span style="position:absolute;left:50%;top:0;bottom:0;width:1.5px;transform:translateX(-50%);background-image:repeating-linear-gradient(var(--accent) 0 4px,transparent 4px 8px);opacity:.8"></span><span style="position:absolute;top:50%;left:74%;width:8px;height:8px;border-radius:50%;transform:translate(-50%,-50%);background:var(--accent);box-shadow:0 0 0 3px var(--accent-wash)"></span></span></div>
+          <h3 style="font-size:17.5px;color:var(--ink-hi);margin-bottom:8px;font-weight:500">Auth and session bypass</h3>
+          <p style="font-size:14px;color:var(--ink-soft);line-height:1.5">Privilege escalation, token confusion, and flows that forget to check again.</p>
+        </div>
+        <div style="border:1px solid var(--line);border-radius:13px;background:var(--panel);padding:22px 20px;transition:border-color .18s,transform .18s" style-hover="border-color:var(--accent-line);transform:translateY(-3px)">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px"><span style="font-family:var(--mono);font-size:11.5px;color:var(--accent);letter-spacing:.06em">A05</span><span style="position:relative;display:inline-block;width:40px;height:22px"><span style="position:absolute;left:50%;top:0;bottom:0;width:1.5px;transform:translateX(-50%);background-image:repeating-linear-gradient(var(--accent) 0 4px,transparent 4px 8px);opacity:.8"></span><span style="position:absolute;top:50%;left:74%;width:8px;height:8px;border-radius:50%;transform:translate(-50%,-50%);background:var(--accent);box-shadow:0 0 0 3px var(--accent-wash)"></span></span></div>
+          <h3 style="font-size:17.5px;color:var(--ink-hi);margin-bottom:8px;font-weight:500">Server side request forgery</h3>
+          <p style="font-size:14px;color:var(--ink-soft);line-height:1.5">Coaxing the backend into reaching places the boundary assumed it could not.</p>
+        </div>
+        <div style="border:1px solid var(--line);border-radius:13px;background:var(--panel);padding:22px 20px;transition:border-color .18s,transform .18s" style-hover="border-color:var(--accent-line);transform:translateY(-3px)">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px"><span style="font-family:var(--mono);font-size:11.5px;color:var(--accent);letter-spacing:.06em">A06</span><span style="position:relative;display:inline-block;width:40px;height:22px"><span style="position:absolute;left:50%;top:0;bottom:0;width:1.5px;transform:translateX(-50%);background-image:repeating-linear-gradient(var(--accent) 0 4px,transparent 4px 8px);opacity:.8"></span><span style="position:absolute;top:50%;left:74%;width:8px;height:8px;border-radius:50%;transform:translate(-50%,-50%);background:var(--accent);box-shadow:0 0 0 3px var(--accent-wash)"></span></span></div>
+          <h3 style="font-size:17.5px;color:var(--ink-hi);margin-bottom:8px;font-weight:500">Privilege escalation</h3>
+          <p style="font-size:14px;color:var(--ink-soft);line-height:1.5">Climbing from a low-trust caller to actions only an admin should reach.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== DIFFERENTIATION ===================== -->
+  <section style="border-top:1px solid var(--line)">
+    <div style="max-width:var(--maxw);margin:0 auto;padding:100px 32px">
+      <p style="font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:14px">04 / Why it's different</p>
+      <h2 style="font-family:var(--serif);font-weight:300;font-size:clamp(40px,6vw,76px);line-height:.98;letter-spacing:-.03em;color:var(--ink-hi);margin-bottom:54px">Differentiation</h2>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:1px solid var(--line)">
+        <div style="padding:30px 26px 30px 0;border-right:1px solid var(--line)">
+          <p style="font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-faint);margin-bottom:18px">Scanners</p>
+          <p style="font-size:16px;color:var(--ink-soft);line-height:1.55">Match known payloads against a checklist. Loud, generic, and blind to logic that is unique to you. You triage the noise.</p>
+        </div>
+        <div style="padding:30px 26px;border-right:1px solid var(--line)">
+          <p style="font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-faint);margin-bottom:18px">Manual pentest</p>
+          <p style="font-size:16px;color:var(--ink-soft);line-height:1.55">Deep but a snapshot. Expensive, scheduled, and stale the day after it ends, while your app keeps shipping.</p>
+        </div>
+        <div style="padding:30px 0 30px 26px;background:linear-gradient(180deg,var(--accent-wash),transparent 64%)">
+          <p style="font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);margin-bottom:18px">UnboundCompute</p>
+          <p style="font-size:16px;color:var(--ink-hi);line-height:1.55">Reasons about your app continuously, crosses only the boundaries that should hold, and proves each one with replayable evidence.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== CTA ===================== -->
+  <section id="cta" style="border-top:1px solid var(--line);background-image:radial-gradient(900px 520px at 50% 120%,var(--accent-wash),transparent 60%);position:relative">
+    <div style="max-width:var(--maxw);margin:0 auto;padding:110px 32px;text-align:center;position:relative">
+      <div style="position:absolute;left:50%;top:0;bottom:0;width:2px;transform:translateX(-50%);background-image:repeating-linear-gradient(var(--accent) 0 6px,transparent 6px 13px);opacity:.5"></div>
+      <div style="position:relative">
+        <p style="font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:26px">Request access</p>
+        <h2 style="font-family:var(--serif);font-weight:300;font-size:clamp(40px,6vw,74px);line-height:.98;letter-spacing:-.03em;color:var(--ink-hi);margin-bottom:24px">Find the line.<br>Then watch it <em style="font-style:italic;color:var(--accent)">cross.</em></h2>
+        <p style="font-size:18px;color:var(--ink-soft);max-width:46ch;margin:0 auto 34px;line-height:1.55">UnboundCompute is in private access. Point it at a staging environment and see what it proves before your next release does.</p>
+        <form id="waitlist-form" novalidate>
+          <input id="wl-email" type="email" name="email" required placeholder="you@company.com" aria-label="Your work email" autocomplete="email">
+          <button id="wl-submit" type="submit">Request access</button>
+        </form>
+        <p id="wl-msg" role="status" aria-live="polite"></p>
+        <p style="margin-top:24px;font-family:var(--mono);font-size:12px;letter-spacing:.04em;color:var(--ink-faint)">or <a href="app.html" style="color:var(--ink-soft);border-bottom:1px solid var(--line)" style-hover="color:var(--ink)">explore the console demo</a> with sample data</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer style="border-top:1px solid var(--line);position:relative;overflow:hidden">
+    <div class="uc-word-wrap" aria-hidden="true"><span class="uc-word"><span class="b">Unbound</span>Compute<span class="d">.</span></span></div>
+    <div style="position:relative;z-index:1;max-width:var(--maxw);margin:0 auto;padding:56px 32px 34px;display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px;border-bottom:1px solid var(--line-2)">
+      <div>
+        <a href="#top" style="display:flex;align-items:center;gap:11px;font-family:var(--mono);font-weight:600;font-size:15px;margin-bottom:14px">
+          <span style="width:27px;height:27px;border-radius:7px;border:1px solid var(--accent-line);display:grid;place-items:center"><svg viewBox="0 0 24 24" fill="none" style="width:15px;height:15px"><line x1="12" y1="3" x2="12" y2="21" stroke="var(--accent)" stroke-width="1.8" stroke-dasharray="2.6 2.6"/><circle cx="12" cy="12" r="3" fill="var(--accent)"/></svg></span>UnboundCompute</a>
+        <p style="font-size:13px;color:var(--ink-faint);line-height:1.6;max-width:30ch">An autonomous security researcher that finds the line, crosses it, and proves it.</p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:11px;font-size:13.5px;color:var(--ink-soft)"><span style="font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-faint);margin-bottom:5px">Product</span><a href="#proof" style-hover="color:var(--ink)">Proof</a><a href="#capabilities" style-hover="color:var(--ink)">Capabilities</a><a href="design-partners.html" style-hover="color:var(--ink)">Design partners</a><a href="tools/" style-hover="color:var(--ink)">Tools</a><a href="#cta" style-hover="color:var(--ink)">Request access</a></div>
+      <div style="display:flex;flex-direction:column;gap:11px;font-size:13.5px;color:var(--ink-soft)"><span style="font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-faint);margin-bottom:5px">Company</span><a href="about.html" style-hover="color:var(--ink)">About</a><a href="research.html" style-hover="color:var(--ink)">Research</a><a href="careers.html" style-hover="color:var(--ink)">Careers</a></div>
+      <div style="display:flex;flex-direction:column;gap:11px;font-size:13.5px;color:var(--ink-soft)"><span style="font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-faint);margin-bottom:5px">Legal</span><a href="trust.html" style-hover="color:var(--ink)">Trust center</a><a href="privacy.html" style-hover="color:var(--ink)">Privacy</a><a href="terms.html" style-hover="color:var(--ink)">Terms</a></div>
+    </div>
+    <div style="position:relative;z-index:1;max-width:var(--maxw);margin:0 auto;padding:22px 32px 104px;display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--ink-faint);flex-wrap:wrap;gap:10px">
+      <span>&copy; 2026 UnboundCompute</span><span>the boundary held, until it didn't</span>
+    </div>
+  </footer>
+  </div>
+</div>
+
+<!-- hover handler (replaces the design framework's style-hover) -->
+<script>
+  (function(){
+    document.querySelectorAll('[style-hover]').forEach(function(el){
+      var base = el.getAttribute('style') || '';
+      var hov = el.getAttribute('style-hover');
+      el.addEventListener('mouseenter', function(){ el.setAttribute('style', base + ';' + hov); });
+      el.addEventListener('mouseleave', function(){ el.setAttribute('style', base); });
+    });
+  })();
+</script>
+
+<!-- boundary field background + animated hero signature -->
+<script>
+(function(){
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  class UC {
+    constructor(){ this._reduce = reduce; this.motion = !reduce; }
+    start(){ this.initBg(); this.initHero(); }
+
+    hexA(hex,a){ hex=(hex||'#fb5b46').trim().replace('#',''); if(hex.length===3) hex=hex.split('').map(x=>x+x).join(''); const n=parseInt(hex,16); return 'rgba('+((n>>16)&255)+','+((n>>8)&255)+','+(n&255)+','+a+')'; }
+    _accent(){ return (getComputedStyle(document.documentElement).getPropertyValue('--accent')||'#fb5b46'); }
+
+    initBg(){
+      const c = document.querySelector('[data-uc-bg]');
+      if(!c) return;
+      this._c = c; this._ctx = c.getContext('2d');
+      this._reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      this._bt = 0; this._scanY = 0; this._breaches = []; this._nextBreach = 2.5;
+      this._resize = () => {
+        const dpr = Math.min(window.devicePixelRatio||1, 2);
+        this._W = c.clientWidth; this._H = c.clientHeight;
+        c.width = this._W*dpr; c.height = this._H*dpr;
+        this._ctx.setTransform(dpr,0,0,dpr,0,0);
+        const gap = 168; this._cols = [];
+        for(let x=gap*0.5; x<this._W+gap; x+=gap) this._cols.push(x);
+        if(!this._bgOn) this._paintStatic();
+      };
+      window.addEventListener('resize', this._resize);
+      this._ready = true; this._resize();
+      this.bgMotion(this.motion);
+    }
+    _colX(bx,y,t){ return bx + Math.sin(y*0.0055 + t*0.45 + bx*0.015)*3.2; }
+    _paint(){
+      const ctx=this._ctx, W=this._W, H=this._H; if(!ctx||!W) return;
+      ctx.clearRect(0,0,W,H);
+      this._bt += 0.016; const t=this._bt, ac=(this._accent()||'#fb5b46').trim();
+      this._scanY += H*0.016/8.5; if(this._scanY>H+130) this._scanY=-130;
+      const sy=this._scanY;
+      const grad=ctx.createLinearGradient(0,sy-130,0,sy+130);
+      grad.addColorStop(0,'rgba(0,0,0,0)'); grad.addColorStop(0.5,this.hexA(ac,0.06)); grad.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=grad; ctx.fillRect(0,sy-130,W,260);
+      ctx.setLineDash([3,9]); ctx.lineWidth=1;
+      for(const bx of this._cols){
+        ctx.strokeStyle='rgba(244,242,236,0.085)';
+        ctx.beginPath();
+        for(let y=0;y<=H;y+=10){ const x=this._colX(bx,y,t); if(y===0) ctx.moveTo(x,y); else ctx.lineTo(x,y); }
+        ctx.stroke();
+        const nx=this._colX(bx,sy,t);
+        ctx.fillStyle=this.hexA(ac,0.13); ctx.beginPath(); ctx.arc(nx,sy,6,0,6.283); ctx.fill();
+        ctx.fillStyle=this.hexA(ac,0.5); ctx.beginPath(); ctx.arc(nx,sy,2.1,0,6.283); ctx.fill();
+      }
+      ctx.setLineDash([]);
+      this._nextBreach -= 0.016;
+      if(this._nextBreach<=0 && this._cols.length){ const bx=this._cols[Math.floor(Math.random()*this._cols.length)]; this._breaches.push({bx, y:60+Math.random()*(H-120), life:1.7, max:1.7}); this._nextBreach = 2.4+Math.random()*3.2; }
+      for(const b of this._breaches){
+        b.life -= 0.016; const a=Math.max(0,Math.min(1,Math.min(b.life,b.max-b.life)/0.32));
+        const x=this._colX(b.bx,b.y,t);
+        ctx.strokeStyle=this.hexA(ac,0.6*a); ctx.lineWidth=1.8; ctx.beginPath(); ctx.moveTo(x,b.y-15); ctx.lineTo(x,b.y+15); ctx.stroke();
+        ctx.fillStyle=this.hexA(ac,0.16*a); ctx.beginPath(); ctx.arc(x,b.y,9,0,6.283); ctx.fill();
+        ctx.fillStyle=this.hexA(ac,0.88*a); ctx.beginPath(); ctx.arc(x,b.y,2.4,0,6.283); ctx.fill();
+      }
+      this._breaches = this._breaches.filter(b=>b.life>0);
+    }
+    _paintStatic(){
+      const ctx=this._ctx, W=this._W, H=this._H; if(!ctx||!W) return;
+      ctx.clearRect(0,0,W,H);
+      ctx.setLineDash([3,9]); ctx.lineWidth=1; ctx.strokeStyle='rgba(244,242,236,0.085)';
+      for(const bx of (this._cols||[])){ ctx.beginPath(); for(let y=0;y<=H;y+=10){ const x=this._colX(bx,y,0); if(y===0)ctx.moveTo(x,y); else ctx.lineTo(x,y); } ctx.stroke(); }
+      ctx.setLineDash([]);
+    }
+    _loop(){ this._paint(); this._raf = requestAnimationFrame(()=>this._loop()); }
+    bgMotion(on){
+      if(!this._ready) return;
+      this._bgOn = on && !this._reduce;
+      if(this._bgOn){ if(!this._raf) this._loop(); }
+      else { if(this._raf){ cancelAnimationFrame(this._raf); this._raf=null; } this._paintStatic(); }
+    }
+    initHero(){
+      const cv = document.querySelector('[data-uc-hero]');
+      if(!cv) return;
+      this.hero = { cv, ctx: cv.getContext('2d'), W:0, Hh:0, t:0, last:0, pts:[], cut:-1, red:0, sparks:[], breach:null, line:'', lineT:0, statusKey:'' };
+      this._heroResize = () => {
+        const dpr = Math.min(window.devicePixelRatio||1, 2);
+        this.hero.W = cv.clientWidth; this.hero.Hh = cv.clientHeight;
+        cv.width = this.hero.W*dpr; cv.height = this.hero.Hh*dpr;
+        this.hero.ctx.setTransform(dpr,0,0,dpr,0,0);
+        this._heroInitPts();
+        if(!this._heroOn) this._heroRender();
+      };
+      window.addEventListener('resize', this._heroResize);
+      this._heroReady = true; this._heroResize();
+      this.heroMotion(this.motion);
+    }
+    _rr(ctx,x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+    _heroInitPts(){ const h=this.hero; const W=h.W,Hh=h.Hh; if(!W) return; const N=30, L=W*0.10, R=W*0.90, restY=Hh*0.42, dx=(R-L)/(N-1); h.pts=[]; for(let i=0;i<N;i++){ h.pts.push({x:L+i*dx, y:restY, vy:0, restY:restY}); } h.cut=-1; h.red=0; h.sparks=[]; h.breach=null; }
+    _heroDrive(t){
+      const N=(this.hero.pts&&this.hero.pts.length)||30;
+      const tri=(a,b,pk)=>{ if(t<a||t>b) return 0; const m=(a+b)/2; const u=t<m?(t-a)/(m-a):(b-t)/(b-m); return pk*(u*u*(3-2*u)); };
+      if(t>=0.3&&t<=2.4) return { idx:Math.round(N*0.34), amp:tri(0.3,2.4,34), breach:false };
+      if(t>=2.8&&t<=4.9) return { idx:Math.round(N*0.64), amp:tri(2.8,4.9,34), breach:false };
+      if(t>=6.4&&t<=8.4){ const amp=64*Math.max(0,Math.min(1,(t-6.4)/2.0)); return { idx:Math.round(N*0.5), amp, breach:true }; }
+      return null;
+    }
+    _heroPhase(t){
+      if(t<2.6) return { key:'A', badge:'○ probing', color:'var(--ink-soft)', line:'probing /orders/4471/refund as another user' };
+      if(t<5.0) return { key:'B', badge:'○ held', color:'var(--hold)', line:'boundary holds · 403 denied · expected' };
+      if(t<6.4) return { key:'R', badge:'○ reasoning', color:'var(--ink-soft)', line:'escalating · session swap · object-id walk …' };
+      if(t<7.85) return { key:'P', badge:'○ pressure', color:'var(--ink-soft)', line:'pressure rising · boundary straining …' };
+      if(t<9.2) return { key:'X', badge:'● crossed', color:'var(--accent)', line:'boundary ruptured · 200 OK · refund issued' };
+      return { key:'V', badge:'● proven', color:'var(--accent)', line:'broken access control · contradiction proven' };
+    }
+    _heroStep(dt){
+      const h=this.hero; if(!h.pts||!h.pts.length){ this._heroInitPts(); return; }
+      const LOOP=11; h.t+=dt; if(h.t>=LOOP){ h.t-=LOOP; this._heroInitPts(); h.statusKey=''; }
+      const pts=h.pts, N=pts.length;
+      const drv=this._heroDrive(h.t);
+      const drivenIdx=(drv && h.cut<0)?drv.idx:-1;
+      for(let i=1;i<N-1;i++){
+        if(i===drivenIdx) continue;
+        const p=pts[i]; let sum=0,c=0;
+        if(!(h.cut>=0 && i-1===h.cut)){ sum+=pts[i-1].y; c++; }
+        if(!(h.cut>=0 && i===h.cut)){ sum+=pts[i+1].y; c++; }
+        const navg=c?sum/c:p.restY;
+        const acc=(p.restY-p.y)*0.02 + (navg-p.y)*0.26;
+        p.vy=(p.vy+acc)*0.9; p.y+=p.vy;
+      }
+      if(drivenIdx>=0){
+        const dp=pts[drivenIdx]; dp.y=dp.restY-drv.amp; dp.vy=0;
+        if(drv.breach && drv.amp>=46 && h.cut<0){
+          h.cut=drivenIdx; h.red=1;
+          h.breach={ x:dp.x, y:dp.y, vy:-200, life:1.1 };
+          for(let k=0;k<22;k++){ const a=-Math.PI/2+(Math.random()-0.5)*1.9, s=70+Math.random()*160; h.sparks.push({x:dp.x,y:dp.y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:.6,max:.6}); }
+        }
+      }
+      if(h.cut>=0) h.red += (1-h.red)*Math.min(1,dt*8);
+      if(h.breach){ h.breach.y+=h.breach.vy*dt; h.breach.vy*=0.97; h.breach.life-=dt; if(h.breach.life<=0) h.breach=null; }
+      for(const s of h.sparks){ s.x+=s.vx*dt; s.y+=s.vy*dt; s.vx*=0.9; s.vy=s.vy*0.9+300*dt; s.life-=dt; }
+      h.sparks=h.sparks.filter(s=>s.life>0);
+      const ph=this._heroPhase(h.t);
+      if(ph.key!==h.statusKey){ h.statusKey=ph.key; const el=document.querySelector('[data-uc-status]'); if(el){ el.textContent=ph.badge; el.style.color=ph.color; } h.line=ph.line; h.lineT=h.t; }
+    }
+    _heroMemPath(ctx,a,b){ const pts=this.hero.pts; ctx.beginPath(); for(let i=a;i<=b;i++){ const p=pts[i]; if(i===a) ctx.moveTo(p.x,p.y); else ctx.lineTo(p.x,p.y); } ctx.stroke(); }
+    _heroStamp(ctx,label,col,cx,cy,fill,ac){ ctx.font='600 8.5px "JetBrains Mono", ui-monospace, monospace'; ctx.textBaseline='middle'; const bw=30; this._rr(ctx,cx-bw/2,cy-7.5,bw,15,3); if(fill){ ctx.fillStyle=col; ctx.fill(); ctx.fillStyle='#1a0c09'; } else { ctx.fillStyle='rgba(255,255,255,0.05)'; ctx.fill(); ctx.strokeStyle=col; ctx.lineWidth=1; this._rr(ctx,cx-bw/2,cy-7.5,bw,15,3); ctx.stroke(); ctx.fillStyle=col; } ctx.textAlign='center'; ctx.fillText(label,cx,cy+0.5); ctx.textAlign='start'; ctx.textBaseline='alphabetic'; }
+    _heroRender(){
+      const h=this.hero; if(!h) return; const ctx=h.ctx, W=h.W, Hh=h.Hh; if(!ctx||!W||!h.pts.length) return;
+      const ac=(this._accent()||'#fb5b46').trim(); const pts=h.pts, N=pts.length;
+      const restY=pts[0].restY, L=pts[0].x, R=pts[N-1].x, bxc=(L+R)/2;
+      ctx.clearRect(0,0,W,Hh); ctx.lineCap='round'; ctx.lineJoin='round';
+      ctx.setLineDash([2,7]); ctx.strokeStyle='rgba(244,242,236,0.07)'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(L,restY); ctx.lineTo(R,restY); ctx.stroke(); ctx.setLineDash([]);
+      const drv=this._heroDrive(h.t);
+      if(drv && h.cut<0 && drv.amp>1){ const dp=pts[drv.idx]; const f=Math.min(1,drv.amp/46); ctx.strokeStyle=this.hexA(ac,0.22+0.5*f); ctx.setLineDash([3,4]); ctx.lineWidth=1.2; ctx.beginPath(); ctx.moveTo(dp.x,Hh*0.84); ctx.lineTo(dp.x,dp.y+6); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle=this.hexA(ac,0.5+0.5*f); ctx.beginPath(); ctx.arc(dp.x,Hh*0.84,2.4,0,6.283); ctx.fill(); }
+      const drawMem=(col,w,glow)=>{ ctx.strokeStyle=col; ctx.lineWidth=w; if(glow){ctx.shadowColor=ac;ctx.shadowBlur=glow;} if(h.cut<0){ this._heroMemPath(ctx,0,N-1); } else { this._heroMemPath(ctx,0,h.cut); this._heroMemPath(ctx,h.cut+1,N-1); } ctx.shadowBlur=0; };
+      drawMem('rgba(143,139,128,'+(0.55*(1-h.red)+0.2)+')', 1.7, 0);
+      if(h.red>0.01) drawMem(this.hexA(ac,Math.min(1,h.red)), 2, 14*h.red);
+      ctx.fillStyle='rgba(244,242,236,0.5)'; ctx.beginPath(); ctx.arc(L,restY,2.2,0,6.283); ctx.fill(); ctx.beginPath(); ctx.arc(R,restY,2.2,0,6.283); ctx.fill();
+      ctx.save(); ctx.translate(bxc,restY); ctx.font='7.5px "JetBrains Mono", ui-monospace, monospace'; ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillStyle='#0e0e10'; this._rr(ctx,-46,-7,92,13,2); ctx.fill();
+      ctx.fillStyle=h.red>0.3?this.hexA(ac,0.9):'rgba(94,91,84,0.92)'; ctx.fillText('TRUST BOUNDARY',0,0.5); ctx.restore();
+      ctx.textAlign='start'; ctx.textBaseline='alphabetic';
+      h.sparks.forEach(s=>{ const a=Math.max(0,s.life/s.max); ctx.fillStyle=this.hexA(ac,a); ctx.beginPath(); ctx.arc(s.x,s.y,1.6*a+0.4,0,6.283); ctx.fill(); });
+      if(h.breach){ const b=h.breach; const a=Math.max(0,Math.min(1,b.life)); ctx.fillStyle=this.hexA(ac,0.18*a); ctx.beginPath(); ctx.arc(b.x,b.y,8,0,6.283); ctx.fill(); ctx.fillStyle=this.hexA(ac,a); ctx.beginPath(); ctx.arc(b.x,b.y,3.5,0,6.283); ctx.fill(); }
+      const ph=this._heroPhase(h.t);
+      if(ph.key==='B'){ const dp=pts[Math.round(N*0.64)]; this._heroStamp(ctx,'403','rgba(143,139,128,1)',dp.x,dp.y-15,false,ac); }
+      else if(ph.key==='X'||ph.key==='V'){ this._heroStamp(ctx,'200',this.hexA(ac,1),bxc,restY-18,true,ac); }
+      const mx=Math.min(R+18,W-9), mt=Hh*0.2, mb=Hh*0.7, mh=mb-mt;
+      ctx.lineCap='butt'; ctx.strokeStyle='rgba(244,242,236,0.12)'; ctx.lineWidth=3; ctx.beginPath(); ctx.moveTo(mx,mt); ctx.lineTo(mx,mb); ctx.stroke();
+      const frac=h.cut>=0?1:Math.min(1,(drv?drv.amp:0)/46);
+      ctx.strokeStyle=h.cut>=0?this.hexA(ac,0.95):this.hexA(ac,0.35+0.55*frac); ctx.beginPath(); ctx.moveTo(mx,mb); ctx.lineTo(mx,mb-mh*frac); ctx.stroke();
+      ctx.strokeStyle=this.hexA(ac,0.55); ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(mx-4,mt); ctx.lineTo(mx+4,mt); ctx.stroke();
+      ctx.lineCap='round';
+      const ly=Hh*0.92, lx=L-2; const txt=h.line||''; const rev=Math.floor(Math.max(0,Math.min(1,(h.t-(h.lineT||0))/0.55))*txt.length); const shown=txt.slice(0,rev);
+      ctx.font='10.5px "JetBrains Mono", ui-monospace, monospace'; ctx.textBaseline='alphabetic';
+      ctx.fillStyle=this.hexA(ac,0.9); ctx.fillText('›', lx, ly);
+      ctx.fillStyle=(ph.key==='X'||ph.key==='V')?this.hexA(ac,0.95):'rgba(155,152,143,0.92)'; ctx.fillText(shown, lx+12, ly);
+      if(rev<txt.length){ const w=ctx.measureText(shown).width; ctx.fillStyle=this.hexA(ac,0.8); ctx.fillRect(lx+12+w+1,ly-9,5,11); }
+    }
+    _heroLoop(now){ if(!this.hero) return; const dt=Math.min(0.05,(now-(this.hero.last||now))/1000); this.hero.last=now; this._heroStep(dt); this._heroRender(); this._heroRaf=requestAnimationFrame(t=>this._heroLoop(t)); }
+    _heroStatic(){ const h=this.hero; if(!h||!h.W) return; this._heroInitPts(); const N=h.pts.length; h.cut=Math.round(N/2); h.red=1; h.t=9.7; h.pts[h.cut].y-=5; h.pts[h.cut+1].y+=5; const ph=this._heroPhase(h.t); h.statusKey=ph.key; h.line=ph.line; h.lineT=9.0; const el=document.querySelector('[data-uc-status]'); if(el){ el.textContent=ph.badge; el.style.color=ph.color; } this._heroRender(); }
+    heroMotion(on){ if(!this._heroReady) return; this._heroOn = on && !this._reduce; if(this._heroOn){ if(!this._heroRaf){ this.hero.last=0; this._heroRaf=requestAnimationFrame(t=>this._heroLoop(t)); } } else { if(this._heroRaf){ cancelAnimationFrame(this._heroRaf); this._heroRaf=null; } this._heroStatic(); } }
+  }
+
+  new UC().start();
+})();
+</script>
+
+<!-- Firebase (waitlist) -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCTEvETNFtYDUdo_ZH3hge3qOwcp9U-WhU",
+    authDomain: "unboundcompute.firebaseapp.com",
+    projectId: "unboundcompute",
+    storageBucket: "unboundcompute.firebasestorage.app",
+    messagingSenderId: "1051550385244",
+    appId: "1:1051550385244:web:9899e66e3e8a20cdcc5299",
+    measurementId: "G-XCEPB67XE6"
+  };
+
+  try {
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    window.__submitWaitlist = async (email, source) => {
+      await addDoc(collection(db, "early_access"), {
+        email: email,
+        status: "pending",
+        created_at: serverTimestamp(),
+        source: "landing_page_v9",
+        cta: source || "cta",
+        ref: location.href,
+        ua: navigator.userAgent
+      });
+    };
+  } catch (e) {
+    console.error("Firebase init failed (did you paste your config?):", e);
+  }
+</script>
+
+<!-- Waitlist form handler -->
+<script>
+  (function () {
+    const form = document.getElementById('waitlist-form');
+    if (!form) return;
+    const email = document.getElementById('wl-email');
+    const msg = document.getElementById('wl-msg');
+    const btn = form.querySelector('button[type="submit"]');
+    const valid = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const val = (email.value || '').trim();
+      if (!valid(val)) {
+        msg.textContent = 'Please enter a valid email address.';
+        msg.className = 'err';
+        email.focus();
+        return;
+      }
+      const original = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = 'Sending…';
+      msg.textContent = '';
+      msg.className = '';
+      try {
+        if (typeof window.__submitWaitlist !== 'function') {
+          throw new Error('Waitlist backend not ready');
+        }
+        await window.__submitWaitlist(val, 'cta');
+        email.value = '';
+        btn.textContent = 'Requested ✓';
+        msg.textContent = "You're on the list, we'll be in touch.";
+        msg.className = 'ok';
+        if (typeof window.gtag === 'function') {
+          gtag('event', 'request_access', { method: 'landing_page' });
+          gtag('event', 'conversion', { send_to: 'AW-16469698408' });
+        }
+      } catch (err) {
+        console.error(err);
+        btn.disabled = false;
+        btn.textContent = original;
+        msg.textContent = 'Something went wrong. Please try again.';
+        msg.className = 'err';
+      }
+    });
+  })();
+</script>
+
+<!-- Google Analytics 4 / Google Ads / Microsoft Clarity (deferred) -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){ dataLayer.push(arguments); }
+  (function () {
+    var loaded = false;
+    function loadAnalytics() {
+      if (loaded) return; loaded = true;
+      gtag('js', new Date());
+      gtag('config', 'G-XCEPB67XE6');
+      gtag('config', 'AW-16469698408');
+      var g = document.createElement('script');
+      g.src = 'https://www.googletagmanager.com/gtag/js?id=G-XCEPB67XE6';
+      g.async = true;
+      document.head.appendChild(g);
+      (function (c, l, a, r, i, t, y) {
+        c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments) };
+        t = l.createElement(r); t.async = 1; t.src = "https://www.clarity.ms/tag/" + i;
+        y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
+      })(window, document, "clarity", "script", "vlzp6fvarw");
+    }
+    if ('requestIdleCallback' in window) requestIdleCallback(loadAnalytics, { timeout: 3000 });
+    else setTimeout(loadAnalytics, 2000);
+  })();
+</script>
+</body>
+</html>

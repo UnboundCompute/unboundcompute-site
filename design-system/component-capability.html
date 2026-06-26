@@ -1,0 +1,28 @@
+<!-- @dsCard group="Components" -->
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+<title>Editorial entries</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@450&family=JetBrains+Mono:wght@500&family=Newsreader:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0a0b;--ink:#f4f2ec;--ink-soft:#9b988f;--ink-faint:#5e5b54;--line:rgba(244,242,236,.13);--accent:#fb5b46;}
+  *{margin:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;padding:64px}
+  .kick{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+  h1{font-weight:600;font-size:22px;letter-spacing:-.02em;margin-bottom:8px}
+  .doc{font-size:13px;color:var(--ink-faint);margin-bottom:46px;max-width:560px;line-height:1.6}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);column-gap:60px;row-gap:54px;max-width:1040px}
+  .feat{border-top:1px solid var(--line);padding-top:26px}
+  .num{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent);letter-spacing:.1em;display:block;margin-bottom:16px}
+  .feat h3{font-family:'Newsreader',serif;font-weight:500;font-size:23px;letter-spacing:-.01em;margin-bottom:11px}
+  .feat p{color:var(--ink-soft);font-size:15px;line-height:1.6}
+</style></head>
+<body>
+  <p class="kick">Components</p>
+  <h1>Editorial entries</h1>
+  <p class="doc">Replaces the icon-card grid — the single most generated-looking pattern on the web. Numbered, borderless, serif-titled. Reads like an index, not a template.</p>
+  <div class="grid">
+    <div class="feat"><span class="num">01</span><h3>Thinks like a researcher</h3><p>It works from assumptions about your application, not a fixed list of vulnerability types, so it reaches the logic that scanners cannot.</p></div>
+    <div class="feat"><span class="num">02</span><h3>Verified, never guessed</h3><p>Every finding rests on repeatable evidence from a real request. No interpretation in the verdict, so almost nothing to triage.</p></div>
+    <div class="feat"><span class="num">03</span><h3>Findings become tests</h3><p>Each confirmed crossing is a repeatable proof. Wire it into your pipeline and every fix stays checked.</p></div>
+  </div>
+</body></html>

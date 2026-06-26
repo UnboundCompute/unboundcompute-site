@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Encoded Payload Deobfuscator | UnboundCompute</title>
+<meta name="description" content="Paste an obfuscated blob from a macro, phishing log, or suspicious script and peel back the layers: base64, PowerShell EncodedCommand UTF-16LE, gzip and deflate, hex, URL encoding, and char code arrays. Decodes and displays only, never executes. Runs fully in your browser." />
+<meta name="keywords" content="deobfuscator, base64 decoder, powershell encodedcommand decoder, gzip payload decoder, malware triage, incident response, decode obfuscated payload, layered decoder, hex decoder, url decode" />
+<meta name="robots" content="index, follow" />
+<meta name="author" content="UnboundCompute" />
+<meta name="theme-color" content="#0a0a0b" />
+<link rel="canonical" href="https://unboundcompute.com/tools/encoded-payload-deobfuscator.html" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a0a0b'/%3E%3Cline x1='16' y1='4' x2='16' y2='28' stroke='%23fb5b46' stroke-width='2' stroke-dasharray='3 3'/%3E%3Ccircle cx='16' cy='16' r='3.4' fill='%23fb5b46'/%3E%3C/svg%3E" />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="UnboundCompute" />
+<meta property="og:title" content="Encoded Payload Deobfuscator" />
+<meta property="og:description" content="Peel back the layers of an obfuscated payload: base64, PowerShell EncodedCommand, gzip, hex, URL encoding, and char codes. Decodes only, never executes. Runs fully in your browser." />
+<meta property="og:url" content="https://unboundcompute.com/tools/encoded-payload-deobfuscator.html" />
+<meta property="og:image" content="https://unboundcompute.com/og.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Encoded Payload Deobfuscator" />
+<meta name="twitter:description" content="Peel back the layers of an obfuscated payload for malware triage and incident response. Runs fully in your browser." />
+<meta name="twitter:image" content="https://unboundcompute.com/og.png" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "Encoded Payload Deobfuscator",
+      "applicationCategory": "SecurityApplication",
+      "operatingSystem": "Web",
+      "browserRequirements": "Requires JavaScript. Runs entirely client side.",
+      "url": "https://unboundcompute.com/tools/encoded-payload-deobfuscator.html",
+      "description": "A free tool that peels back the layers of an obfuscated payload for malware triage and incident response. It detects and decodes base64 and URL safe base64, the PowerShell EncodedCommand UTF-16LE shape, gzip and deflate, hex strings, URL percent encoding, and decimal char code arrays, applying each step repeatedly until the result stops changing. It decodes and displays only, and never executes decoded content. All decoding happens in the browser.",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "publisher": { "@type": "Organization", "name": "UnboundCompute", "url": "https://unboundcompute.com/" }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Does this deobfuscator run my payload?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No, and that is the whole point. The tool only decodes and displays the bytes of a payload. It never evaluates, runs, or fetches anything that the payload contains. There is no eval, no script injection, and no network call. You can safely look at what a hostile blob would have done without taking the risk of running it." }
+        },
+        {
+          "@type": "Question",
+          "name": "Is anything I paste sent to a server?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. Every decode step runs in your browser with JavaScript, including the gzip and deflate inflation, which uses the built in DecompressionStream in the browser rather than a remote service. The blob you paste is never uploaded, logged, or stored. That matters because a payload pulled from a real incident may itself be sensitive evidence." }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the PowerShell EncodedCommand layer?",
+          "acceptedAnswer": { "@type": "Answer", "text": "PowerShell can take a command as a base64 string through its EncodedCommand or enc flag. The catch is that the text inside is UTF-16LE, not UTF-8, so a naive base64 decode shows a string with a null byte between every character. This tool detects that pattern after a base64 step and decodes it as UTF-16LE, which is why a PowerShell encoded command comes out as clean readable text here." }
+        },
+        {
+          "@type": "Question",
+          "name": "Which layers can it peel back?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Standard and URL safe base64, UTF-16LE text after base64, gzip and zlib deflate, hex strings with or without spaces or with hex prefixes, URL percent encoding, decimal char code arrays, and unicode escapes. It applies these repeatedly, one layer at a time, until the output stops changing, so a payload wrapped several times unwinds to the readable core." }
+        },
+        {
+          "@type": "Question",
+          "name": "It stopped on a layer that still looks scrambled. Why?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Automatic peeling stops when no known transform applies or when a step would not change the result. Some payloads use a custom or single byte XOR layer that has no fixed signature, so the tool offers a single byte XOR hint you can run by hand rather than forcing a guess. You can also apply any single transform manually to take the next step yourself." }
+        }
+      ]
+    }
+  ]
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600&family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0a0b; --bg-2:#070708; --panel:#0e0e10; --panel-2:#131315;
+    --ink:#f4f2ec; --ink-hi:#fbf9f3; --ink-soft:#9b988f; --ink-faint:#5e5b54;
+    --line:rgba(244,242,236,.13); --line-2:rgba(244,242,236,.07);
+    --accent:#fb5b46; --accent-2:#ff7d6b; --accent-wash:rgba(251,91,70,.12); --on-accent:#1a0c09; --accent-line:rgba(251,91,70,.42);
+    --pass:#5fd6a4; --pass-wash:rgba(95,214,164,.1); --warn:#e8b04b; --warn-wash:rgba(232,176,75,.1); --fail:#fb5b46; --fail-wash:rgba(251,91,70,.1); --info:#7c93ff; --info-wash:rgba(124,147,255,.1);
+    --serif:'Newsreader',Georgia,serif; --mono:'JetBrains Mono',ui-monospace,monospace; --sans:'Inter',system-ui,sans-serif;
+    --maxw:920px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;line-height:1.6}
+  ::selection{background:var(--accent);color:var(--on-accent)}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+
+  nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);background:rgba(10,10,11,.72);border-bottom:1px solid var(--line-2)}
+  nav .wrap{height:64px;display:flex;align-items:center;justify-content:space-between}
+  nav a.brand{display:flex;align-items:center;gap:11px;font-family:var(--mono);font-weight:600;font-size:15px;color:var(--ink);letter-spacing:-.01em}
+  nav a.brand:hover{text-decoration:none}
+  nav .badge{width:27px;height:27px;border-radius:7px;border:1px solid var(--accent-line);display:grid;place-items:center}
+  nav a.cta{font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:9px 16px;border-radius:8px;background:var(--accent);color:var(--on-accent)}
+  nav a.cta:hover{filter:brightness(1.08);text-decoration:none}
+
+  header.hero{padding:64px 0 28px}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:18px}
+  h1{font-family:var(--serif);font-weight:400;font-size:clamp(32px,5vw,52px);line-height:1.08;letter-spacing:-.015em;color:var(--ink-hi)}
+  .lede{margin-top:18px;font-size:18px;color:var(--ink-soft);max-width:660px}
+  .privacy{margin-top:18px;display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);border:1px solid var(--line);border-radius:8px;padding:8px 13px;background:var(--panel)}
+  .privacy svg{width:14px;height:14px;flex:none}
+
+  .tool{margin:30px 0 12px;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px}
+  label.fld{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:10px}
+  textarea{width:100%;min-height:150px;resize:vertical;background:var(--bg-2);border:1px solid var(--line);border-radius:11px;padding:15px;color:var(--ink);font-family:var(--mono);font-size:13.5px;line-height:1.55;outline:none;transition:border-color .2s,box-shadow .2s;word-break:break-all}
+  textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-wash)}
+  textarea::placeholder{color:var(--ink-faint)}
+  .row{display:flex;gap:11px;flex-wrap:wrap;margin-top:14px;align-items:center}
+  button{font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;padding:13px 22px;border-radius:9px;cursor:pointer;border:1px solid var(--line);background:transparent;color:var(--ink);transition:filter .15s,border-color .15s,background .15s}
+  button.primary{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+  button.primary:hover{filter:brightness(1.08)}
+  button.ghost:hover{border-color:var(--accent-line);color:var(--ink-hi)}
+  .hint{font-family:var(--mono);font-size:12px;color:var(--ink-faint);margin-left:auto}
+
+  .manual{margin-top:14px;border-top:1px solid var(--line-2);padding-top:14px;display:flex;gap:11px;flex-wrap:wrap;align-items:center}
+  .manual label{font-family:var(--mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-faint)}
+  select{font-family:var(--mono);font-size:12.5px;background:var(--bg-2);border:1px solid var(--line);border-radius:8px;padding:10px 12px;color:var(--ink);outline:none}
+  select:focus{border-color:var(--accent)}
+
+  #results{margin-top:8px}
+  .grade-card{display:flex;align-items:center;gap:22px;background:var(--panel-2);border:1px solid var(--line);border-radius:16px;padding:22px 24px;margin:20px 0}
+  .grade{font-family:var(--serif);font-size:46px;line-height:1;width:96px;height:96px;border-radius:18px;display:grid;place-items:center;flex:none;border:1.5px solid;color:var(--accent);border-color:var(--accent-line);background:var(--accent-wash)}
+  .grade-meta h2{font-family:var(--serif);font-weight:400;font-size:24px;color:var(--ink-hi);margin-bottom:4px}
+  .grade-meta p{color:var(--ink-soft);font-size:14.5px}
+
+  .layers{display:flex;flex-direction:column;gap:11px}
+  .layer{border:1px solid var(--line);border-radius:13px;padding:16px 18px;background:var(--panel)}
+  .layer .top{display:flex;align-items:flex-start;gap:13px}
+  .dot{width:26px;height:26px;border-radius:7px;flex:none;display:grid;place-items:center;font-size:12px;font-weight:700;margin-top:1px;font-family:var(--mono);background:var(--accent-wash);color:var(--accent)}
+  .dot.final{background:var(--pass-wash);color:var(--pass)}
+  .layer h3{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--ink-hi);letter-spacing:-.01em}
+  .layer .tform{margin-top:3px;font-family:var(--mono);font-size:12px;color:var(--ink-soft)}
+  .layer pre{margin-top:11px;font-family:var(--mono);font-size:13px;line-height:1.55;color:var(--ink);white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere;background:var(--bg-2);border:1px solid var(--line-2);border-radius:9px;padding:12px 13px;max-height:340px;overflow:auto}
+  .layer .meta{margin-top:9px;font-family:var(--mono);font-size:11.5px;color:var(--ink-faint)}
+  .layer.is-final{border-color:var(--pass);background:var(--pass-wash)}
+  .badgeflag{display:inline-block;font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;padding:2px 8px;border-radius:99px;border:1px solid var(--line);color:var(--ink-soft);margin-left:8px;vertical-align:middle}
+  .badgeflag.final{border-color:var(--pass);color:var(--pass)}
+
+  .note{border:1px solid var(--line);border-radius:13px;padding:14px 18px;background:var(--panel);margin-top:11px;font-size:13.5px;color:var(--ink-soft)}
+  .note b{color:var(--ink)}
+  .note .why{margin-top:7px;font-size:13px;color:var(--ink-faint)}
+  .xorgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-top:11px}
+  .xorgrid .x{background:var(--bg-2);border:1px solid var(--line-2);border-radius:8px;padding:9px 10px;font-family:var(--mono);font-size:12px;color:var(--ink);word-break:break-all}
+  .xorgrid .x b{color:var(--accent)}
+  .empty{color:var(--ink-faint);font-family:var(--mono);font-size:13px;text-align:center;padding:30px}
+
+  .prose{padding:44px 0 20px}
+  .prose h2{font-family:var(--serif);font-weight:400;font-size:30px;color:var(--ink-hi);margin:36px 0 14px;letter-spacing:-.01em}
+  .prose h3{font-family:var(--mono);font-size:15px;color:var(--ink-hi);margin:24px 0 8px}
+  .prose p{color:var(--ink-soft);margin-bottom:14px;font-size:16px}
+  .prose ul{color:var(--ink-soft);margin:0 0 14px 20px;font-size:16px}
+  .prose li{margin-bottom:7px}
+  .prose code{font-family:var(--mono);font-size:13.5px;background:var(--panel-2);border:1px solid var(--line-2);border-radius:5px;padding:1px 6px;color:var(--ink)}
+  .related{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:8px}
+  .related a{display:block;border:1px solid var(--line);border-radius:11px;padding:14px 16px;color:var(--ink);font-size:14.5px;background:var(--panel)}
+  .related a:hover{border-color:var(--accent-line);text-decoration:none}
+  .related a span{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:5px}
+
+  footer{border-top:1px solid var(--line-2);margin-top:40px;padding:30px 0;color:var(--ink-faint);font-family:var(--mono);font-size:12.5px}
+  footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px}
+  footer a{color:var(--ink-soft)}
+  @media (max-width:560px){
+    .related{grid-template-columns:1fr}
+    .grade-card{flex-direction:column;align-items:flex-start;gap:16px}
+    .hint{margin-left:0;width:100%}
+  }
+</style>
+</head>
+<body>
+
+<nav><div class="wrap">
+  <a class="brand" href="https://unboundcompute.com/">
+    <span class="badge"><svg viewBox="0 0 24 24" fill="none" style="width:15px;height:15px"><line x1="12" y1="3" x2="12" y2="21" stroke="var(--accent)" stroke-width="1.8" stroke-dasharray="2.6 2.6"/><circle cx="12" cy="12" r="3" fill="var(--accent)"/></svg></span>
+    UnboundCompute
+  </a>
+  <a class="cta" href="https://unboundcompute.com/#cta">Request access</a>
+</div></nav>
+
+<header class="hero"><div class="wrap">
+  <div class="eyebrow">Free tool</div>
+  <h1>Encoded Payload Deobfuscator</h1>
+  <p class="lede">Paste an obfuscated blob from a macro, a phishing log line, or a suspicious script, and watch it unwind layer by layer: base64, the PowerShell encoded command shape, gzip and deflate, hex, URL encoding, and char code arrays. It decodes and shows you what the payload contains. It never runs it.</p>
+  <div class="privacy">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6l8-4z" stroke="var(--accent)" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Decodes and displays only, it never executes the payload. Everything runs in your browser. Nothing is sent to any server.
+  </div>
+</div></header>
+
+<div class="wrap">
+  <div class="tool">
+    <label class="fld" for="blob">Paste an obfuscated payload</label>
+    <textarea id="blob" spellcheck="false" placeholder="powershell -enc SQBFAFgAIAAoAE4AZQB3AC0ATwBiAGoAZQBjAHQAKQA=&#10;&#10;Or any base64, gzip, hex, URL encoded, or char code blob. It is decoded locally and never executed."></textarea>
+    <div class="row">
+      <button class="primary" id="decode">Peel the layers</button>
+      <button class="ghost" id="example">Load example</button>
+      <button class="ghost" id="exampleGz">Gzip example</button>
+      <button class="ghost" id="clear">Clear</button>
+      <span class="hint" id="hint">No data leaves this page</span>
+    </div>
+    <div class="manual">
+      <label for="manualSel">Apply one transform by hand</label>
+      <select id="manualSel">
+        <option value="">Choose a transform</option>
+        <option value="base64">Base64 (auto UTF-16LE or UTF-8)</option>
+        <option value="gzip">Gzip or deflate inflate</option>
+        <option value="hex">Hex string</option>
+        <option value="url">URL percent decode</option>
+        <option value="charcodes">Decimal char code array</option>
+        <option value="unicode">Unicode \u escapes</option>
+        <option value="utf16">Reinterpret current bytes as UTF-16LE</option>
+      </select>
+      <button class="ghost" id="manualBtn">Apply</button>
+    </div>
+  </div>
+  <div id="results"><div class="empty">Each decode layer and the final readable payload will appear here.</div></div>
+</div>
+
+<div class="wrap prose">
+  <h2>What this deobfuscator does</h2>
+  <p>Attackers rarely ship a payload in the clear. A malicious macro, a phishing log line, or a dropped script almost always wraps the real command in a few layers of encoding so that a quick glance, and a naive filter, see only noise. The layers are usually reversible and stack in a predictable way. This tool detects each layer, applies it, and repeats until the output stops changing, so the readable core falls out the bottom. It is built for triage: you paste, you read, you move on. Crucially, it only decodes and displays bytes. It contains no <code>eval</code>, runs nothing the payload references, and makes no network request, so looking at a hostile blob here does not run it.</p>
+
+  <h3>Base64 and the PowerShell encoded command shape</h3>
+  <p>Base64 is the most common wrapper, in both the standard alphabet and the URL safe variant that swaps two characters. After a base64 step the tool inspects the raw bytes. If it sees the classic pattern of a printable character followed by a null byte, over and over, that is UTF-16LE text, which is exactly what PowerShell expects behind its <code>-EncodedCommand</code> and <code>-enc</code> flags. In that case it decodes the bytes as UTF-16LE so the command reads cleanly, rather than as a string riddled with null bytes. Otherwise it decodes as UTF-8.</p>
+
+  <h3>Gzip and deflate compression</h3>
+  <p>A payload is often compressed before it is base64 encoded, which both shrinks it and scrambles it past simple keyword matching. After a base64 step the tool checks the first bytes: the gzip magic number <code>1f 8b</code>, or a zlib header, signals compressed data. It inflates the bytes using the browser <code>DecompressionStream</code> API, so the work stays client side with no library and no upload. Because that API is asynchronous, the decode runs through <code>await</code> and the layer appears once inflation finishes.</p>
+
+  <h3>Hex, URL encoding, char codes, and unicode escapes</h3>
+  <p>Beyond base64 and compression, the tool recognises several lighter wrappers that show up constantly in obfuscated scripts:</p>
+  <ul>
+    <li>Hex strings, whether they are run together, spaced out, or written with <code>0x</code> or <code>\x</code> prefixes.</li>
+    <li>URL percent encoding, the <code>%41%42</code> style seen in phishing links and request logs.</li>
+    <li>Decimal char code arrays such as <code>104,105</code>, which decode to the characters at those code points.</li>
+    <li>Unicode <code>A</code> escapes used to hide strings inside scripts.</li>
+  </ul>
+
+  <h3>When automatic peeling stops</h3>
+  <p>The tool stops on its own once no known transform applies, or once a step would leave the output unchanged, so it does not loop forever or invent structure that is not there. Some payloads add a custom or single byte XOR layer, which has no fixed signature to detect safely. When the result still looks non printable, the tool offers a single byte XOR hint: it shows the candidate keys whose output looks most like text, as a suggestion you choose to apply, never a forced guess. You can also pick any single transform from the manual list to take the next step yourself.</p>
+
+  <h2>How to read the layers</h2>
+  <p>Each layer is numbered in the order it was applied, labelled with the transform that produced it, and shows the resulting text. The last layer, marked final, is where peeling stopped. Treat the final text as evidence to read, not a verdict: a deobfuscated command still needs a human to judge intent, and that judgement about what a command is really trying to do is the kind of reasoning an <a href="https://security.unboundcompute.com/ai-security-testing/" rel="noopener">AI security testing</a> approach brings, rather than matching one string. For the broader picture of how encoded inputs slip past filters, the <a href="https://security.unboundcompute.com/web-security-glossary/" rel="noopener">web security glossary</a> and the <a href="https://security.unboundcompute.com/what-is-web-application-security/" rel="noopener">application security</a> writing are good next stops.</p>
+
+  <h2>Related reading</h2>
+  <div class="related">
+    <a href="https://security.unboundcompute.com/what-is-web-application-security/"><span>Guide</span>What is web application security</a>
+    <a href="https://security.unboundcompute.com/ai-security-testing/"><span>Guide</span>AI security testing</a>
+    <a href="https://security.unboundcompute.com/web-security-glossary/"><span>Reference</span>Web security glossary</a>
+    <a href="https://security.unboundcompute.com/category/access-control/"><span>Deep dive</span>Access control</a>
+  </div>
+
+  <h2>More free tools</h2>
+  <div class="related">
+    <a href="https://unboundcompute.com/tools/ioc-defanger-extractor.html"><span>Free tool</span>IOC Defanger and Extractor</a>
+    <a href="https://unboundcompute.com/tools/classical-cipher-solver.html"><span>Free tool</span>Classical Cipher Solver</a>
+    <a href="https://unboundcompute.com/tools/secret-scanner.html"><span>Free tool</span>Secret Scanner</a>
+    <a href="https://unboundcompute.com/tools/"><span>Free tools</span>All security tools</a>
+  </div>
+</div>
+
+<footer><div class="wrap">
+  <div>Built by <a href="https://unboundcompute.com/">UnboundCompute</a>, autonomous security research for web apps and APIs.</div>
+  <div><a href="https://unboundcompute.com/#cta">Request access</a></div>
+</div></footer>
+
+<script>
+(function(){
+  "use strict";
+  var $ = function(s){ return document.querySelector(s); };
+
+  function esc(s){ return String(s).replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];}); }
+
+  // ---- byte helpers ---------------------------------------------------------
+  function strToBytes(s){
+    // latin1 view: each char code is one byte (0..255). Used after atob.
+    var b = new Uint8Array(s.length);
+    for (var i=0;i<s.length;i++) b[i] = s.charCodeAt(i) & 0xff;
+    return b;
+  }
+  function bytesToLatin1(bytes){
+    var out = "";
+    for (var i=0;i<bytes.length;i++) out += String.fromCharCode(bytes[i]);
+    return out;
+  }
+  function decodeUtf8(bytes){ return new TextDecoder("utf-8",{fatal:false}).decode(bytes); }
+  function decodeUtf16le(bytes){ return new TextDecoder("utf-16le",{fatal:false}).decode(bytes); }
+
+  function printableRatio(s){
+    if (!s.length) return 0;
+    var ok = 0;
+    for (var i=0;i<s.length;i++){
+      var c = s.charCodeAt(i);
+      if (c === 9 || c === 10 || c === 13 || (c >= 32 && c <= 126) || c >= 160) ok++;
+    }
+    return ok / s.length;
+  }
+  function looksPrintable(s){ return s.length > 0 && printableRatio(s) >= 0.85; }
+
+  // ---- individual transforms ------------------------------------------------
+  // Each returns { ok, text, label, meta, bytes } or { ok:false }.
+
+  function tryBase64(input){
+    var t = input.trim();
+    // tolerate whitespace inside the blob
+    var compact = t.replace(/\s+/g,"");
+    if (compact.length < 8) return { ok:false };
+    // accept standard and url safe alphabets, optional padding
+    if (!/^[A-Za-z0-9+/_-]+={0,2}$/.test(compact)) return { ok:false };
+    if (compact.length % 4 === 1) return { ok:false };
+    var b64 = compact.replace(/-/g,"+").replace(/_/g,"/");
+    while (b64.length % 4) b64 += "=";
+    var bin;
+    try { bin = atob(b64); } catch(e){ return { ok:false }; }
+    if (!bin.length) return { ok:false };
+    var bytes = strToBytes(bin);
+    var label = "Base64 decode";
+    // gzip / zlib detection happens in the layered loop on the bytes
+    return { ok:true, label:label, bytes:bytes, fromBase64:true };
+  }
+
+  function isUtf16le(bytes){
+    if (bytes.length < 4 || bytes.length % 2 !== 0) return false;
+    var nulls = 0, pairs = bytes.length / 2;
+    for (var i=0;i<bytes.length;i+=2){
+      var lo = bytes[i], hi = bytes[i+1];
+      // ascii text in utf-16le is [printable][00]
+      if (hi === 0 && (lo === 9 || lo === 10 || lo === 13 || (lo >= 32 && lo <= 126))) nulls++;
+    }
+    return (nulls / pairs) >= 0.85;
+  }
+
+  function gzipMagic(bytes){ return bytes.length >= 2 && bytes[0] === 0x1f && bytes[1] === 0x8b; }
+  function zlibMagic(bytes){
+    // zlib: CMF FLG, CMF low nibble 8 (deflate), (CMF*256+FLG) % 31 === 0
+    if (bytes.length < 2) return false;
+    if ((bytes[0] & 0x0f) !== 0x08) return false;
+    return ((bytes[0] << 8) + bytes[1]) % 31 === 0;
+  }
+
+  async function inflate(bytes, format){
+    if (typeof DecompressionStream === "undefined") throw new Error("DecompressionStream is unavailable in this browser.");
+    var ds = new DecompressionStream(format);
+    var stream = new Response(new Blob([bytes]).stream().pipeThrough(ds));
+    var buf = await stream.arrayBuffer();
+    return new Uint8Array(buf);
+  }
+
+  function tryHex(input){
+    var t = input.trim();
+    // strip 0x and \x prefixes and separators
+    var cleaned = t.replace(/0x/gi,"").replace(/\\x/gi,"").replace(/[\s,:;-]/g,"");
+    if (cleaned.length < 4 || cleaned.length % 2 !== 0) return { ok:false };
+    if (!/^[0-9a-fA-F]+$/.test(cleaned)) return { ok:false };
+    var bytes = new Uint8Array(cleaned.length/2);
+    for (var i=0;i<bytes.length;i++) bytes[i] = parseInt(cleaned.substr(i*2,2),16);
+    return { ok:true, label:"Hex decode", bytes:bytes };
+  }
+
+  function tryUrl(input){
+    var t = input.trim();
+    if (!/%[0-9a-fA-F]{2}/.test(t)) return { ok:false };
+    var out;
+    try { out = decodeURIComponent(t.replace(/\+/g," ")); }
+    catch(e){ return { ok:false }; }
+    if (out === t) return { ok:false };
+    return { ok:true, label:"URL percent decode", text:out };
+  }
+
+  function tryCharCodes(input){
+    var t = input.trim();
+    // sequences like 104,105,33 or 104 105 33 (decimal)
+    if (!/^[\s,;]*\d{1,7}([\s,;]+\d{1,7}){2,}[\s,;]*$/.test(t)) return { ok:false };
+    var nums = t.split(/[\s,;]+/).filter(function(x){ return x.length; }).map(Number);
+    if (nums.some(function(n){ return !isFinite(n) || n < 0 || n > 0x10ffff; })) return { ok:false };
+    var out = "";
+    try { out = nums.map(function(n){ return String.fromCodePoint(n); }).join(""); }
+    catch(e){ return { ok:false }; }
+    return { ok:true, label:"Char code array decode", text:out };
+  }
+
+  function tryUnicode(input){
+    var t = input;
+    if (!/\\u[0-9a-fA-F]{4}|\\x[0-9a-fA-F]{2}/.test(t)) return { ok:false };
+    var out = t.replace(/\\u\{([0-9a-fA-F]+)\}/g,function(_,h){ return String.fromCodePoint(parseInt(h,16)); })
+               .replace(/\\u([0-9a-fA-F]{4})/g,function(_,h){ return String.fromCharCode(parseInt(h,16)); })
+               .replace(/\\x([0-9a-fA-F]{2})/g,function(_,h){ return String.fromCharCode(parseInt(h,16)); });
+    if (out === t) return { ok:false };
+    return { ok:true, label:"Unicode escape decode", text:out };
+  }
+
+  // single byte xor candidates (hint only)
+  function xorCandidates(bytes){
+    var cands = [];
+    for (var k=1;k<256;k++){
+      var s = "";
+      for (var i=0;i<bytes.length;i++) s += String.fromCharCode(bytes[i] ^ k);
+      var r = printableRatio(s);
+      if (r >= 0.95) cands.push({ key:k, ratio:r, text:s });
+    }
+    cands.sort(function(a,b){ return b.ratio - a.ratio; });
+    return cands.slice(0,6);
+  }
+
+  // ---- the layered peeling loop --------------------------------------------
+  // A "layer" is { n, label, transform, text, meta }.
+
+  async function bytesToText(bytes){
+    // choose utf-16le when the byte pattern says so, else utf-8
+    if (isUtf16le(bytes)) return { text: decodeUtf16le(bytes), label:"UTF-16LE text" };
+    return { text: decodeUtf8(bytes), label:"UTF-8 text" };
+  }
+
+  // Decode one byte buffer that may be compressed, returning text + label.
+  async function bytesLayer(bytes){
+    if (gzipMagic(bytes)){
+      try {
+        var g = await inflate(bytes, "gzip");
+        var t = await bytesToText(g);
+        return { text: t.text, label: "Gzip inflate, then " + t.label, bytes: g };
+      } catch(e){ /* fall through to raw text */ }
+    }
+    if (zlibMagic(bytes)){
+      try {
+        var z = await inflate(bytes, "deflate");
+        var tz = await bytesToText(z);
+        return { text: tz.text, label: "Zlib deflate inflate, then " + tz.label, bytes: z };
+      } catch(e){ /* fall through */ }
+    }
+    var tt = await bytesToText(bytes);
+    return { text: tt.text, label: tt.label, bytes: bytes };
+  }
+
+  async function peel(input){
+    var layers = [{ n:0, label:"Input", transform:"Raw pasted blob", text:input }];
+    var current = input, lastBytes = null;
+    var MAX = 24;
+    for (var step=0; step<MAX; step++){
+      var moved = false;
+
+      // 1. base64 -> bytes -> (gzip/zlib?) -> utf16/utf8 text
+      var b = tryBase64(current);
+      if (b.ok){
+        var res = await bytesLayer(b.bytes);
+        if (res.text && res.text !== current && looksPrintableOrCompressed(res.text)){
+          layers.push({ n:layers.length, label:"Base64", transform:res.label, text:res.text, meta:byteMeta(b.bytes) });
+          current = res.text; lastBytes = res.bytes; moved = true; continue;
+        }
+      }
+
+      // 2. lighter transforms
+      var order = [tryUrl(current), tryUnicode(current), tryHex(current), tryCharCodes(current)];
+      for (var i=0;i<order.length;i++){
+        var r = order[i];
+        if (r.ok){
+          var text = r.text;
+          if (r.bytes){ var bt = await bytesLayer(r.bytes); text = bt.text; r.label = r.label + ", then " + bt.label; lastBytes = r.bytes; }
+          if (text && text !== current && looksPrintable(text)){
+            layers.push({ n:layers.length, label:label4(r.label), transform:r.label, text:text, meta:r.bytes?byteMeta(r.bytes):"" });
+            current = text; moved = true; break;
+          }
+        }
+      }
+      if (moved) continue;
+      break;
+    }
+    return { layers: layers, lastBytes: lastBytes, final: current };
+  }
+
+  function looksPrintableOrCompressed(s){
+    // text out of a base64 step is acceptable if printable; compressed paths
+    // already produced text, so just require printability here
+    return looksPrintable(s);
+  }
+  function label4(l){ return l.split(",")[0].replace(/ decode$/,""); }
+
+  function byteMeta(bytes){
+    var hex = [];
+    for (var i=0;i<Math.min(bytes.length,8);i++) hex.push(("0"+bytes[i].toString(16)).slice(-2));
+    return bytes.length + " bytes, starts " + hex.join(" ");
+  }
+
+  // ---- manual single transform ---------------------------------------------
+  async function applyManual(kind, input){
+    if (kind === "base64"){
+      var b = tryBase64(input);
+      if (!b.ok) return { ok:false, msg:"That does not look like valid base64." };
+      var res = await bytesLayer(b.bytes);
+      return { ok:true, label:res.label, text:res.text };
+    }
+    if (kind === "gzip"){
+      // expect raw bytes; take input as base64 first if it is base64, else latin1
+      var bytes;
+      var bb = tryBase64(input);
+      bytes = bb.ok ? bb.bytes : strToBytes(input);
+      try {
+        var fmt = gzipMagic(bytes) ? "gzip" : "deflate";
+        var g = await inflate(bytes, fmt);
+        var t = await bytesToText(g);
+        return { ok:true, label:(fmt==="gzip"?"Gzip":"Deflate")+" inflate, then "+t.label, text:t.text };
+      } catch(e){ return { ok:false, msg:"Could not inflate these bytes. "+e.message }; }
+    }
+    if (kind === "hex"){ var h = tryHex(input); if (!h.ok) return { ok:false, msg:"Not a valid hex string." }; var ht = await bytesToText(h.bytes); return { ok:true, label:"Hex decode, "+ht.label, text:ht.text }; }
+    if (kind === "url"){ var u = tryUrl(input); return u.ok ? { ok:true, label:u.label, text:u.text } : { ok:false, msg:"No URL percent encoding found." }; }
+    if (kind === "charcodes"){ var c = tryCharCodes(input); return c.ok ? { ok:true, label:c.label, text:c.text } : { ok:false, msg:"Not a decimal char code array." }; }
+    if (kind === "unicode"){ var n = tryUnicode(input); return n.ok ? { ok:true, label:n.label, text:n.text } : { ok:false, msg:"No unicode escapes found." }; }
+    if (kind === "utf16"){ return { ok:true, label:"UTF-16LE reinterpret", text: decodeUtf16le(strToBytes(input)) }; }
+    return { ok:false, msg:"Pick a transform first." };
+  }
+
+  // ---- rendering ------------------------------------------------------------
+  function renderLayers(result){
+    var layers = result.layers;
+    var peeled = layers.length - 1;
+    var html = "";
+
+    html += '<div class="grade-card">';
+    html += '<div class="grade">'+peeled+'</div>';
+    html += '<div class="grade-meta"><h2>'+(peeled===1?"1 layer":peeled+" layers")+' peeled</h2>';
+    if (peeled === 0) html += '<p>No known encoding layer applied. The input may already be readable, or it uses a wrapper this tool does not detect. Try a manual transform below.</p>';
+    else html += '<p>The payload unwound to the readable text in the final layer. This tool decoded and displayed the bytes only. It never executed any of it.</p>';
+    html += '</div></div>';
+
+    html += '<div class="layers">';
+    layers.forEach(function(l, idx){
+      var isFinal = idx === layers.length - 1 && peeled > 0;
+      html += '<div class="layer'+(isFinal?' is-final':'')+'"><div class="top">';
+      html += '<span class="dot'+(isFinal?' final':'')+'">'+(idx===0?'in':l.n)+'</span><div style="flex:1">';
+      html += '<h3>'+(idx===0?'Input':'Layer '+l.n)+(isFinal?'<span class="badgeflag final">Final</span>':'')+'</h3>';
+      html += '<div class="tform">'+esc(l.transform)+'</div>';
+      html += '<pre>'+esc(l.text.length>20000?l.text.slice(0,20000)+"\n... (truncated for display)":l.text)+'</pre>';
+      if (l.meta) html += '<div class="meta">'+esc(l.meta)+'</div>';
+      html += '</div></div></div>';
+    });
+    html += '</div>';
+
+    // single byte XOR hint if the final result still looks non printable
+    var fin = result.final;
+    if (peeled === 0 || !looksPrintable(fin)){
+      var src = result.lastBytes || strToBytes(fin);
+      var cands = src.length ? xorCandidates(src) : [];
+      html += '<div class="note"><b>Single byte XOR hint</b> '
+        + (cands.length
+            ? 'The final bytes still look non printable. These single byte keys produce the most text like output. This is a suggestion only, nothing is applied automatically.'
+            : 'The result still looks non printable and no single byte XOR key produced clean text. The payload may use a multi byte key or another custom scheme.');
+      html += '<div class="why">XOR has no fixed signature, so the tool offers candidates rather than forcing a guess.</div>';
+      if (cands.length){
+        html += '<div class="xorgrid">';
+        cands.forEach(function(c){
+          var preview = c.text.length>120 ? c.text.slice(0,120)+"..." : c.text;
+          html += '<div class="x"><b>key 0x'+("0"+c.key.toString(16)).slice(-2)+'</b><br>'+esc(preview)+'</div>';
+        });
+        html += '</div>';
+      }
+      html += '</div>';
+    }
+    return html;
+  }
+
+  // ---- examples -------------------------------------------------------------
+  // Harmless, invented payloads. No real malware.
+
+  // base64 of a UTF-16LE string: PowerShell -enc shape. Built at load time.
+  function utf16leBase64(str){
+    var bytes = new Uint8Array(str.length*2);
+    for (var i=0;i<str.length;i++){ var c = str.charCodeAt(i); bytes[i*2]=c & 0xff; bytes[i*2+1]=(c>>8)&0xff; }
+    return btoa(bytesToLatin1(bytes));
+  }
+  var EXAMPLE = utf16leBase64('Write-Output "hello from a benign demo payload"');
+
+  // base64 of gzip of a harmless string, built async with CompressionStream
+  async function makeGzExample(){
+    var msg = 'echo benign-demo-string-not-malware';
+    if (typeof CompressionStream === "undefined") return btoa(msg); // graceful fallback
+    var cs = new CompressionStream("gzip");
+    var bytes = new TextEncoder().encode(msg);
+    var buf = await new Response(new Blob([bytes]).stream().pipeThrough(cs)).arrayBuffer();
+    return btoa(bytesToLatin1(new Uint8Array(buf)));
+  }
+
+  // ---- wiring ---------------------------------------------------------------
+  async function run(){
+    var text = $("#blob").value;
+    if (!text.trim()){ $("#results").innerHTML = '<div class="empty">Paste a payload first.</div>'; return; }
+    $("#results").innerHTML = '<div class="empty">Peeling layers...</div>';
+    try {
+      var result = await peel(text);
+      $("#results").innerHTML = renderLayers(result);
+      $("#results").scrollIntoView({ behavior:"smooth", block:"start" });
+    } catch(e){
+      $("#results").innerHTML = '<div class="empty">'+esc("Could not decode this input. "+e.message)+'</div>';
+    }
+  }
+
+  $("#decode").addEventListener("click", run);
+  $("#example").addEventListener("click", function(){ $("#blob").value = "powershell -enc " + EXAMPLE; run(); });
+  $("#exampleGz").addEventListener("click", async function(){
+    $("#blob").value = await makeGzExample(); run();
+  });
+  $("#clear").addEventListener("click", function(){ $("#blob").value=""; $("#results").innerHTML='<div class="empty">Each decode layer and the final readable payload will appear here.</div>'; $("#blob").focus(); });
+  $("#manualBtn").addEventListener("click", async function(){
+    var kind = $("#manualSel").value, input = $("#blob").value.trim();
+    if (!kind){ $("#results").innerHTML = '<div class="empty">Choose a transform to apply by hand.</div>'; return; }
+    if (!input){ $("#results").innerHTML = '<div class="empty">Paste a payload first.</div>'; return; }
+    var r = await applyManual(kind, input);
+    if (!r.ok){ $("#results").innerHTML = '<div class="empty">'+esc(r.msg)+'</div>'; return; }
+    var html = '<div class="layers"><div class="layer is-final"><div class="top"><span class="dot final">1</span><div style="flex:1">';
+    html += '<h3>Manual transform<span class="badgeflag final">Applied</span></h3>';
+    html += '<div class="tform">'+esc(r.label)+'</div>';
+    html += '<pre>'+esc(r.text.length>20000?r.text.slice(0,20000)+"\n... (truncated for display)":r.text)+'</pre>';
+    html += '</div></div></div></div>';
+    $("#results").innerHTML = html;
+  });
+  $("#blob").addEventListener("keydown", function(e){ if ((e.metaKey||e.ctrlKey) && e.key==="Enter") run(); });
+})();
+</script>
+</body>
+</html>

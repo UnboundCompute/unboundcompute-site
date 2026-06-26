@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>JWT Security Inspector and Decoder | UnboundCompute</title>
+<meta name="description" content="Paste a JSON Web Token and get a decoded, security graded report. Flags alg none, key confusion risk, missing expiry, sensitive payload data, and jku key injection. Runs fully in your browser." />
+<meta name="keywords" content="jwt decoder, jwt inspector, jwt security, decode jwt, jwt alg none, jwt vulnerabilities, json web token checker, jwt analyzer" />
+<meta name="robots" content="index, follow" />
+<meta name="author" content="UnboundCompute" />
+<meta name="theme-color" content="#0a0a0b" />
+<link rel="canonical" href="https://unboundcompute.com/tools/jwt-security-inspector.html" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a0a0b'/%3E%3Cline x1='16' y1='4' x2='16' y2='28' stroke='%23fb5b46' stroke-width='2' stroke-dasharray='3 3'/%3E%3Ccircle cx='16' cy='16' r='3.4' fill='%23fb5b46'/%3E%3C/svg%3E" />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="UnboundCompute" />
+<meta property="og:title" content="JWT Security Inspector and Decoder" />
+<meta property="og:description" content="Decode a JSON Web Token and get a security graded report. Runs fully in your browser, nothing is sent to any server." />
+<meta property="og:url" content="https://unboundcompute.com/tools/jwt-security-inspector.html" />
+<meta property="og:image" content="https://unboundcompute.com/og.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="JWT Security Inspector and Decoder" />
+<meta name="twitter:description" content="Decode a JSON Web Token and get a security graded report. Runs fully in your browser." />
+<meta name="twitter:image" content="https://unboundcompute.com/og.png" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "JWT Security Inspector and Decoder",
+      "applicationCategory": "SecurityApplication",
+      "operatingSystem": "Web",
+      "browserRequirements": "Requires JavaScript. Runs entirely client side.",
+      "url": "https://unboundcompute.com/tools/jwt-security-inspector.html",
+      "description": "A free tool that decodes a JSON Web Token and grades its security. Flags the alg none vulnerability, symmetric key confusion risk, missing or expired exp claims, sensitive data left readable in the payload, and external key references like jku and x5u. All analysis happens in the browser.",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "publisher": { "@type": "Organization", "name": "UnboundCompute", "url": "https://unboundcompute.com/" }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is a JSON Web Token (JWT)?",
+          "acceptedAnswer": { "@type": "Answer", "text": "A JSON Web Token is a compact, signed token with three parts separated by dots: a header that names the signing algorithm, a payload that carries claims like the user id and an expiry time, and a signature. The header and payload are base64url encoded, not encrypted, so anyone holding the token can read them. The signature is what proves the token was issued by a server that holds the key." }
+        },
+        {
+          "@type": "Question",
+          "name": "Does this JWT inspector send my token anywhere?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. The decoding and the security checks run entirely in your browser with JavaScript. The token you paste is never uploaded, logged, or sent to any server. This matters because a real JWT is usually a live session secret, so you can safely inspect a production token here without it leaving your machine." }
+        },
+        {
+          "@type": "Question",
+          "name": "Can this tool verify a JWT signature?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No, and that is deliberate. Verifying a signature needs the secret key for HMAC or the public key for RSA and ECDSA, and this tool never asks for a key so it never touches one. It decodes the token and audits its structure and claims for common weaknesses. To verify a signature you must check it on the server that holds the key." }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the alg none vulnerability?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Some JWT libraries once accepted a token whose header set the algorithm to none, meaning the token carries no signature at all. If a server trusts that header, an attacker can craft any payload they like, set alg to none, drop the signature, and the server accepts it as genuine. The fix is to pin the expected algorithm on the server and reject none outright." }
+        }
+      ]
+    }
+  ]
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600&family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0a0b; --bg-2:#070708; --panel:#0e0e10; --panel-2:#131315;
+    --ink:#f4f2ec; --ink-hi:#fbf9f3; --ink-soft:#9b988f; --ink-faint:#5e5b54;
+    --line:rgba(244,242,236,.13); --line-2:rgba(244,242,236,.07);
+    --accent:#fb5b46; --accent-2:#ff7d6b; --accent-wash:rgba(251,91,70,.12); --on-accent:#1a0c09; --accent-line:rgba(251,91,70,.42);
+    --pass:#5fd6a4; --pass-wash:rgba(95,214,164,.1); --warn:#e8b04b; --warn-wash:rgba(232,176,75,.1); --fail:#fb5b46; --fail-wash:rgba(251,91,70,.1); --info:#7c93ff; --info-wash:rgba(124,147,255,.1);
+    --serif:'Newsreader',Georgia,serif; --mono:'JetBrains Mono',ui-monospace,monospace; --sans:'Inter',system-ui,sans-serif;
+    --maxw:920px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;line-height:1.6}
+  ::selection{background:var(--accent);color:var(--on-accent)}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+
+  nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);background:rgba(10,10,11,.72);border-bottom:1px solid var(--line-2)}
+  nav .wrap{height:64px;display:flex;align-items:center;justify-content:space-between}
+  nav a.brand{display:flex;align-items:center;gap:11px;font-family:var(--mono);font-weight:600;font-size:15px;color:var(--ink);letter-spacing:-.01em}
+  nav a.brand:hover{text-decoration:none}
+  nav .badge{width:27px;height:27px;border-radius:7px;border:1px solid var(--accent-line);display:grid;place-items:center}
+  nav a.cta{font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:9px 16px;border-radius:8px;background:var(--accent);color:var(--on-accent)}
+  nav a.cta:hover{filter:brightness(1.08);text-decoration:none}
+
+  header.hero{padding:64px 0 28px}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:18px}
+  h1{font-family:var(--serif);font-weight:400;font-size:clamp(32px,5vw,52px);line-height:1.08;letter-spacing:-.015em;color:var(--ink-hi)}
+  .lede{margin-top:18px;font-size:18px;color:var(--ink-soft);max-width:660px}
+  .privacy{margin-top:18px;display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);border:1px solid var(--line);border-radius:8px;padding:8px 13px;background:var(--panel)}
+  .privacy svg{width:14px;height:14px;flex:none}
+
+  .tool{margin:30px 0 12px;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px}
+  label.fld{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:10px}
+  textarea{width:100%;min-height:150px;resize:vertical;background:var(--bg-2);border:1px solid var(--line);border-radius:11px;padding:15px;color:var(--ink);font-family:var(--mono);font-size:13.5px;line-height:1.55;outline:none;transition:border-color .2s,box-shadow .2s;word-break:break-all}
+  textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-wash)}
+  textarea::placeholder{color:var(--ink-faint)}
+  .row{display:flex;gap:11px;flex-wrap:wrap;margin-top:14px;align-items:center}
+  button{font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;padding:13px 22px;border-radius:9px;cursor:pointer;border:1px solid var(--line);background:transparent;color:var(--ink);transition:filter .15s,border-color .15s,background .15s}
+  button.primary{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+  button.primary:hover{filter:brightness(1.08)}
+  button.ghost:hover{border-color:var(--accent-line);color:var(--ink-hi)}
+  .hint{font-family:var(--mono);font-size:12px;color:var(--ink-faint);margin-left:auto}
+
+  #results{margin-top:8px}
+  .decoded{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0}
+  .seg{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:16px 18px;min-width:0}
+  .seg h3{font-family:var(--mono);font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+  .seg pre{font-family:var(--mono);font-size:13px;line-height:1.55;color:var(--ink);white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere}
+  .seg .claims{margin-top:11px;border-top:1px solid var(--line-2);padding-top:10px;display:flex;flex-direction:column;gap:5px}
+  .seg .claims div{font-family:var(--mono);font-size:12px;color:var(--ink-soft)}
+  .seg .claims b{color:var(--ink)}
+  .seg .err{color:var(--fail);font-family:var(--mono);font-size:13px}
+
+  .grade-card{display:flex;align-items:center;gap:22px;background:var(--panel-2);border:1px solid var(--line);border-radius:16px;padding:22px 24px;margin:20px 0}
+  .grade{font-family:var(--serif);font-size:62px;line-height:1;width:96px;height:96px;border-radius:18px;display:grid;place-items:center;flex:none;border:1.5px solid}
+  .grade.g-A,.grade.g-B{color:var(--pass);border-color:var(--pass);background:var(--pass-wash)}
+  .grade.g-C{color:var(--warn);border-color:var(--warn);background:var(--warn-wash)}
+  .grade.g-D,.grade.g-F{color:var(--fail);border-color:var(--fail);background:var(--fail-wash)}
+  .grade-meta h2{font-family:var(--serif);font-weight:400;font-size:24px;color:var(--ink-hi);margin-bottom:4px}
+  .grade-meta p{color:var(--ink-soft);font-size:14.5px}
+  .score-bar{height:7px;border-radius:99px;background:var(--line-2);margin-top:12px;overflow:hidden;max-width:340px}
+  .score-bar > i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--accent-2))}
+
+  .checks{display:flex;flex-direction:column;gap:11px}
+  .check{border:1px solid var(--line);border-radius:13px;padding:16px 18px;background:var(--panel)}
+  .check .top{display:flex;align-items:flex-start;gap:13px}
+  .dot{width:20px;height:20px;border-radius:6px;flex:none;display:grid;place-items:center;font-size:13px;font-weight:700;margin-top:1px}
+  .dot.pass{background:var(--pass-wash);color:var(--pass)}
+  .dot.warn{background:var(--warn-wash);color:var(--warn)}
+  .dot.fail{background:var(--fail-wash);color:var(--fail)}
+  .dot.info{background:var(--info-wash);color:var(--info)}
+  .check h3{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--ink-hi);letter-spacing:-.01em}
+  .check .finding{margin-top:5px;font-size:14.5px;color:var(--ink)}
+  .check .why{margin-top:9px;font-size:13.5px;color:var(--ink-soft)}
+  .check .fix{margin-top:9px;font-size:13px;color:var(--ink-soft);font-family:var(--mono);background:var(--bg-2);border:1px solid var(--line-2);border-radius:8px;padding:9px 11px;white-space:pre-wrap;word-break:break-word}
+  .check .more{margin-top:9px;font-size:13px}
+  .sub{margin-top:11px;padding-left:15px;border-left:2px solid var(--line);display:flex;flex-direction:column;gap:7px}
+  .sub div{font-size:13.5px;color:var(--ink-soft)}
+  .sub b{color:var(--ink)}
+  .empty{color:var(--ink-faint);font-family:var(--mono);font-size:13px;text-align:center;padding:30px}
+
+  .prose{padding:44px 0 20px}
+  .prose h2{font-family:var(--serif);font-weight:400;font-size:30px;color:var(--ink-hi);margin:36px 0 14px;letter-spacing:-.01em}
+  .prose h3{font-family:var(--mono);font-size:15px;color:var(--ink-hi);margin:24px 0 8px}
+  .prose p{color:var(--ink-soft);margin-bottom:14px;font-size:16px}
+  .prose ul{color:var(--ink-soft);margin:0 0 14px 20px;font-size:16px}
+  .prose li{margin-bottom:7px}
+  .prose code{font-family:var(--mono);font-size:13.5px;background:var(--panel-2);border:1px solid var(--line-2);border-radius:5px;padding:1px 6px;color:var(--ink)}
+  .related{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:8px}
+  .related a{display:block;border:1px solid var(--line);border-radius:11px;padding:14px 16px;color:var(--ink);font-size:14.5px;background:var(--panel)}
+  .related a:hover{border-color:var(--accent-line);text-decoration:none}
+  .related a span{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:5px}
+
+  footer{border-top:1px solid var(--line-2);margin-top:40px;padding:30px 0;color:var(--ink-faint);font-family:var(--mono);font-size:12.5px}
+  footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px}
+  footer a{color:var(--ink-soft)}
+  @media (max-width:560px){
+    .related{grid-template-columns:1fr}
+    .decoded{grid-template-columns:1fr}
+    .grade-card{flex-direction:column;align-items:flex-start;gap:16px}
+    .hint{margin-left:0;width:100%}
+  }
+</style>
+</head>
+<body>
+
+<nav><div class="wrap">
+  <a class="brand" href="https://unboundcompute.com/">
+    <span class="badge"><svg viewBox="0 0 24 24" fill="none" style="width:15px;height:15px"><line x1="12" y1="3" x2="12" y2="21" stroke="var(--accent)" stroke-width="1.8" stroke-dasharray="2.6 2.6"/><circle cx="12" cy="12" r="3" fill="var(--accent)"/></svg></span>
+    UnboundCompute
+  </a>
+  <a class="cta" href="https://unboundcompute.com/#cta">Request access</a>
+</div></nav>
+
+<header class="hero"><div class="wrap">
+  <div class="eyebrow">Free tool</div>
+  <h1>JWT Security Inspector</h1>
+  <p class="lede">Paste a JSON Web Token to decode its header and payload, then read a graded security report. It flags the alg none trap, key confusion risk, missing or expired expiry, secrets sitting in plain sight in the payload, and external key references an attacker can abuse.</p>
+  <div class="privacy">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6l8-4z" stroke="var(--accent)" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Your token is a secret. Everything runs in your browser. Nothing is sent to any server.
+  </div>
+</div></header>
+
+<div class="wrap">
+  <div class="tool">
+    <label class="fld" for="jwt">Paste a JSON Web Token</label>
+    <textarea id="jwt" spellcheck="false" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.signature&#10;&#10;A Bearer prefix is fine, it is stripped automatically. The token is decoded locally and never sent anywhere."></textarea>
+    <div class="row">
+      <button class="primary" id="analyze">Decode and inspect</button>
+      <button class="ghost" id="example">Load example</button>
+      <button class="ghost" id="clear">Clear</button>
+      <span class="hint" id="hint">No data leaves this page</span>
+    </div>
+  </div>
+  <div id="results"><div class="empty">Your decoded token and graded report will appear here.</div></div>
+</div>
+
+<div class="wrap prose">
+  <h2>What this JWT inspector checks</h2>
+  <p>A JSON Web Token looks like one long opaque string, but it is just three base64url chunks joined by dots: a header, a payload, and a signature. The header and payload are encoded, not encrypted, so they are readable by anyone who holds the token. This tool decodes both, then audits the parts that decide whether the token is safe, drawing on the token handling guidance in the <a href="https://datatracker.ietf.org/doc/html/rfc8725" rel="noopener" target="_blank">JWT Best Current Practices</a> and the core <a href="https://datatracker.ietf.org/doc/html/rfc7519" rel="noopener" target="_blank">RFC 7519</a>.</p>
+
+  <h3>The algorithm and the alg none trap</h3>
+  <p>The header names the algorithm used to sign the token. The classic failure is a token that sets the algorithm to none, which means it carries no signature at all. A server that trusts that header will accept a payload an attacker wrote by hand. The inspector flags a none algorithm as a critical finding and explains the fix, which is to pin the expected algorithm on the server and reject anything else.</p>
+
+  <h3>Key confusion between symmetric and asymmetric</h3>
+  <p>When a token uses an HMAC algorithm like HS256, the same secret both signs and verifies it, so anyone who can verify can also forge. There is a sharper version of this: if a service expects an asymmetric algorithm like RS256 but a library lets the attacker switch the header to HS256, the attacker can sign a forged token using the service public key as the HMAC secret. The public key is not a secret, so the forgery passes. The tool notes when a token uses a symmetric algorithm so you can confirm the verifier pins the algorithm it expects.</p>
+
+  <h3>Expiry and lifetime</h3>
+  <p>A token with no <code>exp</code> claim never expires, so a single leaked token is valid forever. The inspector flags a missing expiry, tells you when a token has already expired, and warns when the gap between issued at and expiry is very long, since a long lived bearer token is a long lived liability if it leaks.</p>
+
+  <h3>Secrets and personal data in the payload</h3>
+  <p>Because the payload is only encoded, putting a password, an API key, or sensitive personal data inside it is the same as publishing it to anyone who sees the token. The tool scans claim names and values for the patterns that should never travel in a JWT and points them out. This is the same readable by anyone surface that makes <a href="https://security.unboundcompute.com/what-is-csrf/" rel="noopener">cookie and token handling</a> worth getting right.</p>
+
+  <h3>External key references and kid handling</h3>
+  <p>The header can carry a <code>jku</code> or <code>x5u</code> field that points the verifier at a URL to fetch the key from. If the verifier follows that URL without a strict allow list, an attacker points it at a key they control and forges valid tokens, often pulling the server into a request to an internal address along the way. A <code>kid</code> field is meant to be an opaque key id, but if the server feeds it into a file path or a database query it becomes an injection sink. The inspector surfaces these so you can check how the verifier treats them.</p>
+
+  <h2>How to read the grade</h2>
+  <p>Each graded check contributes a weighted share of a score out of one hundred. A pass earns its full weight, a weak setting earns part of it, and a dangerous one earns none. The grade is a fast signal about the token as it stands, not a verdict on the whole system. This tool decodes and audits, it does not verify the signature, because verifying needs the key and the key never belongs in a page like this. Judging whether a token is actually safe means understanding how the server issues and checks it, which is the kind of context an <a href="https://security.unboundcompute.com/ai-security-testing/" rel="noopener">AI security testing</a> approach reasons about rather than pattern matching one string. For the wider set of token and session boundaries attackers probe, see the <a href="https://security.unboundcompute.com/category/access-control/" rel="noopener">access control</a> writing.</p>
+
+  <h2>Related reading</h2>
+  <div class="related">
+    <a href="https://security.unboundcompute.com/what-is-csrf/"><span>Deep dive</span>What is CSRF</a>
+    <a href="https://security.unboundcompute.com/what-is-web-application-security/"><span>Guide</span>What is web application security</a>
+    <a href="https://security.unboundcompute.com/ai-security-testing/"><span>Guide</span>AI security testing</a>
+    <a href="https://security.unboundcompute.com/web-security-glossary/"><span>Reference</span>Web security glossary</a>
+  </div>
+
+  <h2>More free tools</h2>
+  <div class="related">
+    <a href="https://unboundcompute.com/tools/cookie-security-auditor.html"><span>Free tool</span>Cookie Security Auditor</a>
+    <a href="https://unboundcompute.com/tools/security-headers-analyzer.html"><span>Free tool</span>Security Headers and CSP Analyzer</a>
+    <a href="https://unboundcompute.com/tools/password-strength-analyzer.html"><span>Free tool</span>Password Strength and Entropy Analyzer</a>
+    <a href="https://unboundcompute.com/tools/cors-misconfiguration-checker.html"><span>Free tool</span>CORS Misconfiguration Checker</a>
+      <a href="https://unboundcompute.com/tools/"><span>All tools</span>Free security tools hub</a>
+  </div>
+</div>
+
+<footer><div class="wrap">
+  <div>Built by <a href="https://unboundcompute.com/">UnboundCompute</a>, autonomous security research for web apps and APIs.</div>
+  <div><a href="https://unboundcompute.com/#cta">Request access</a></div>
+</div></footer>
+
+<script>
+(function(){
+  "use strict";
+  var $ = function(s){ return document.querySelector(s); };
+
+  function b64urlEncode(obj){
+    var json = JSON.stringify(obj);
+    var b64 = btoa(unescape(encodeURIComponent(json)));
+    return b64.replace(/=+$/,"").replace(/\+/g,"-").replace(/\//g,"_");
+  }
+
+  // A deliberately weak demo token: HS256, jku pointing offsite, secrets in
+  // the payload, and no exp. Decodes cleanly so the report shows real flags.
+  var EXAMPLE = [
+    b64urlEncode({ alg:"HS256", typ:"JWT", jku:"https://keys.acme.example/jwks.json" }),
+    b64urlEncode({ sub:"1001", name:"Acme Admin", email:"admin@acme.example", password:"hunter2", role:"admin", iat:1700000000 }),
+    "QnVpbHRGb3JEZW1vT25seU5vdEFSZWFsU2lnbmF0dXJl"
+  ].join(".");
+
+  function b64urlToStr(seg){
+    seg = seg.replace(/-/g,"+").replace(/_/g,"/");
+    while (seg.length % 4) seg += "=";
+    var bin = atob(seg);                       // throws on bad base64
+    try {
+      var bytes = new Uint8Array(bin.length);
+      for (var i=0;i<bin.length;i++) bytes[i] = bin.charCodeAt(i);
+      return new TextDecoder("utf-8").decode(bytes);
+    } catch(e){ return bin; }
+  }
+
+  function parseJwt(raw){
+    raw = raw.trim().replace(/^Bearer\s+/i,"").replace(/\s+/g,"");
+    var res = { raw:raw, header:null, payload:null, headerErr:null, payloadErr:null, sig:"", parts:0 };
+    if (!raw){ res.fatal = "Paste a token first."; return res; }
+    var parts = raw.split(".");
+    res.parts = parts.length;
+    res.sig = parts[2] || "";
+    if (parts.length < 2){ res.fatal = "This does not look like a JWT. A JWT has at least two segments joined by dots."; return res; }
+    try { res.header = JSON.parse(b64urlToStr(parts[0])); }
+    catch(e){ res.headerErr = "The header segment is not valid base64url JSON."; }
+    try { res.payload = JSON.parse(b64urlToStr(parts[1])); }
+    catch(e){ res.payloadErr = "The payload segment is not valid base64url JSON."; }
+    if (res.headerErr && res.payloadErr){ res.fatal = "Neither segment decoded as JSON. This may not be a JWT."; }
+    return res;
+  }
+
+  function nowSecs(){ return Math.floor(Date.now()/1000); }
+
+  function fmtTime(secs){
+    if (typeof secs !== "number" || !isFinite(secs)) return String(secs);
+    var d = new Date(secs*1000);
+    if (isNaN(d.getTime())) return String(secs);
+    var diff = secs - nowSecs(), abs = Math.abs(diff);
+    var rel;
+    if (abs < 60) rel = abs + " seconds";
+    else if (abs < 3600) rel = Math.round(abs/60) + " minutes";
+    else if (abs < 86400) rel = Math.round(abs/3600) + " hours";
+    else rel = Math.round(abs/86400) + " days";
+    rel = diff >= 0 ? ("in " + rel) : (rel + " ago");
+    return d.toISOString().replace(".000","") + " (" + rel + ")";
+  }
+
+  var STD = { iss:1, sub:1, aud:1, exp:1, nbf:1, iat:1, jti:1 };
+  var SENSITIVE = /^(pass(word|wd)?|secret|client_?secret|priv(ate)?_?key|api_?key|access_?key|access_?token|refresh_?token|ssn|social_?security|cvv|cvc|pin|card_?number|credit_?card)$/i;
+
+  function leaves(obj, prefix, out){
+    if (obj && typeof obj === "object"){
+      Object.keys(obj).forEach(function(k){ leaves(obj[k], prefix ? prefix+"."+k : k, out); });
+    } else {
+      out.push({ path: prefix, key: prefix.split(".").pop(), val: obj });
+    }
+    return out;
+  }
+
+  // status: pass | warn | fail | info. weight 0 => advisory (not graded).
+  function buildChecks(j){
+    var checks = [], hdr = j.header || {}, pl = j.payload || {};
+    var alg = (hdr.alg || "").toString();
+
+    // 1. Algorithm + alg:none
+    (function(){
+      var weight = 24;
+      if (!hdr.alg){ checks.push({w:weight,s:"warn",h:"Algorithm",f:"The header has no alg field. A well formed JWS header must declare its algorithm.",fix:"Issue tokens with an explicit alg, and have the verifier pin the one it expects.",why:"A missing algorithm forces the verifier to guess, which is exactly the ambiguity attacks rely on."}); return; }
+      if (/^none$/i.test(alg)){ checks.push({w:weight,s:"fail",h:"Algorithm: none",f:"The algorithm is set to none, so this token is unsigned. Anyone can write any payload and have it accepted by a server that trusts this header.",fix:"On the server, pin the expected algorithm and reject alg none outright. Never let the token choose its own verification.",why:"alg none is the original JWT bypass. If the library honors it, there is no signature to forge because there is no signature at all.",link:"https://security.unboundcompute.com/web-security-glossary/",linkText:"More token terms"}); return; }
+      if (/^HS(256|384|512)$/i.test(alg)){ checks.push({w:weight,s:"pass",h:"Algorithm: "+alg+" (symmetric)",f:"Uses an HMAC algorithm. This is valid, but the same secret signs and verifies, so confirm the verifier pins HS"+alg.slice(2)+" and does not accept an asymmetric algorithm on the same endpoint.",why:"If a service that expects RS256 can be switched to HS256, an attacker can sign a forged token with the public key as the HMAC secret. Pinning the algorithm closes that key confusion path."}); return; }
+      if (/^(RS|PS|ES)(256|384|512)$|^EdDSA$/i.test(alg)){ checks.push({w:weight,s:"pass",h:"Algorithm: "+alg+" (asymmetric)",f:"Uses an asymmetric signature, so only the private key can sign while the public key only verifies.",why:"Confirm the verifier rejects a downgrade to none or to an HMAC algorithm, since both turn the public key into a forgery tool."}); return; }
+      checks.push({w:weight,s:"warn",h:"Algorithm: "+alg,f:"Unrecognized or unusual algorithm value. Confirm it is one your verifier actually supports and pins.",fix:"Stick to a vetted algorithm such as RS256, ES256, or HS256, and pin it on the server.",why:"Obscure or non standard algorithm values are a common sign of a hand edited token."});
+    })();
+
+    // 2. Signature present (cannot verify without the key, and we never ask for one)
+    (function(){
+      var weight = 16;
+      if (j.parts < 3 || !j.sig){ checks.push({w:weight,s:"fail",h:"Signature",f:"There is no signature segment. This token is unsecured, so nothing proves it was issued by your server.",fix:"Always issue and require a signed token. Reject any token that arrives without a signature.",why:"An unsigned token is just attacker controlled JSON wearing a token shaped costume."}); return; }
+      checks.push({w:weight,s:"pass",h:"Signature",f:"A signature segment is present. This tool does not verify it, because verifying needs the key and the key never belongs in a web page. Check the signature on the server that holds the key.",why:"A present signature is necessary but not sufficient. Only the verifier with the correct key can prove it is genuine."});
+    })();
+
+    // 3. Expiry
+    (function(){
+      var weight = 18, exp = pl.exp;
+      if (exp === undefined || exp === null){ checks.push({w:weight,s:"fail",h:"Expiry (exp)",f:"No exp claim. This token never expires, so a single leaked copy stays valid forever.",fix:"Set a short exp on every token, and use a separate refresh token for longer sessions.",why:"Expiry is the main limit on the damage of a leaked token. Without it, a leak is permanent."}); return; }
+      if (typeof exp !== "number"){ checks.push({w:weight,s:"warn",h:"Expiry (exp)",f:"exp is present but is not a number. It must be a numeric seconds since epoch value.",fix:"Encode exp as a NumericDate, the number of seconds since 1970, not a string.",why:"A non numeric exp may be parsed loosely or ignored, which can let an expired token through."}); return; }
+      if (exp <= nowSecs()){ checks.push({w:weight,s:"info",h:"Expiry (exp)",f:"This token has already expired ("+fmtTime(exp)+"). That is safe to see here, a correct server should now reject it.",why:"An expired token is only a risk if the server still accepts it. Confirm your verifier checks exp."}); return; }
+      var iat = pl.iat, life = (typeof iat === "number") ? (exp - iat) : null;
+      if (life !== null && life > 86400){ checks.push({w:weight,s:"warn",h:"Expiry (exp)",f:"Valid until "+fmtTime(exp)+", but the lifetime is long ("+Math.round(life/86400)+" days from issue). A long lived bearer token is a long lived liability if it leaks.",fix:"Prefer minutes to hours for an access token. Use refresh tokens for longer sessions.",why:"The longer a token lives, the longer a stolen one keeps working."}); return; }
+      checks.push({w:weight,s:"pass",h:"Expiry (exp)",f:"Valid until "+fmtTime(exp)+".",why:"A near term expiry limits how long a leaked token stays useful."});
+    })();
+
+    // 4. iat / nbf sanity (advisory-ish, light weight)
+    (function(){
+      var weight = 6, iat = pl.iat, nbf = pl.nbf, notes = [], bad = false;
+      if (typeof iat === "number"){
+        if (iat > nowSecs() + 300){ notes.push("iat is in the future ("+fmtTime(iat)+"), which usually means a clock or generation bug."); bad = true; }
+        else notes.push("Issued at "+fmtTime(iat)+".");
+      }
+      if (typeof nbf === "number"){
+        if (nbf > nowSecs() + 300){ notes.push("nbf (not before) is in the future ("+fmtTime(nbf)+"), so this token is not yet valid."); }
+        else notes.push("Not before "+fmtTime(nbf)+".");
+      }
+      if (!notes.length){ checks.push({w:0,s:"info",h:"Issued at and not before",f:"No iat or nbf claims found. Both are optional, but iat helps with auditing and revocation windows.",why:"Timestamps make it possible to reason about when a token was minted and when it became valid."}); return; }
+      checks.push({w:weight,s:bad?"warn":"pass",h:"Issued at and not before",f:notes.join(" "),why:"Sane timestamps are a small but real signal that the token was minted by your system and not hand built."});
+    })();
+
+    // 5. Sensitive data in the payload (readable by anyone)
+    (function(){
+      var weight = 14, hits = [];
+      leaves(pl, "", []).forEach(function(l){
+        if (STD[l.key]) return;
+        if (SENSITIVE.test(l.key)){ hits.push("<b>"+esc(l.path)+"</b> looks like a secret or credential, and the payload is readable by anyone holding the token."); return; }
+        if (typeof l.val === "string"){
+          if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(l.val)){ hits.push("<b>"+esc(l.path)+"</b> contains an email address ("+esc(l.val)+"), which is personal data exposed to anyone who reads the token."); return; }
+          if (/^[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]*$/.test(l.val)){ hits.push("<b>"+esc(l.path)+"</b> looks like another JWT nested inside this one, which often leaks a second credential."); return; }
+        }
+      });
+      if (hits.length){ checks.push({w:weight,s:"fail",h:"Sensitive data in payload",f:"The payload carries data that should not travel in a JWT. Remember the payload is only base64url encoded, not encrypted.",subs:hits,fix:"Keep secrets and personal data out of the payload. Store them server side and reference them by an opaque id.",why:"Anyone who can read the token can read every claim. Encoding is not encryption.",link:"https://security.unboundcompute.com/what-is-web-application-security/",linkText:"Why data exposure matters"}); return; }
+      checks.push({w:weight,s:"pass",h:"Sensitive data in payload",f:"No obvious secrets, credentials, or nested tokens spotted in the claims.",why:"The payload is readable to anyone with the token, so keeping secrets out of it is the right call."});
+    })();
+
+    // 6. Audience and issuer binding
+    (function(){
+      var weight = 8, miss = [];
+      if (pl.iss === undefined) miss.push("iss (issuer)");
+      if (pl.aud === undefined) miss.push("aud (audience)");
+      if (miss.length === 2){ checks.push({w:weight,s:"warn",h:"Audience and issuer binding",f:"No iss or aud claims. The token is not bound to who issued it or who it is for, so it may be replayable across services that share a key.",fix:"Set iss to your issuer and aud to the intended service, and have each service verify both.",why:"Without audience binding, a token minted for one service can be replayed against another that trusts the same key."}); return; }
+      if (miss.length === 1){ checks.push({w:weight,s:"warn",h:"Audience and issuer binding",f:"Missing "+miss[0]+". Set both iss and aud so the token is bound to its issuer and its intended audience.",fix:"Add the missing claim and verify it on the receiving service.",why:"Both claims together stop a token from being reused outside the service it was meant for."}); return; }
+      checks.push({w:weight,s:"pass",h:"Audience and issuer binding",f:"Both iss ("+esc(String(pl.iss))+") and aud are set.",why:"Issuer and audience binding limit a token to the service it was minted for."});
+    })();
+
+    // 7. Header key references (jku / x5u / jwk / kid)
+    (function(){
+      var weight = 8, subs = [], danger = false;
+      if (hdr.jku){ subs.push("<b>jku</b> points the verifier at "+esc(String(hdr.jku))+" to fetch the key. If that URL is not strictly allow listed, an attacker can point it at their own key and forge tokens."); danger = true; }
+      if (hdr.x5u){ subs.push("<b>x5u</b> references an external certificate URL ("+esc(String(hdr.x5u))+"). Same risk as jku, plus a request the server makes to a place the attacker may choose."); danger = true; }
+      if (hdr.jwk){ subs.push("<b>jwk</b> embeds a public key inside the token itself. A verifier that trusts this key verifies the attacker against the attacker. The key must come from the server, never from the token."); danger = true; }
+      if (hdr.kid !== undefined){ subs.push("<b>kid</b> is "+esc(String(hdr.kid))+". Treat it as an opaque key id only. If it reaches a file path or a database query it becomes an injection sink."); }
+      if (danger){ checks.push({w:weight,s:"fail",h:"Header key references",f:"The header tells the verifier where to get its key. That decision must belong to the server, not the token.",subs:subs,fix:"Ignore jku, x5u, and jwk from the token. Resolve keys from a fixed, server side allow list keyed by a known kid.",why:"If the token can choose the verification key, an attacker chooses it too, and every signature check becomes theatre."}); return; }
+      if (subs.length){ checks.push({w:weight,s:"warn",h:"Header key references",f:"The header carries a kid. That is normal, just confirm how the server uses it.",subs:subs,why:"A kid is meant to select a key from a trusted set, not to be interpreted as a path or a query fragment."}); return; }
+      checks.push({w:weight,s:"pass",h:"Header key references",f:"No jku, x5u, jwk, or kid in the header that could steer key selection.",why:"With no key hints in the token, the server alone decides which key verifies it."});
+    })();
+
+    return checks;
+  }
+
+  function grade(checks){
+    var earned = 0, possible = 0;
+    checks.forEach(function(ch){
+      if (!ch.w) return;
+      possible += ch.w;
+      earned += ch.s === "pass" ? ch.w : ch.s === "warn" ? ch.w*0.5 : ch.s === "info" ? ch.w : 0;
+    });
+    var pct = possible ? Math.round(earned/possible*100) : 0;
+    var letter = pct>=90?"A":pct>=80?"B":pct>=70?"C":pct>=60?"D":"F";
+    return { pct: pct, letter: letter };
+  }
+
+  function esc(s){ return String(s).replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];}); }
+
+  function claimRow(label, val){ return '<div><b>'+esc(label)+'</b> '+esc(fmtTime(val))+'</div>'; }
+
+  function renderDecoded(j){
+    var html = '<div class="decoded">';
+    // header
+    html += '<div class="seg"><h3>Header</h3>';
+    if (j.header) html += '<pre>'+esc(JSON.stringify(j.header,null,2))+'</pre>';
+    else html += '<div class="err">'+esc(j.headerErr||"Not decoded.")+'</div>';
+    html += '</div>';
+    // payload
+    html += '<div class="seg"><h3>Payload</h3>';
+    if (j.payload){
+      html += '<pre>'+esc(JSON.stringify(j.payload,null,2))+'</pre>';
+      var rows = "";
+      ["iat","nbf","exp"].forEach(function(k){ if (typeof j.payload[k] === "number") rows += claimRow(k+":", j.payload[k]); });
+      if (rows) html += '<div class="claims">'+rows+'</div>';
+    } else {
+      html += '<div class="err">'+esc(j.payloadErr||"Not decoded.")+'</div>';
+    }
+    html += '</div></div>';
+    return html;
+  }
+
+  function render(j, checks){
+    var html = renderDecoded(j);
+    var g = grade(checks);
+    var sum = { pass:0, warn:0, fail:0 };
+    checks.forEach(function(c){ if (c.w && sum[c.s]!==undefined) sum[c.s]++; });
+
+    html += '<div class="grade-card">';
+    html += '<div class="grade g-'+g.letter+'">'+g.letter+'</div>';
+    html += '<div class="grade-meta"><h2>Score '+g.pct+' out of 100</h2>';
+    html += '<p>'+sum.pass+' strong, '+sum.warn+' to improve, '+sum.fail+' dangerous. This audits structure and claims. It does not verify the signature, which needs the key.</p>';
+    html += '<div class="score-bar"><i style="width:'+g.pct+'%"></i></div></div></div>';
+
+    html += '<div class="checks">';
+    checks.forEach(function(c){
+      var sym = c.s==="pass"?"&#10003;":c.s==="warn"?"!":c.s==="fail"?"&#10007;":"i";
+      html += '<div class="check"><div class="top"><span class="dot '+c.s+'">'+sym+'</span><div style="flex:1">';
+      html += '<h3>'+esc(c.h)+'</h3>';
+      html += '<div class="finding">'+esc(c.f)+'</div>';
+      if (c.subs && c.subs.length){
+        html += '<div class="sub">';
+        c.subs.forEach(function(s){ html += '<div>'+s+'</div>'; });   // subs may contain <b>
+        html += '</div>';
+      }
+      if (c.why) html += '<div class="why">'+esc(c.why)+'</div>';
+      if (c.fix && c.s !== "pass") html += '<div class="fix">'+esc(c.fix)+'</div>';
+      if (c.link) html += '<div class="more"><a href="'+c.link+'" rel="noopener">'+esc(c.linkText||"Learn more")+' &rarr;</a></div>';
+      html += '</div></div></div>';
+    });
+    html += '</div>';
+    return html;
+  }
+
+  function run(){
+    var text = $("#jwt").value;
+    var j = parseJwt(text);
+    if (j.fatal){ $("#results").innerHTML = '<div class="empty">'+esc(j.fatal)+'</div>'; return; }
+    var checks = buildChecks(j);
+    $("#results").innerHTML = render(j, checks);
+    $("#results").scrollIntoView({ behavior:"smooth", block:"start" });
+  }
+
+  $("#analyze").addEventListener("click", run);
+  $("#example").addEventListener("click", function(){ $("#jwt").value = EXAMPLE; run(); });
+  $("#clear").addEventListener("click", function(){ $("#jwt").value=""; $("#results").innerHTML='<div class="empty">Your decoded token and graded report will appear here.</div>'; $("#jwt").focus(); });
+  $("#jwt").addEventListener("keydown", function(e){ if ((e.metaKey||e.ctrlKey) && e.key==="Enter") run(); });
+})();
+</script>
+</body>
+</html>

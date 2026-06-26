@@ -1,0 +1,30 @@
+<!-- @dsCard group="Components" -->
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+<title>Comparison</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@450&family=JetBrains+Mono:wght@500&family=Newsreader:ital,opsz,wght@0,6..72,400;1,6..72,400&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0a0b;--ink:#f4f2ec;--ink-soft:#9b988f;--ink-faint:#5e5b54;--line:rgba(244,242,236,.13);--accent:#fb5b46;--accent-2:#ff7d6b;}
+  *{margin:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;padding:64px}
+  .kick{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+  h1{font-weight:600;font-size:22px;letter-spacing:-.02em;margin-bottom:46px}
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:72px;max-width:980px}
+  .card{border-top:1px solid var(--line);padding-top:30px}
+  .card.us{border-top-color:var(--accent)}
+  .label{display:inline-flex;align-items:center;gap:9px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:20px}
+  .label::before{content:"";width:6px;height:6px;border-radius:1px;background:var(--ink-faint)}
+  .card.us .label{color:var(--accent)}.card.us .label::before{background:var(--accent)}
+  .card h3{font-family:'Newsreader',serif;font-weight:400;font-size:28px;letter-spacing:-.01em;line-height:1.14;margin-bottom:16px}
+  .card.muted h3{color:var(--ink-soft);font-style:italic}
+  .card.us h3{color:var(--accent-2)}
+  .card p{color:var(--ink-soft);font-size:16px;line-height:1.62}
+</style></head>
+<body>
+  <p class="kick">Components</p>
+  <h1>Comparison — scanner vs UnboundCompute</h1>
+  <div class="split">
+    <div class="card muted"><span class="label">A scanner asks</span><h3>&ldquo;Is this endpoint open to IDOR?&rdquo;</h3><p>It matches patterns against a fixed list. Endless payloads, noisy output, blind to ownership, roles, workflows, and state.</p></div>
+    <div class="card us"><span class="label">UnboundCompute asks</span><h3>&ldquo;Which line does this app trust, and will it hold?&rdquo;</h3><p>It models the rules the app is meant to enforce, then designs the exact request that should be stopped at the line. A finding is a boundary that gave way, proven.</p></div>
+  </div>
+</body></html>

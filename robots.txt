@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://unboundcompute.com/sitemap.xml
+Sitemap: https://security.unboundcompute.com/sitemap.xml

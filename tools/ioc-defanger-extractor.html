@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>IOC Extractor and Defanger | UnboundCompute</title>
+<meta name="description" content="Paste a threat report, alert, or log lines and pull out every indicator of compromise: IPs, domains, URLs, emails, file hashes, and CVEs. Defang and refang output for safe pasting into tickets. Runs fully in your browser." />
+<meta name="keywords" content="ioc extractor, defang url, refang, indicator of compromise, threat intelligence, incident response, ioc parser, threat intel tool, defang ip, extract iocs" />
+<meta name="robots" content="index, follow" />
+<meta name="author" content="UnboundCompute" />
+<meta name="theme-color" content="#0a0a0b" />
+<link rel="canonical" href="https://unboundcompute.com/tools/ioc-defanger-extractor.html" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a0a0b'/%3E%3Cline x1='16' y1='4' x2='16' y2='28' stroke='%23fb5b46' stroke-width='2' stroke-dasharray='3 3'/%3E%3Ccircle cx='16' cy='16' r='3.4' fill='%23fb5b46'/%3E%3C/svg%3E" />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="UnboundCompute" />
+<meta property="og:title" content="IOC Extractor and Defanger" />
+<meta property="og:description" content="Extract indicators of compromise from threat reports and logs, then defang or refang them. Runs fully in your browser, nothing is sent to any server." />
+<meta property="og:url" content="https://unboundcompute.com/tools/ioc-defanger-extractor.html" />
+<meta property="og:image" content="https://unboundcompute.com/og.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="IOC Extractor and Defanger" />
+<meta name="twitter:description" content="Extract indicators of compromise from threat reports and logs, then defang or refang them. Runs fully in your browser." />
+<meta name="twitter:image" content="https://unboundcompute.com/og.png" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "IOC Extractor and Defanger",
+      "applicationCategory": "SecurityApplication",
+      "operatingSystem": "Web",
+      "browserRequirements": "Requires JavaScript. Runs entirely client side.",
+      "url": "https://unboundcompute.com/tools/ioc-defanger-extractor.html",
+      "description": "A free tool for threat intelligence and incident response analysts. It extracts indicators of compromise from a block of text, categorized and deduplicated: IPv4 and IPv6 addresses, domains and hostnames, URLs, email addresses, MD5, SHA1 and SHA256 file hashes, CVE identifiers, and bitcoin addresses. It also defangs and refangs output so links are safe to paste into tickets and email. Already defanged input is refanged internally before extraction. All processing happens in the browser.",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "publisher": { "@type": "Organization", "name": "UnboundCompute", "url": "https://unboundcompute.com/" }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is defanging and refanging?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Defanging rewrites an indicator so it can no longer be clicked or auto resolved when it lands in a ticket, a chat, or an email. The common conventions turn http into hxxp, a dot into [.], an at sign into [at], and :// into [://]. Refanging reverses those substitutions to recover the live indicator. Defanged text is safe to share because nobody accidentally visits a malicious host while reading the report." }
+        },
+        {
+          "@type": "Question",
+          "name": "Does this tool send my pasted text anywhere?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. The extraction, defanging, and refanging all run in your browser with JavaScript. The text you paste is never uploaded, logged, or sent to any server. This matters because incident data often contains victim hosts, internal addresses, and sensitive context, so you can paste a real report here without it leaving your machine." }
+        },
+        {
+          "@type": "Question",
+          "name": "Can it extract indicators that are already defanged?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes. Before extraction the tool refangs the input internally, so an indicator written as hxxps://evil[.]example or 198[.]51[.]100[.]23 or user[at]evil[.]example is recognized and categorized just like a live one. You do not need to clean the report by hand first." }
+        },
+        {
+          "@type": "Question",
+          "name": "How accurate is the extraction?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Extraction is done with client side regular expressions that favor recall, so they are tuned to catch indicators rather than to be perfectly precise. That means you may see a benign domain or a string that merely looks like a hash. Always review the results before acting on them. The tool is a fast first pass, not a verdict on what is malicious." }
+        },
+        {
+          "@type": "Question",
+          "name": "Which indicator types does it recognize?",
+          "acceptedAnswer": { "@type": "Answer", "text": "IPv4 and IPv6 addresses, domains and hostnames, full URLs, email addresses, MD5, SHA1 and SHA256 file hashes, CVE identifiers in the CVE-YEAR-NUMBER form, and bitcoin addresses. Each category is deduplicated, counted, and given its own copy button." }
+        }
+      ]
+    }
+  ]
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600&family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0a0b; --bg-2:#070708; --panel:#0e0e10; --panel-2:#131315;
+    --ink:#f4f2ec; --ink-hi:#fbf9f3; --ink-soft:#9b988f; --ink-faint:#5e5b54;
+    --line:rgba(244,242,236,.13); --line-2:rgba(244,242,236,.07);
+    --accent:#fb5b46; --accent-2:#ff7d6b; --accent-wash:rgba(251,91,70,.12); --on-accent:#1a0c09; --accent-line:rgba(251,91,70,.42);
+    --pass:#5fd6a4; --pass-wash:rgba(95,214,164,.1); --warn:#e8b04b; --warn-wash:rgba(232,176,75,.1); --fail:#fb5b46; --fail-wash:rgba(251,91,70,.1); --info:#7c93ff; --info-wash:rgba(124,147,255,.1);
+    --serif:'Newsreader',Georgia,serif; --mono:'JetBrains Mono',ui-monospace,monospace; --sans:'Inter',system-ui,sans-serif;
+    --maxw:920px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;line-height:1.6}
+  ::selection{background:var(--accent);color:var(--on-accent)}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+
+  nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);background:rgba(10,10,11,.72);border-bottom:1px solid var(--line-2)}
+  nav .wrap{height:64px;display:flex;align-items:center;justify-content:space-between}
+  nav a.brand{display:flex;align-items:center;gap:11px;font-family:var(--mono);font-weight:600;font-size:15px;color:var(--ink);letter-spacing:-.01em}
+  nav a.brand:hover{text-decoration:none}
+  nav .badge{width:27px;height:27px;border-radius:7px;border:1px solid var(--accent-line);display:grid;place-items:center}
+  nav a.cta{font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:9px 16px;border-radius:8px;background:var(--accent);color:var(--on-accent)}
+  nav a.cta:hover{filter:brightness(1.08);text-decoration:none}
+
+  header.hero{padding:64px 0 28px}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:18px}
+  h1{font-family:var(--serif);font-weight:400;font-size:clamp(32px,5vw,52px);line-height:1.08;letter-spacing:-.015em;color:var(--ink-hi)}
+  .lede{margin-top:18px;font-size:18px;color:var(--ink-soft);max-width:660px}
+  .privacy{margin-top:18px;display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);border:1px solid var(--line);border-radius:8px;padding:8px 13px;background:var(--panel)}
+  .privacy svg{width:14px;height:14px;flex:none}
+
+  .tool{margin:30px 0 12px;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px}
+  label.fld{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:10px}
+  textarea{width:100%;min-height:170px;resize:vertical;background:var(--bg-2);border:1px solid var(--line);border-radius:11px;padding:15px;color:var(--ink);font-family:var(--mono);font-size:13.5px;line-height:1.55;outline:none;transition:border-color .2s,box-shadow .2s;word-break:break-all}
+  textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-wash)}
+  textarea::placeholder{color:var(--ink-faint)}
+  .row{display:flex;gap:11px;flex-wrap:wrap;margin-top:14px;align-items:center}
+  button{font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;padding:13px 22px;border-radius:9px;cursor:pointer;border:1px solid var(--line);background:transparent;color:var(--ink);transition:filter .15s,border-color .15s,background .15s}
+  button.primary{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+  button.primary:hover{filter:brightness(1.08)}
+  button.ghost:hover{border-color:var(--accent-line);color:var(--ink-hi)}
+  .hint{font-family:var(--mono);font-size:12px;color:var(--ink-faint);margin-left:auto}
+
+  #results{margin-top:8px}
+
+  .summary{display:flex;align-items:center;gap:22px;background:var(--panel-2);border:1px solid var(--line);border-radius:16px;padding:22px 24px;margin:20px 0}
+  .summary .count{font-family:var(--serif);font-size:54px;line-height:1;width:96px;height:96px;border-radius:18px;display:grid;place-items:center;flex:none;border:1.5px solid var(--accent);color:var(--accent);background:var(--accent-wash)}
+  .summary-meta h2{font-family:var(--serif);font-weight:400;font-size:24px;color:var(--ink-hi);margin-bottom:4px}
+  .summary-meta p{color:var(--ink-soft);font-size:14.5px}
+
+  .cat{border:1px solid var(--line);border-radius:13px;padding:16px 18px;background:var(--panel);margin-bottom:11px}
+  .cat .top{display:flex;align-items:center;gap:13px}
+  .cat h3{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--ink-hi);letter-spacing:.02em;text-transform:uppercase;flex:1}
+  .cat .pill{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-wash);border:1px solid var(--accent-line);border-radius:99px;padding:3px 10px}
+  .cat .copy{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:7px 13px;border-radius:8px;cursor:pointer;border:1px solid var(--line);background:transparent;color:var(--ink-soft);transition:border-color .15s,color .15s}
+  .cat .copy:hover{border-color:var(--accent-line);color:var(--ink-hi)}
+  .cat ul{margin-top:11px;border-top:1px solid var(--line-2);padding-top:11px;list-style:none;display:flex;flex-direction:column;gap:4px}
+  .cat li{font-family:var(--mono);font-size:13px;color:var(--ink);word-break:break-all}
+  .cat .note{margin-top:9px;font-family:var(--mono);font-size:11.5px;color:var(--ink-faint)}
+
+  .fang{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px;margin:20px 0}
+  .fang h2{font-family:var(--serif);font-weight:400;font-size:22px;color:var(--ink-hi);margin-bottom:6px}
+  .fang p{color:var(--ink-soft);font-size:14px;margin-bottom:14px}
+  .fang .out{width:100%;min-height:120px;resize:vertical;background:var(--bg-2);border:1px solid var(--line);border-radius:11px;padding:15px;color:var(--ink);font-family:var(--mono);font-size:13.5px;line-height:1.55;outline:none;word-break:break-all;white-space:pre-wrap}
+  .fang .applied{margin-top:11px;font-family:var(--mono);font-size:12px;color:var(--ink-soft);display:flex;flex-wrap:wrap;gap:7px}
+  .fang .applied span{border:1px solid var(--line-2);border-radius:7px;padding:4px 9px;background:var(--bg-2)}
+
+  .empty{color:var(--ink-faint);font-family:var(--mono);font-size:13px;text-align:center;padding:30px}
+
+  .prose{padding:44px 0 20px}
+  .prose h2{font-family:var(--serif);font-weight:400;font-size:30px;color:var(--ink-hi);margin:36px 0 14px;letter-spacing:-.01em}
+  .prose h3{font-family:var(--mono);font-size:15px;color:var(--ink-hi);margin:24px 0 8px}
+  .prose p{color:var(--ink-soft);margin-bottom:14px;font-size:16px}
+  .prose ul{color:var(--ink-soft);margin:0 0 14px 20px;font-size:16px}
+  .prose li{margin-bottom:7px}
+  .prose code{font-family:var(--mono);font-size:13.5px;background:var(--panel-2);border:1px solid var(--line-2);border-radius:5px;padding:1px 6px;color:var(--ink)}
+  .related{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:8px}
+  .related a{display:block;border:1px solid var(--line);border-radius:11px;padding:14px 16px;color:var(--ink);font-size:14.5px;background:var(--panel)}
+  .related a:hover{border-color:var(--accent-line);text-decoration:none}
+  .related a span{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:5px}
+
+  footer{border-top:1px solid var(--line-2);margin-top:40px;padding:30px 0;color:var(--ink-faint);font-family:var(--mono);font-size:12.5px}
+  footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px}
+  footer a{color:var(--ink-soft)}
+  @media (max-width:560px){
+    .related{grid-template-columns:1fr}
+    .summary{flex-direction:column;align-items:flex-start;gap:16px}
+    .hint{margin-left:0;width:100%}
+  }
+</style>
+</head>
+<body>
+
+<nav><div class="wrap">
+  <a class="brand" href="https://unboundcompute.com/">
+    <span class="badge"><svg viewBox="0 0 24 24" fill="none" style="width:15px;height:15px"><line x1="12" y1="3" x2="12" y2="21" stroke="var(--accent)" stroke-width="1.8" stroke-dasharray="2.6 2.6"/><circle cx="12" cy="12" r="3" fill="var(--accent)"/></svg></span>
+    UnboundCompute
+  </a>
+  <a class="cta" href="https://unboundcompute.com/#cta">Request access</a>
+</div></nav>
+
+<header class="hero"><div class="wrap">
+  <div class="eyebrow">Free tool</div>
+  <h1>IOC Extractor and Defanger</h1>
+  <p class="lede">Paste a threat report, an alert, log lines, or an email body and pull out every indicator of compromise, categorized and deduplicated with a copy button each. It reads indicators that are already defanged, and it can defang or refang any text so links are safe to paste into a ticket.</p>
+  <div class="privacy">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6l8-4z" stroke="var(--accent)" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Incident data is sensitive. Everything runs in your browser. Nothing is sent to any server.
+  </div>
+</div></header>
+
+<div class="wrap">
+  <div class="tool">
+    <label class="fld" for="src">Paste a report, alert, log lines, or email body</label>
+    <textarea id="src" spellcheck="false" placeholder="Paste threat intel or incident text here. Defanged indicators like hxxps://evil[.]example or 198[.]51[.]100[.]23 are recognized too. Everything is processed locally and never sent anywhere."></textarea>
+    <div class="row">
+      <button class="primary" id="extract">Extract indicators</button>
+      <button class="ghost" id="example">Load example</button>
+      <button class="ghost" id="clear">Clear</button>
+      <span class="hint" id="hint">No data leaves this page</span>
+    </div>
+  </div>
+  <div id="results"><div class="empty">Extracted indicators and the defang and refang output will appear here.</div></div>
+</div>
+
+<div class="wrap prose">
+  <h2>What this IOC extractor does</h2>
+  <p>An indicator of compromise is a small piece of observable evidence that points at malicious activity: an attacker controlled IP address, a command and control domain, a download URL, a phishing sender, a file hash, or a vulnerability identifier. A threat report or an alert is usually written for humans, so those indicators are scattered through prose and log lines. This tool reads the whole block of text, finds the indicators, groups them by type, removes duplicates, counts each group, and gives every group its own copy button so you can move them straight into a case, a watchlist, or a detection rule.</p>
+
+  <h3>The indicator types it recognizes</h3>
+  <ul>
+    <li>IPv4 and IPv6 addresses</li>
+    <li>Domains and hostnames</li>
+    <li>Full URLs</li>
+    <li>Email addresses</li>
+    <li>File hashes: MD5 (32 hex), SHA1 (40 hex), and SHA256 (64 hex)</li>
+    <li>CVE identifiers in the <code>CVE-YEAR-NUMBER</code> form</li>
+    <li>Bitcoin addresses</li>
+  </ul>
+
+  <h3>Reading input that is already defanged</h3>
+  <p>Analysts share indicators in a deactivated form so nobody clicks them by accident, so the same domain might arrive as <code>evil[.]example</code>, <code>evil(.)example</code>, or <code>hxxps://evil[.]example</code>. Before it extracts anything, this tool refangs the input internally, undoing <code>hxxp</code>, <code>[.]</code>, <code>(.)</code>, <code>[at]</code>, and <code>[://]</code> style substitutions, so a defanged indicator is matched exactly like a live one. You do not need to clean the report by hand first.</p>
+
+  <h3>Defang and refang for safe sharing</h3>
+  <p>The second function works on whole text rather than single indicators. Defanging rewrites <code>http</code> to <code>hxxp</code>, <code>https</code> to <code>hxxps</code>, <code>://</code> to <code>[://]</code>, every dot to <code>[.]</code>, and the at sign to <code>[at]</code>, which produces text that is safe to paste into a ticket, a chat, or an email without a live clickable link. Refanging reverses each of those substitutions to recover the working indicator when you actually need it. The output panel shows which transformations were applied and copies in one click.</p>
+
+  <h3>An honest note on accuracy</h3>
+  <p>Extraction runs on client side regular expressions, and they are written to favor recall, which means they aim to catch indicators rather than to be perfectly precise. You may see a benign domain, a documentation address, or a string that merely looks like a hash. Treat the output as a fast first pass that still needs a human review, not as a judgment about what is malicious. Deciding which indicators actually matter is the kind of context an <a href="https://security.unboundcompute.com/ai-security-testing/" rel="noopener">AI security testing</a> approach reasons about rather than pattern matching one string.</p>
+
+  <h2>Why this runs in your browser</h2>
+  <p>Incident text is some of the most sensitive material an analyst handles. It can name victim hosts, internal addresses, account identifiers, and the details of a live intrusion. Pasting any of that into a server you do not control is its own exposure. Every part of this tool, the extraction and the defang and refang, runs as JavaScript on this page, so the text you paste is never uploaded, logged, or stored. You can run a real report through it without the input ever leaving your machine. For the wider set of boundaries attackers probe, see the <a href="https://security.unboundcompute.com/web-security-glossary/" rel="noopener">web security glossary</a> and the <a href="https://security.unboundcompute.com/category/access-control/" rel="noopener">access control</a> writing.</p>
+
+  <h2>Frequently asked questions</h2>
+  <h3>What is defanging and refanging</h3>
+  <p>Defanging rewrites an indicator so it can no longer be clicked or auto resolved when it lands in a ticket or an email, turning <code>http</code> into <code>hxxp</code>, a dot into <code>[.]</code>, and the at sign into <code>[at]</code>. Refanging reverses those substitutions to recover the live indicator when you need to work with it.</p>
+  <h3>Can it extract indicators that are already defanged</h3>
+  <p>Yes. The input is refanged internally before extraction, so a host written as <code>hxxps://evil[.]example</code> or an address written as <code>198[.]51[.]100[.]23</code> is recognized and categorized just like a live one.</p>
+  <h3>How accurate is the extraction</h3>
+  <p>It favors recall, so it is tuned to catch indicators rather than to be perfectly precise. Review the results before acting on them. The tool is a fast first pass, not a verdict on what is malicious.</p>
+
+  <h2>More free tools</h2>
+  <div class="related">
+    <a href="https://unboundcompute.com/tools/subdomain-takeover-checker.html"><span>Free tool</span>Subdomain Takeover Fingerprint Checker</a>
+    <a href="https://unboundcompute.com/tools/security-headers-analyzer.html"><span>Free tool</span>Security Headers and CSP Analyzer</a>
+    <a href="https://unboundcompute.com/tools/jwt-security-inspector.html"><span>Free tool</span>JWT Security Inspector</a>
+    <a href="https://unboundcompute.com/tools/"><span>Free tools</span>All free security tools</a>
+  </div>
+</div>
+
+<footer><div class="wrap">
+  <div>Built by <a href="https://unboundcompute.com/">UnboundCompute</a>, autonomous security research for web apps and APIs.</div>
+  <div><a href="https://unboundcompute.com/#cta">Request access</a></div>
+</div></footer>
+
+<script>
+(function(){
+  "use strict";
+  var $ = function(s){ return document.querySelector(s); };
+
+  var EXAMPLE = [
+    "Incident summary 2026-06-14",
+    "",
+    "A phishing wave delivered a loader that beaconed to hxxps://evil[.]example/path/update and a",
+    "secondary host cdn[.]bad-host(.)evil[.]example. The staging server resolved to 198[.]51[.]100[.]23",
+    "and an alternate node at 203.0.113.77. A live mirror was seen at http://malware.test.evil.example/x.",
+    "",
+    "Sender of record: alerts[at]evil[.]example, reply-to mailbox payments@evil.example.",
+    "Dropped payload SHA256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855,",
+    "with an MD5 of 5d41402abc4b2a76b9719d911017c592 and a config blob hash 0123456789abcdef0123456789abcdef01234567.",
+    "",
+    "The loader exploited CVE-2024-0001 in the document parser. Ransom note demanded payment to",
+    "the bitcoin address 1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2. IPv6 callback observed at 2001:db8::1337.",
+    "",
+    "All values above are invented documentation examples for testing only."
+  ].join("\n");
+
+  // ---- refang: turn defanged text back into live indicators ----
+  function refang(t){
+    return t
+      .replace(/\[\.\]|\(\.\)|\{\.\}|\[dot\]|\(dot\)/gi, ".")
+      .replace(/\[:\/\/\]|\(:\/\/\)|\[:\]\/\//gi, "://")
+      .replace(/\bhxxps\b/gi, "https")
+      .replace(/\bhxxp\b/gi, "http")
+      .replace(/\bfxp\b/gi, "ftp")
+      .replace(/\s*\[at\]\s*|\s*\(at\)\s*|\s*\{at\}\s*/gi, "@")
+      .replace(/\[:\]/g, ":")
+      .replace(/\[\/\]/g, "/");
+  }
+
+  // ---- defang: deactivate live indicators ----
+  function defang(t){
+    return t
+      .replace(/\bhttps\b/gi, "hxxps")
+      .replace(/\bhttp\b/gi, "hxxp")
+      .replace(/\bftp\b/gi, "fxp")
+      .replace(/:\/\//g, "[://]")
+      .replace(/@/g, "[at]")
+      .replace(/\./g, "[.]");
+  }
+
+  // ---- extraction patterns (run over the refanged text) ----
+  // order matters: longer hashes first so a SHA256 is not eaten as parts.
+  var SHA256 = /\b[a-fA-F0-9]{64}\b/g;
+  var SHA1   = /\b[a-fA-F0-9]{40}\b/g;
+  var MD5    = /\b[a-fA-F0-9]{32}\b/g;
+  var CVE    = /\bCVE-\d{4}-\d{4,7}\b/gi;
+  var IPV4   = /\b(?:(?:25[0-5]|2[0-4]\d|1?\d?\d)\.){3}(?:25[0-5]|2[0-4]\d|1?\d?\d)\b/g;
+  var IPV6   = /\b(?:[A-F0-9]{1,4}:){2,7}[A-F0-9]{1,4}\b|\b(?:[A-F0-9]{1,4}:){1,7}:(?:[A-F0-9]{1,4})?\b|::(?:[A-F0-9]{1,4}:){0,6}[A-F0-9]{1,4}\b/gi;
+  var URLRE  = /\b(?:https?|ftp):\/\/[^\s"'<>()\[\]{}]+/gi;
+  var EMAIL  = /\b[A-Za-z0-9._%+\-]+@(?:[A-Za-z0-9](?:[A-Za-z0-9\-]{0,61}[A-Za-z0-9])?\.)+[A-Za-z]{2,}\b/g;
+  var BTC    = /\b(?:bc1[ac-hj-np-z02-9]{11,71}|[13][a-km-zA-HJ-NP-Z1-9]{25,34})\b/g;
+  // domain / hostname: at least one dot, a real looking TLD.
+  var DOMAIN = /\b(?:[A-Za-z0-9](?:[A-Za-z0-9\-]{0,61}[A-Za-z0-9])?\.)+[A-Za-z]{2,24}\b/g;
+
+  function uniq(arr){
+    var seen = {}, out = [];
+    arr.forEach(function(v){
+      var k = v.toLowerCase();
+      if (!seen[k]){ seen[k] = 1; out.push(v); }
+    });
+    return out;
+  }
+
+  function find(re, text){
+    var m, out = [];
+    re.lastIndex = 0;
+    while ((m = re.exec(text)) !== null){
+      out.push(m[0]);
+      if (m.index === re.lastIndex) re.lastIndex++;
+    }
+    return out;
+  }
+
+  function stripPunct(s){ return s.replace(/[.,;:)\]}'"]+$/, ""); }
+
+  function extract(rawInput){
+    var text = refang(rawInput);
+
+    var sha256 = uniq(find(SHA256, text));
+    var sha1   = uniq(find(SHA1, text));
+    var md5    = uniq(find(MD5, text));
+    var cve    = uniq(find(CVE, text).map(function(s){ return s.toUpperCase(); }));
+    var ipv4   = uniq(find(IPV4, text));
+    var ipv6raw = find(IPV6, text).filter(function(s){ return s.indexOf(":") !== -1 && s.length > 2; });
+    var ipv6   = uniq(ipv6raw);
+    var urls   = uniq(find(URLRE, text).map(stripPunct));
+    var emails = uniq(find(EMAIL, text).map(function(s){ return s.toLowerCase(); }));
+    var btc    = uniq(find(BTC, text));
+
+    // hashes are hex strings; remove them and IPs from the domain pass so a
+    // bare hash or a dotted IP is not also reported as a domain.
+    var hashSet = {};
+    sha256.concat(sha1, md5).forEach(function(h){ hashSet[h.toLowerCase()] = 1; });
+
+    // domains: exclude anything that is an IPv4, sits inside a URL host only,
+    // or has an all numeric TLD. We keep hostnames found in URLs too.
+    var domains = uniq(find(DOMAIN, text).map(function(s){ return s.toLowerCase(); }).filter(function(d){
+      if (/^(?:\d{1,3}\.){3}\d{1,3}$/.test(d)) return false;   // IPv4
+      if (/\.\d+$/.test(d)) return false;                       // numeric TLD
+      return true;
+    }));
+
+    return {
+      categories: [
+        { key:"ipv4",    label:"IPv4 addresses",  items:ipv4 },
+        { key:"ipv6",    label:"IPv6 addresses",  items:ipv6 },
+        { key:"domain",  label:"Domains and hostnames", items:domains, note:"Includes hosts pulled from URLs and emails. Review for benign domains." },
+        { key:"url",     label:"URLs",            items:urls },
+        { key:"email",   label:"Email addresses", items:emails },
+        { key:"sha256",  label:"SHA256 hashes",   items:sha256 },
+        { key:"sha1",    label:"SHA1 hashes",     items:sha1 },
+        { key:"md5",     label:"MD5 hashes",      items:md5 },
+        { key:"cve",     label:"CVE identifiers", items:cve },
+        { key:"btc",     label:"Bitcoin addresses", items:btc }
+      ]
+    };
+  }
+
+  function esc(s){ return String(s).replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];}); }
+
+  function copyText(text, btn){
+    var done = function(){ var old = btn.textContent; btn.textContent = "Copied"; setTimeout(function(){ btn.textContent = old; }, 1200); };
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(done, function(){ fallbackCopy(text); done(); });
+    } else { fallbackCopy(text); done(); }
+  }
+  function fallbackCopy(text){
+    var ta = document.createElement("textarea");
+    ta.value = text; ta.setAttribute("readonly",""); ta.style.position="absolute"; ta.style.left="-9999px";
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand("copy"); } catch(e){}
+    document.body.removeChild(ta);
+  }
+
+  function render(res, rawInput){
+    var found = res.categories.filter(function(c){ return c.items.length; });
+    var total = found.reduce(function(n,c){ return n + c.items.length; }, 0);
+
+    var html = "";
+    html += '<div class="summary">';
+    html += '<div class="count">'+total+'</div>';
+    html += '<div class="summary-meta"><h2>'+total+' indicator'+(total===1?"":"s")+' across '+found.length+' categor'+(found.length===1?"y":"ies")+'</h2>';
+    html += '<p>Deduplicated and counted. Extraction favors recall, so review the results before acting on them. Already defanged input was refanged before matching.</p></div></div>';
+
+    if (!total){
+      html += '<div class="empty">No indicators were recognized in this text.</div>';
+    } else {
+      res.categories.forEach(function(c){
+        if (!c.items.length) return;
+        html += '<div class="cat" data-key="'+c.key+'">';
+        html += '<div class="top"><h3>'+esc(c.label)+'</h3>';
+        html += '<span class="pill">'+c.items.length+'</span>';
+        html += '<button class="copy" type="button">Copy</button></div>';
+        html += '<ul>';
+        c.items.forEach(function(it){ html += '<li>'+esc(it)+'</li>'; });
+        html += '</ul>';
+        if (c.note) html += '<div class="note">'+esc(c.note)+'</div>';
+        html += '</div>';
+      });
+    }
+
+    // ---- defang / refang panel ----
+    var defanged = defang(refang(rawInput));   // normalize then defang for a clean result
+    html += '<div class="fang" id="fang">';
+    html += '<h2>Defang and refang</h2>';
+    html += '<p>The box below holds a transformed copy of your input. Defang makes links safe to paste; refang restores them. Edit the box freely, then copy.</p>';
+    html += '<textarea class="out" id="fangout" spellcheck="false"></textarea>';
+    html += '<div class="applied" id="fangapplied"></div>';
+    html += '<div class="row">';
+    html += '<button class="primary" id="dofang" type="button">Defang</button>';
+    html += '<button class="ghost" id="dorefang" type="button">Refang</button>';
+    html += '<button class="ghost" id="copyfang" type="button">Copy output</button>';
+    html += '</div></div>';
+
+    $("#results").innerHTML = html;
+
+    // wire per category copy buttons
+    Array.prototype.forEach.call(document.querySelectorAll(".cat"), function(cat){
+      var key = cat.getAttribute("data-key");
+      var c = res.categories.filter(function(x){ return x.key === key; })[0];
+      var btn = cat.querySelector(".copy");
+      btn.addEventListener("click", function(){ copyText(c.items.join("\n"), btn); });
+    });
+
+    // wire defang / refang
+    var out = $("#fangout"), applied = $("#fangapplied");
+    out.value = defanged;
+    setApplied(applied, "defang");
+
+    $("#dofang").addEventListener("click", function(){ out.value = defang(refang(out.value)); setApplied(applied, "defang"); });
+    $("#dorefang").addEventListener("click", function(){ out.value = refang(out.value); setApplied(applied, "refang"); });
+    $("#copyfang").addEventListener("click", function(){ copyText(out.value, $("#copyfang")); });
+  }
+
+  function setApplied(el, mode){
+    var rules = mode === "defang"
+      ? ["http → hxxp", "https → hxxps", ":// → [://]", ". → [.]", "@ → [at]"]
+      : ["hxxp → http", "hxxps → https", "[://] → ://", "[.] / (.) → .", "[at] → @"];
+    el.innerHTML = '<span style="color:var(--accent)">Applied:</span>' + rules.map(function(r){ return '<span>'+esc(r)+'</span>'; }).join("");
+  }
+
+  function run(){
+    var text = $("#src").value;
+    if (!text.trim()){ $("#results").innerHTML = '<div class="empty">Paste some text first.</div>'; return; }
+    var res = extract(text);
+    render(res, text);
+    $("#results").scrollIntoView({ behavior:"smooth", block:"start" });
+  }
+
+  $("#extract").addEventListener("click", run);
+  $("#example").addEventListener("click", function(){ $("#src").value = EXAMPLE; run(); });
+  $("#clear").addEventListener("click", function(){ $("#src").value=""; $("#results").innerHTML='<div class="empty">Extracted indicators and the defang and refang output will appear here.</div>'; $("#src").focus(); });
+  $("#src").addEventListener("keydown", function(e){ if ((e.metaKey||e.ctrlKey) && e.key==="Enter") run(); });
+
+  // expose for headless self test
+  if (typeof window !== "undefined"){ window.__IOC = { extract: extract, defang: defang, refang: refang }; }
+})();
+</script>
+</body>
+</html>

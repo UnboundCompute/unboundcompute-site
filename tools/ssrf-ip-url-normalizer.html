@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>SSRF IP and URL Normalizer and Range Classifier | UnboundCompute</title>
+<meta name="description" content="Paste a host, IPv4, IPv6, or URL and see every encoding an attacker can use to dodge a naive SSRF filter: dotless decimal, octal, hex, IPv4 mapped IPv6, and more. Classifies the address against loopback, private, link local, CGNAT, and the cloud metadata range. Runs fully in your browser." />
+<meta name="keywords" content="ssrf, ssrf filter bypass, ip normalizer, ip encoding, dotless decimal ip, octal ip, hex ip, cloud metadata 169.254.169.254, ipv4 mapped ipv6, ssrf allowlist bypass" />
+<meta name="robots" content="index, follow" />
+<meta name="author" content="UnboundCompute" />
+<meta name="theme-color" content="#0a0a0b" />
+<link rel="canonical" href="https://unboundcompute.com/tools/ssrf-ip-url-normalizer.html" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a0a0b'/%3E%3Cline x1='16' y1='4' x2='16' y2='28' stroke='%23fb5b46' stroke-width='2' stroke-dasharray='3 3'/%3E%3Ccircle cx='16' cy='16' r='3.4' fill='%23fb5b46'/%3E%3C/svg%3E" />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="UnboundCompute" />
+<meta property="og:title" content="SSRF IP and URL Normalizer and Range Classifier" />
+<meta property="og:description" content="See every encoding of an IP address that bypasses a naive SSRF filter, and classify the canonical address against loopback, private, link local, CGNAT, and the cloud metadata range. Runs fully in your browser, nothing is sent to any server." />
+<meta property="og:url" content="https://unboundcompute.com/tools/ssrf-ip-url-normalizer.html" />
+<meta property="og:image" content="https://unboundcompute.com/og.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="SSRF IP and URL Normalizer and Range Classifier" />
+<meta name="twitter:description" content="Every IP encoding that dodges a naive SSRF filter, plus a clear range verdict. Runs fully in your browser." />
+<meta name="twitter:image" content="https://unboundcompute.com/og.png" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "SSRF IP and URL Normalizer and Range Classifier",
+      "applicationCategory": "SecurityApplication",
+      "operatingSystem": "Web",
+      "browserRequirements": "Requires JavaScript. Runs entirely client side.",
+      "url": "https://unboundcompute.com/tools/ssrf-ip-url-normalizer.html",
+      "description": "A free tool that extracts the host from a URL, IP, or hostname, decodes the many alternate encodings of an IPv4 address that bypass naive SSRF filters, and classifies the canonical address against loopback, private RFC1918, link local, the cloud metadata address, CGNAT, and reserved ranges. All analysis happens in the browser.",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "publisher": { "@type": "Organization", "name": "UnboundCompute", "url": "https://unboundcompute.com/" }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is SSRF and why do IP encodings matter?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Server side request forgery is a flaw where an attacker makes the server fetch a URL of their choosing, often aiming at an internal address the attacker cannot reach directly. Many defenses block a blocklist of literal strings like 127.0.0.1. The problem is that one address has many spellings. The same loopback address can be written as a single decimal number, as octal, as hexadecimal, or mixed, and a parser that accepts those forms but a filter that does not creates a bypass." }
+        },
+        {
+          "@type": "Question",
+          "name": "Does this tool send the address I paste anywhere?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. The parsing, the encoding math, and the range classification all run in your browser with JavaScript. Nothing you paste is uploaded, logged, or sent to any server, so you can test internal hostnames and addresses without them leaving your machine." }
+        },
+        {
+          "@type": "Question",
+          "name": "Can this tool resolve a hostname like internal.corp to an IP?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No, and this is an honest limit. A browser page cannot perform DNS resolution, so the tool works on literal IP addresses and on the host it extracts from a URL. It shows every encoding of a literal address and classifies it, but it does not look up names. A real SSRF defense must also handle DNS, including DNS rebinding where a name resolves to a safe address on the first lookup and an internal address on the second." }
+        },
+        {
+          "@type": "Question",
+          "name": "Why is 169.254.169.254 called out as high risk?",
+          "acceptedAnswer": { "@type": "Answer", "text": "That address is the link local endpoint several cloud platforms use for their instance metadata service. If an attacker can steer a server side request to it, they may read instance credentials, tokens, and configuration. It is one of the highest value SSRF targets, which is why a filter that misses an alternate encoding of it can be so damaging." }
+        },
+        {
+          "@type": "Question",
+          "name": "Is blocking these ranges enough to stop SSRF?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Blocking internal ranges is necessary but not sufficient. A robust defense resolves the host to its final address after following redirects, normalizes every encoding to one canonical form before deciding, validates against an allowlist rather than a blocklist where possible, and accounts for DNS rebinding. This tool helps you see the encoding surface and the range a literal address falls in, which is one part of that larger picture." }
+        }
+      ]
+    }
+  ]
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600&family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0a0b; --bg-2:#070708; --panel:#0e0e10; --panel-2:#131315;
+    --ink:#f4f2ec; --ink-hi:#fbf9f3; --ink-soft:#9b988f; --ink-faint:#5e5b54;
+    --line:rgba(244,242,236,.13); --line-2:rgba(244,242,236,.07);
+    --accent:#fb5b46; --accent-2:#ff7d6b; --accent-wash:rgba(251,91,70,.12); --on-accent:#1a0c09; --accent-line:rgba(251,91,70,.42);
+    --pass:#5fd6a4; --pass-wash:rgba(95,214,164,.1); --warn:#e8b04b; --warn-wash:rgba(232,176,75,.1); --fail:#fb5b46; --fail-wash:rgba(251,91,70,.1); --info:#7c93ff; --info-wash:rgba(124,147,255,.1);
+    --serif:'Newsreader',Georgia,serif; --mono:'JetBrains Mono',ui-monospace,monospace; --sans:'Inter',system-ui,sans-serif;
+    --maxw:920px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;line-height:1.6}
+  ::selection{background:var(--accent);color:var(--on-accent)}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+
+  nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);background:rgba(10,10,11,.72);border-bottom:1px solid var(--line-2)}
+  nav .wrap{height:64px;display:flex;align-items:center;justify-content:space-between}
+  nav a.brand{display:flex;align-items:center;gap:11px;font-family:var(--mono);font-weight:600;font-size:15px;color:var(--ink);letter-spacing:-.01em}
+  nav a.brand:hover{text-decoration:none}
+  nav .badge{width:27px;height:27px;border-radius:7px;border:1px solid var(--accent-line);display:grid;place-items:center}
+  nav a.cta{font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:9px 16px;border-radius:8px;background:var(--accent);color:var(--on-accent)}
+  nav a.cta:hover{filter:brightness(1.08);text-decoration:none}
+
+  header.hero{padding:64px 0 28px}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:18px}
+  h1{font-family:var(--serif);font-weight:400;font-size:clamp(32px,5vw,52px);line-height:1.08;letter-spacing:-.015em;color:var(--ink-hi)}
+  .lede{margin-top:18px;font-size:18px;color:var(--ink-soft);max-width:660px}
+  .privacy{margin-top:18px;display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);border:1px solid var(--line);border-radius:8px;padding:8px 13px;background:var(--panel)}
+  .privacy svg{width:14px;height:14px;flex:none}
+
+  .tool{margin:30px 0 12px;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px}
+  label.fld{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:10px}
+  textarea{width:100%;min-height:96px;resize:vertical;background:var(--bg-2);border:1px solid var(--line);border-radius:11px;padding:15px;color:var(--ink);font-family:var(--mono);font-size:13.5px;line-height:1.55;outline:none;transition:border-color .2s,box-shadow .2s;word-break:break-all}
+  textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-wash)}
+  textarea::placeholder{color:var(--ink-faint)}
+  .row{display:flex;gap:11px;flex-wrap:wrap;margin-top:14px;align-items:center}
+  button{font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;padding:13px 22px;border-radius:9px;cursor:pointer;border:1px solid var(--line);background:transparent;color:var(--ink);transition:filter .15s,border-color .15s,background .15s}
+  button.primary{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+  button.primary:hover{filter:brightness(1.08)}
+  button.ghost:hover{border-color:var(--accent-line);color:var(--ink-hi)}
+  .hint{font-family:var(--mono);font-size:12px;color:var(--ink-faint);margin-left:auto}
+  .examples{margin-top:14px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .examples .lbl{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint);margin-right:2px}
+  .examples button{padding:8px 13px;font-size:12px;text-transform:none;letter-spacing:0}
+
+  #results{margin-top:8px}
+
+  .verdict-card{display:flex;align-items:center;gap:22px;background:var(--panel-2);border:1px solid var(--line);border-radius:16px;padding:22px 24px;margin:20px 0}
+  .vbadge{font-family:var(--mono);font-weight:700;font-size:13px;letter-spacing:.05em;text-transform:uppercase;min-width:96px;padding:18px 12px;border-radius:18px;display:grid;place-items:center;flex:none;border:1.5px solid;text-align:center;line-height:1.3}
+  .vbadge.pass{color:var(--pass);border-color:var(--pass);background:var(--pass-wash)}
+  .vbadge.warn{color:var(--warn);border-color:var(--warn);background:var(--warn-wash)}
+  .vbadge.fail{color:var(--fail);border-color:var(--fail);background:var(--fail-wash)}
+  .vbadge.info{color:var(--info);border-color:var(--info);background:var(--info-wash)}
+  .verdict-meta h2{font-family:var(--serif);font-weight:400;font-size:24px;color:var(--ink-hi);margin-bottom:4px}
+  .verdict-meta .canon{font-family:var(--mono);font-size:15px;color:var(--ink-hi)}
+  .verdict-meta p{color:var(--ink-soft);font-size:14.5px;margin-top:6px}
+
+  .seg{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:16px 18px;margin:14px 0;min-width:0}
+  .seg h3{font-family:var(--mono);font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+  .enc{display:flex;flex-direction:column;gap:1px}
+  .enc-row{display:grid;grid-template-columns:200px 1fr;gap:14px;padding:9px 0;border-top:1px solid var(--line-2);align-items:baseline}
+  .enc-row:first-child{border-top:none}
+  .enc-row .k{font-family:var(--mono);font-size:12px;color:var(--ink-soft)}
+  .enc-row .v{font-family:var(--mono);font-size:13.5px;color:var(--ink-hi);word-break:break-all;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+  .enc-row .v code{background:var(--bg-2);border:1px solid var(--line-2);border-radius:6px;padding:2px 8px}
+  .copy{font-family:var(--mono);font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-faint);border:1px solid var(--line-2);border-radius:6px;padding:3px 7px;cursor:pointer;background:transparent;transition:color .12s,border-color .12s}
+  .copy:hover{color:var(--accent);border-color:var(--accent-line)}
+
+  .checks{display:flex;flex-direction:column;gap:11px;margin-top:14px}
+  .check{border:1px solid var(--line);border-radius:13px;padding:16px 18px;background:var(--panel)}
+  .check .top{display:flex;align-items:flex-start;gap:13px}
+  .dot{width:20px;height:20px;border-radius:6px;flex:none;display:grid;place-items:center;font-size:13px;font-weight:700;margin-top:1px}
+  .dot.pass{background:var(--pass-wash);color:var(--pass)}
+  .dot.warn{background:var(--warn-wash);color:var(--warn)}
+  .dot.fail{background:var(--fail-wash);color:var(--fail)}
+  .dot.info{background:var(--info-wash);color:var(--info)}
+  .check h3{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--ink-hi);letter-spacing:-.01em}
+  .check .finding{margin-top:5px;font-size:14.5px;color:var(--ink)}
+  .check .why{margin-top:9px;font-size:13.5px;color:var(--ink-soft)}
+  .check .more{margin-top:9px;font-size:13px}
+  .note{margin-top:14px;font-size:13.5px;color:var(--ink-soft);background:var(--bg-2);border:1px solid var(--line-2);border-left:3px solid var(--accent-line);border-radius:8px;padding:13px 15px}
+  .note b{color:var(--ink-hi)}
+  .empty{color:var(--ink-faint);font-family:var(--mono);font-size:13px;text-align:center;padding:30px}
+
+  .prose{padding:44px 0 20px}
+  .prose h2{font-family:var(--serif);font-weight:400;font-size:30px;color:var(--ink-hi);margin:36px 0 14px;letter-spacing:-.01em}
+  .prose h3{font-family:var(--mono);font-size:15px;color:var(--ink-hi);margin:24px 0 8px}
+  .prose p{color:var(--ink-soft);margin-bottom:14px;font-size:16px}
+  .prose ul{color:var(--ink-soft);margin:0 0 14px 20px;font-size:16px}
+  .prose li{margin-bottom:7px}
+  .prose code{font-family:var(--mono);font-size:13.5px;background:var(--panel-2);border:1px solid var(--line-2);border-radius:5px;padding:1px 6px;color:var(--ink)}
+  .related{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:8px}
+  .related a{display:block;border:1px solid var(--line);border-radius:11px;padding:14px 16px;color:var(--ink);font-size:14.5px;background:var(--panel)}
+  .related a:hover{border-color:var(--accent-line);text-decoration:none}
+  .related a span{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:5px}
+
+  footer{border-top:1px solid var(--line-2);margin-top:40px;padding:30px 0;color:var(--ink-faint);font-family:var(--mono);font-size:12.5px}
+  footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px}
+  footer a{color:var(--ink-soft)}
+  @media (max-width:560px){
+    .related{grid-template-columns:1fr}
+    .verdict-card{flex-direction:column;align-items:flex-start;gap:16px}
+    .enc-row{grid-template-columns:1fr;gap:3px}
+    .hint{margin-left:0;width:100%}
+  }
+</style>
+</head>
+<body>
+
+<nav><div class="wrap">
+  <a class="brand" href="https://unboundcompute.com/">
+    <span class="badge"><svg viewBox="0 0 24 24" fill="none" style="width:15px;height:15px"><line x1="12" y1="3" x2="12" y2="21" stroke="var(--accent)" stroke-width="1.8" stroke-dasharray="2.6 2.6"/><circle cx="12" cy="12" r="3" fill="var(--accent)"/></svg></span>
+    UnboundCompute
+  </a>
+  <a class="cta" href="https://unboundcompute.com/#cta">Request access</a>
+</div></nav>
+
+<header class="hero"><div class="wrap">
+  <div class="eyebrow">Free tool</div>
+  <h1>SSRF IP and URL Normalizer</h1>
+  <p class="lede">Paste a host, an IPv4 or IPv6 address, or a full URL. The tool extracts the host, decodes every alternate encoding an attacker can use to slip an address past a naive SSRF filter, and classifies the canonical address as loopback, private, link local, CGNAT, reserved, or public.</p>
+  <div class="privacy">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6l8-4z" stroke="var(--accent)" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Everything runs in your browser. Nothing you paste is sent to any server.
+  </div>
+</div></header>
+
+<div class="wrap">
+  <div class="tool">
+    <label class="fld" for="inp">Paste a host, IP address, or URL</label>
+    <textarea id="inp" spellcheck="false" placeholder="http://2130706433/admin&#10;127.0.0.1&#10;169.254.169.254&#10;::ffff:127.0.0.1&#10;&#10;The host is extracted and decoded locally. Nothing is sent anywhere."></textarea>
+    <div class="row">
+      <button class="primary" id="analyze">Normalize and classify</button>
+      <button class="ghost" id="clear">Clear</button>
+      <span class="hint" id="hint">No data leaves this page</span>
+    </div>
+    <div class="examples">
+      <span class="lbl">Examples</span>
+      <button class="ghost ex" data-v="2130706433">2130706433</button>
+      <button class="ghost ex" data-v="0x7f000001">0x7f000001</button>
+      <button class="ghost ex" data-v="169.254.169.254">169.254.169.254</button>
+      <button class="ghost ex" data-v="10.0.0.5">10.0.0.5</button>
+      <button class="ghost ex" data-v="::ffff:127.0.0.1">::ffff:127.0.0.1</button>
+      <button class="ghost ex" data-v="https://93.184.216.34/">93.184.216.34</button>
+    </div>
+  </div>
+  <div id="results"><div class="empty">Your decoded encodings and range verdict will appear here.</div></div>
+</div>
+
+<div class="wrap prose">
+  <h2>Why one address has many spellings</h2>
+  <p>A naive defense against server side request forgery keeps a list of forbidden strings, blocks <code>127.0.0.1</code> and maybe <code>localhost</code>, and considers the job done. The trouble is that the loopback address has dozens of valid spellings. The same 32 bits can be written as a single decimal number, as octal, as hexadecimal, with some octets in one base and some in another, or wrapped inside an IPv6 form. Many URL parsers and network libraries happily accept all of those and resolve them to the same destination, so a filter that only matches the dotted decimal string lets every other form straight through. This tool draws on the address text rules in <a href="https://datatracker.ietf.org/doc/html/rfc3986" rel="noopener" target="_blank">RFC 3986</a> and the special purpose registries described in <a href="https://datatracker.ietf.org/doc/html/rfc6890" rel="noopener" target="_blank">RFC 6890</a>.</p>
+
+  <h3>The encodings the tool shows</h3>
+  <p>When the host is an IPv4 address, or decodes to one, the tool computes the full set of equivalent forms from the same 32-bit integer, using BigInt for the math so nothing overflows:</p>
+  <ul>
+    <li>Dotted decimal, the canonical <code>127.0.0.1</code> form.</li>
+    <li>Dotless decimal, also called the DWORD form, a single base ten number like <code>2130706433</code>.</li>
+    <li>Octal per octet such as <code>0177.0.0.01</code>, where a leading zero switches an octet to base eight.</li>
+    <li>Hexadecimal per octet such as <code>0x7f.0x0.0x0.0x1</code>, and the dotless hex form <code>0x7f000001</code>.</li>
+    <li>Mixed forms that combine bases across the octets, which filters almost never anticipate.</li>
+    <li>IPv4 mapped IPv6 such as <code>::ffff:127.0.0.1</code> and its hex form <code>::ffff:7f00:1</code>.</li>
+  </ul>
+  <p>The tool also accepts these encodings as input. Paste a dotless decimal, an octal, a hex, or a mapped IPv6 form and it decodes back to the canonical dotted quad, then classifies that.</p>
+
+  <h3>What the range verdict means</h3>
+  <p>Once the address is canonical, the tool checks it against a fixed table of special ranges and gives a plain verdict:</p>
+  <ul>
+    <li><b>Loopback</b>, the whole <code>127.0.0.0/8</code> block, not just <code>127.0.0.1</code>.</li>
+    <li><b>Private</b>, the RFC1918 blocks <code>10.0.0.0/8</code>, <code>172.16.0.0/12</code>, and <code>192.168.0.0/16</code>.</li>
+    <li><b>Link local</b>, <code>169.254.0.0/16</code>, with the cloud metadata address <code>169.254.169.254</code> called out on its own as high risk.</li>
+    <li><b>CGNAT</b>, the carrier grade NAT shared space <code>100.64.0.0/10</code>.</li>
+    <li><b>Reserved and special</b>, including this host <code>0.0.0.0/8</code>, multicast <code>224.0.0.0/4</code>, the benchmarking and documentation ranges, and the broadcast address.</li>
+    <li><b>Public</b>, everything else, which is the only class a server side fetch usually has any business reaching.</li>
+  </ul>
+
+  <h3>The metadata endpoint is the prize</h3>
+  <p>The address <code>169.254.169.254</code> sits in the link local range and is the instance metadata endpoint on several cloud platforms. A server side request that reaches it can return instance credentials and configuration, which is why it earns its own warning. An attacker who finds an SSRF and a filter that misses an alternate encoding of this address often turns a small bug into a full credential leak. For the wider shape of these attacks, the <a href="https://security.unboundcompute.com/ai-security-testing/" rel="noopener">AI security testing</a> approach reasons about how a request flows end to end rather than matching one string.</p>
+
+  <h3>An honest limit, DNS and rebinding</h3>
+  <p>This tool runs in a browser page and a browser page cannot perform DNS resolution, so it works on literal addresses and on the host it pulls out of a URL. It does not look up names. A complete SSRF defense has to handle the name layer too, including DNS rebinding, where a hostname resolves to a harmless public address when the filter checks it and to an internal address a moment later when the server actually connects. Treat the encodings and the range verdict here as one slice of the problem, the slice you can compute offline with certainty, and pair it with server side resolution and revalidation after redirects. The same readable surface and parser disagreement themes run through <a href="https://security.unboundcompute.com/what-is-web-application-security/" rel="noopener">web application security</a> more broadly.</p>
+
+  <h2>How to read the result</h2>
+  <p>The top card shows the canonical dotted quad and a one line verdict on the range it falls in. Below it, the encodings panel lists every equivalent spelling so you can confirm your own filter against each one, and a short note restates the core idea: all of the forms above resolve to the same address, so a blocklist that only matches the literal string misses every other form. The point is not to grade your address, it is to make the bypass surface visible. For the broader set of trust boundaries attackers probe, see the <a href="https://security.unboundcompute.com/category/access-control/" rel="noopener">access control</a> writing.</p>
+
+  <h2>Related reading</h2>
+  <div class="related">
+    <a href="https://security.unboundcompute.com/what-is-web-application-security/"><span>Guide</span>What is web application security</a>
+    <a href="https://security.unboundcompute.com/ai-security-testing/"><span>Guide</span>AI security testing</a>
+    <a href="https://security.unboundcompute.com/category/access-control/"><span>Topic</span>Access control</a>
+    <a href="https://security.unboundcompute.com/web-security-glossary/"><span>Reference</span>Web security glossary</a>
+  </div>
+
+  <h2>More free tools</h2>
+  <div class="related">
+    <a href="https://unboundcompute.com/tools/url-parser-confusion-analyzer.html"><span>Free tool</span>URL Parser Confusion Analyzer</a>
+    <a href="https://unboundcompute.com/tools/cors-misconfiguration-checker.html"><span>Free tool</span>CORS Misconfiguration Checker</a>
+    <a href="https://unboundcompute.com/tools/subdomain-takeover-checker.html"><span>Free tool</span>Subdomain Takeover Fingerprint Checker</a>
+    <a href="https://unboundcompute.com/tools/"><span>Hub</span>All free security tools</a>
+  </div>
+</div>
+
+<footer><div class="wrap">
+  <div>Built by <a href="https://unboundcompute.com/">UnboundCompute</a>, autonomous security research for web apps and APIs.</div>
+  <div><a href="https://unboundcompute.com/#cta">Request access</a></div>
+</div></footer>
+
+<script>
+(function(){
+  "use strict";
+  var $ = function(s){ return document.querySelector(s); };
+
+  function esc(s){ return String(s).replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];}); }
+
+  // ---- host extraction -----------------------------------------------------
+  // Pull a host out of a URL, a host:port, or a bare host/IP. No network.
+  function extractHost(raw){
+    var s = raw.trim();
+    if (!s) return { err:"Paste a host, IP address, or URL first." };
+    // strip a scheme and everything before authority if it looks like a URL
+    var note = null, host = s;
+    if (/^[a-zA-Z][a-zA-Z0-9+.-]*:\/\//.test(s)){
+      var rest = s.replace(/^[a-zA-Z][a-zA-Z0-9+.-]*:\/\//,"");
+      // authority ends at first / ? #
+      rest = rest.split(/[\/?#]/)[0];
+      // drop userinfo
+      var at = rest.lastIndexOf("@");
+      if (at >= 0) rest = rest.slice(at+1);
+      host = rest;
+      note = "Host extracted from the URL authority.";
+    }
+    // bracketed IPv6, possibly with a port
+    var m = host.match(/^\[([^\]]+)\](?::\d+)?$/);
+    if (m){ return { host:m[1], note:(note||"")+" IPv6 literal taken from inside the brackets." }; }
+    // strip a trailing :port only when it is unambiguous (one colon, digits after)
+    if (/^[^:]+:\d+$/.test(host)){ host = host.replace(/:\d+$/,""); }
+    return { host:host, note:note };
+  }
+
+  // ---- IPv4 parse (all encodings) -----------------------------------------
+  // Returns BigInt 32-bit value or null. Accepts 1 to 4 parts, each part may
+  // be decimal, octal (leading 0), or hex (0x). A single part is a DWORD.
+  function parsePart(p){
+    if (p === "") return null;
+    var base = 10, body = p;
+    if (/^0[xX][0-9a-fA-F]+$/.test(p)){ base = 16; body = p.slice(2); }
+    else if (/^0[0-7]+$/.test(p)){ base = 8; body = p.slice(1); }
+    else if (/^0$/.test(p)){ base = 10; body = "0"; }
+    else if (/^[0-9]+$/.test(p)){ base = 10; }
+    else return null;
+    var val;
+    try { val = base===16 ? BigInt("0x"+body) : base===8 ? BigInt("0o"+body) : BigInt(body); }
+    catch(e){ return null; }
+    return val;
+  }
+
+  function ipv4ToInt(host){
+    var parts = host.split(".");
+    if (parts.length < 1 || parts.length > 4) return null;
+    var vals = [];
+    for (var i=0;i<parts.length;i++){
+      var v = parsePart(parts[i]);
+      if (v === null) return null;
+      vals.push(v);
+    }
+    var n;
+    if (vals.length === 1){
+      n = vals[0];
+      if (n > 0xFFFFFFFFn) return null;
+    } else {
+      // last part covers the remaining bytes, leading parts are single octets
+      for (var j=0;j<vals.length-1;j++){ if (vals[j] > 255n) return null; }
+      var remBytes = 4 - (vals.length - 1);
+      var last = vals[vals.length-1];
+      var maxLast = (1n << BigInt(remBytes*8)) - 1n;
+      if (last > maxLast) return null;
+      n = 0n;
+      for (var k=0;k<vals.length-1;k++){ n = (n << 8n) | vals[k]; }
+      n = (n << BigInt(remBytes*8)) | last;
+    }
+    if (n < 0n || n > 0xFFFFFFFFn) return null;
+    return n;
+  }
+
+  // ---- IPv6 / mapped parse -------------------------------------------------
+  // Minimal: detect IPv4 mapped IPv6 and return the embedded 32-bit value.
+  function mappedIpv6ToInt(host){
+    var h = host.toLowerCase();
+    if (h.indexOf(":") < 0) return null;
+    // ::ffff:127.0.0.1  (dotted tail)
+    var m = h.match(/^::ffff:(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$/);
+    if (m){ return ipv4ToInt(m[1]); }
+    // ::ffff:7f00:1  (two hex groups)
+    m = h.match(/^::ffff:([0-9a-f]{1,4}):([0-9a-f]{1,4})$/);
+    if (m){
+      var hi = BigInt("0x"+m[1]), lo = BigInt("0x"+m[2]);
+      if (hi > 0xFFFFn || lo > 0xFFFFn) return null;
+      return (hi << 16n) | lo;
+    }
+    return null;
+  }
+
+  function octets(n){
+    return [ (n>>24n)&255n, (n>>16n)&255n, (n>>8n)&255n, n&255n ];
+  }
+  function dotted(n){ return octets(n).map(String).join("."); }
+
+  function encodings(n){
+    var o = octets(n);
+    var hexGroups = [ ((n>>16n)&0xFFFFn).toString(16), (n&0xFFFFn).toString(16) ];
+    return [
+      { k:"Dotted decimal", v:dotted(n), note:"canonical" },
+      { k:"Dotless decimal (DWORD)", v:n.toString(10) },
+      { k:"Dotless hex", v:"0x"+n.toString(16) },
+      { k:"Hex per octet", v:o.map(function(b){ return "0x"+b.toString(16); }).join(".") },
+      { k:"Octal per octet", v:o.map(function(b){ return "0"+b.toString(8); }).join(".") },
+      { k:"Full octal (DWORD)", v:"0"+n.toString(8) },
+      { k:"Mixed (hex, dec, octal, dec)", v:"0x"+o[0].toString(16)+"."+o[1].toString(10)+"."+(o[2]===0n?"0":"0"+o[2].toString(8))+"."+o[3].toString(10) },
+      { k:"IPv4 mapped IPv6 (dotted)", v:"::ffff:"+dotted(n) },
+      { k:"IPv4 mapped IPv6 (hex)", v:"::ffff:"+hexGroups[0]+":"+hexGroups[1] },
+      { k:"IPv6 expanded mapped", v:"0:0:0:0:0:ffff:"+hexGroups[0]+":"+hexGroups[1] }
+    ];
+  }
+
+  // ---- range classification ------------------------------------------------
+  function inCidr(n, base, prefix){
+    var mask = prefix === 0 ? 0n : (0xFFFFFFFFn << BigInt(32-prefix)) & 0xFFFFFFFFn;
+    return (n & mask) === (BigInt(base) & mask);
+  }
+  function ip(a,b,c,d){ return BigInt(a)*16777216n + BigInt(b)*65536n + BigInt(c)*256n + BigInt(d); }
+
+  function classify(n){
+    // metadata first, most specific and highest risk
+    if (n === ip(169,254,169,254)){
+      return { sev:"fail", label:"Cloud metadata", title:"Link local cloud metadata address",
+        msg:"This is 169.254.169.254, the instance metadata endpoint on several cloud platforms. A server side request that reaches it can return instance credentials, tokens, and configuration. This is one of the highest value SSRF targets.",
+        why:"It sits inside the link local range 169.254.0.0/16. A filter that blocks the dotted decimal string but accepts any alternate encoding shown below exposes it.",
+        link:"https://security.unboundcompute.com/ai-security-testing/", linkText:"How SSRF chains are tested" };
+    }
+    if (n === ip(255,255,255,255)){
+      return { sev:"warn", label:"Broadcast", title:"Limited broadcast address",
+        msg:"This is the limited broadcast address 255.255.255.255. It is not a normal destination for a server side fetch.",
+        why:"Special purpose address. A request aimed here is almost always either a probe or a bug." };
+    }
+    if (inCidr(n, ip(127,0,0,0), 8)){
+      return { sev:"fail", label:"Loopback", title:"Loopback address (127.0.0.0/8)",
+        msg:"This resolves to the local machine. A server side request here reaches services bound to the server itself, which are often unauthenticated because they assume only local callers.",
+        why:"The whole 127.0.0.0/8 block is loopback, not just 127.0.0.1. Encodings like 127.0.0.2 or 127.1 land here too and a literal string filter misses them." };
+    }
+    if (inCidr(n, ip(10,0,0,0), 8) || inCidr(n, ip(172,16,0,0), 12) || inCidr(n, ip(192,168,0,0), 16)){
+      return { sev:"fail", label:"Private", title:"Private network address (RFC1918)",
+        msg:"This is an internal RFC1918 address. Reaching it from a server means reaching the internal network: databases, admin panels, and other services that expect to be unreachable from outside.",
+        why:"RFC1918 covers 10.0.0.0/8, 172.16.0.0/12, and 192.168.0.0/16. These should never be a valid destination for a fetch driven by user input." };
+    }
+    if (inCidr(n, ip(169,254,0,0), 16)){
+      return { sev:"fail", label:"Link local", title:"Link local address (169.254.0.0/16)",
+        msg:"This is a link local address. The block also contains the cloud metadata endpoint 169.254.169.254, which makes the whole range sensitive for a server side fetch.",
+        why:"Link local addresses are not routable off the local segment, so a request here is reaching something on the server own link, not a legitimate remote host." };
+    }
+    if (inCidr(n, ip(100,64,0,0), 10)){
+      return { sev:"warn", label:"CGNAT", title:"CGNAT shared address (100.64.0.0/10)",
+        msg:"This is carrier grade NAT shared space. It is not public and not a normal fetch destination, and on some networks it overlaps with internal infrastructure.",
+        why:"The 100.64.0.0/10 block is reserved for shared address space between a provider and its customers, so treat it as internal for SSRF purposes." };
+    }
+    if (inCidr(n, ip(0,0,0,0), 8)){
+      return { sev:"fail", label:"This host", title:"This host range (0.0.0.0/8)",
+        msg:"This is in the 0.0.0.0/8 this host block. On many stacks 0.0.0.0 routes to the local machine, which makes it another loopback style bypass.",
+        why:"0.0.0.0 is a common filter blind spot. It is not a routable destination but it frequently reaches local services." };
+    }
+    if (inCidr(n, ip(224,0,0,0), 4)){
+      return { sev:"warn", label:"Multicast", title:"Multicast address (224.0.0.0/4)",
+        msg:"This is a multicast address, not a single host destination, and not something a normal server side fetch should target.",
+        why:"Multicast and the class E reserved space above it are special purpose. A user driven fetch has no reason to reach them." };
+    }
+    if (inCidr(n, ip(192,0,2,0), 24) || inCidr(n, ip(198,51,100,0), 24) || inCidr(n, ip(203,0,113,0), 24)){
+      return { sev:"info", label:"Documentation", title:"Documentation range (TEST-NET)",
+        msg:"This is a reserved documentation and example range. It is not assigned to any real host.",
+        why:"TEST-NET ranges exist for examples and docs. They are reserved, so seeing one usually means a placeholder slipped through." };
+    }
+    if (inCidr(n, ip(198,18,0,0), 15)){
+      return { sev:"info", label:"Benchmarking", title:"Benchmarking range (198.18.0.0/15)",
+        msg:"This is the network benchmarking range. It is reserved and not a normal public destination.",
+        why:"Reserved for inter network device benchmarking, so it should not appear as a real fetch target." };
+    }
+    return { sev:"pass", label:"Public", title:"Public address",
+      msg:"This is a public, globally routable address. It is not in any loopback, private, link local, CGNAT, or reserved range, so a server side fetch reaching it is not an internal access on its own.",
+      why:"Public does not mean safe. Confirm the host is also on your allowlist, and revalidate after any redirect, since a public address can still redirect toward an internal one." };
+  }
+
+  // ---- render --------------------------------------------------------------
+  function render(host, n, hostNote){
+    var cls = classify(n);
+    var canon = dotted(n);
+    var html = "";
+
+    html += '<div class="verdict-card">';
+    html += '<div class="vbadge '+cls.sev+'">'+esc(cls.label)+'</div>';
+    html += '<div class="verdict-meta"><h2>'+esc(cls.title)+'</h2>';
+    html += '<div class="canon">Canonical: <b>'+esc(canon)+'</b></div>';
+    html += '<p>'+esc(cls.msg)+'</p></div></div>';
+
+    html += '<div class="checks"><div class="check"><div class="top">';
+    var sym = cls.sev==="pass"?"&#10003;":cls.sev==="warn"?"!":cls.sev==="fail"?"&#10007;":"i";
+    html += '<span class="dot '+cls.sev+'">'+sym+'</span><div style="flex:1">';
+    html += '<h3>Range verdict</h3>';
+    html += '<div class="finding">Input host <b>'+esc(host)+'</b> normalizes to <b>'+esc(canon)+'</b>, classified as '+esc(cls.label.toLowerCase())+'.</div>';
+    if (hostNote) html += '<div class="why">'+esc(hostNote.trim())+'</div>';
+    html += '<div class="why">'+esc(cls.why)+'</div>';
+    if (cls.link) html += '<div class="more"><a href="'+cls.link+'" rel="noopener">'+esc(cls.linkText||"Learn more")+' &rarr;</a></div>';
+    html += '</div></div></div></div>';
+
+    html += '<div class="seg"><h3>Equivalent encodings (all resolve to '+esc(canon)+')</h3><div class="enc">';
+    encodings(n).forEach(function(e){
+      html += '<div class="enc-row"><div class="k">'+esc(e.k)+(e.note?' <span style="color:var(--ink-faint)">'+esc(e.note)+'</span>':'')+'</div>';
+      html += '<div class="v"><code>'+esc(e.v)+'</code><button class="copy" data-copy="'+esc(e.v)+'">Copy</button></div></div>';
+    });
+    html += '</div></div>';
+
+    html += '<div class="note"><b>All of the encodings above resolve to the same address.</b> An SSRF allowlist or denylist that only blocks the literal <code>'+esc(canon)+'</code> string misses every other form. A correct defense normalizes every input to one canonical address before deciding. Note the honest limit: this page cannot perform DNS, so it works on literal addresses and shows encodings. It does not resolve names, and it cannot account for DNS rebinding, where a name resolves to a safe address on the first lookup and an internal one on the second.</div>';
+
+    return html;
+  }
+
+  function run(){
+    var ex = extractHost($("#inp").value);
+    if (ex.err){ $("#results").innerHTML = '<div class="empty">'+esc(ex.err)+'</div>'; return; }
+    var host = ex.host;
+    var n = mappedIpv6ToInt(host);
+    var hostNote = ex.note || "";
+    if (n === null){
+      n = ipv4ToInt(host);
+    } else {
+      hostNote += " Decoded from an IPv4 mapped IPv6 form.";
+    }
+    if (n === null){
+      $("#results").innerHTML = '<div class="empty">Extracted host <b>'+esc(host)+'</b> is not a literal IPv4 address or an IPv4 mapped IPv6 form. This tool works on literal addresses, it cannot resolve a hostname through DNS.</div>';
+      return;
+    }
+    $("#results").innerHTML = render(host, n, hostNote);
+    $("#results").scrollIntoView({ behavior:"smooth", block:"start" });
+  }
+
+  $("#analyze").addEventListener("click", run);
+  $("#clear").addEventListener("click", function(){ $("#inp").value=""; $("#results").innerHTML='<div class="empty">Your decoded encodings and range verdict will appear here.</div>'; $("#inp").focus(); });
+  $("#inp").addEventListener("keydown", function(e){ if ((e.metaKey||e.ctrlKey) && e.key==="Enter") run(); });
+
+  Array.prototype.forEach.call(document.querySelectorAll(".ex"), function(b){
+    b.addEventListener("click", function(){ $("#inp").value = b.getAttribute("data-v"); run(); });
+  });
+
+  document.addEventListener("click", function(e){
+    var t = e.target;
+    if (t && t.classList && t.classList.contains("copy")){
+      var v = t.getAttribute("data-copy");
+      if (navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(v).then(function(){
+          var old = t.textContent; t.textContent = "Copied"; setTimeout(function(){ t.textContent = old; }, 1100);
+        }).catch(function(){});
+      }
+    }
+  });
+})();
+</script>
+</body>
+</html>

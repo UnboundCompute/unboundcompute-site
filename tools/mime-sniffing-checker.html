@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>MIME Sniffing and Content Type Checker | UnboundCompute</title>
+<meta name="description" content="Drop a file or paste its leading bytes, declare a Content-Type, and see what a browser would actually sniff it to. Flags the upload XSS trap where a file declared as an image sniffs to HTML and runs script. Runs fully in your browser." />
+<meta name="keywords" content="mime sniffing, content type confusion, x-content-type-options, nosniff, upload xss, content sniffing, mime type checker, whatwg mime sniffing" />
+<meta name="robots" content="index, follow" />
+<meta name="author" content="UnboundCompute" />
+<meta name="theme-color" content="#0a0a0b" />
+<link rel="canonical" href="https://unboundcompute.com/tools/mime-sniffing-checker.html" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a0a0b'/%3E%3Cline x1='16' y1='4' x2='16' y2='28' stroke='%23fb5b46' stroke-width='2' stroke-dasharray='3 3'/%3E%3Ccircle cx='16' cy='16' r='3.4' fill='%23fb5b46'/%3E%3C/svg%3E" />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="UnboundCompute" />
+<meta property="og:title" content="MIME Sniffing and Content Type Checker" />
+<meta property="og:description" content="See what a browser would sniff your file to and whether a benign Content-Type can be overridden to HTML. Runs fully in your browser, nothing is sent to any server." />
+<meta property="og:url" content="https://unboundcompute.com/tools/mime-sniffing-checker.html" />
+<meta property="og:image" content="https://unboundcompute.com/og.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="MIME Sniffing and Content Type Checker" />
+<meta name="twitter:description" content="See what a browser would sniff your file to and whether a benign Content-Type can be overridden to HTML." />
+<meta name="twitter:image" content="https://unboundcompute.com/og.png" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "MIME Sniffing and Content Type Checker",
+      "applicationCategory": "SecurityApplication",
+      "operatingSystem": "Web",
+      "browserRequirements": "Requires JavaScript. Runs entirely client side.",
+      "url": "https://unboundcompute.com/tools/mime-sniffing-checker.html",
+      "description": "A free tool that runs a simplified version of the WHATWG mime sniffing algorithm over the leading bytes of a file. It compares the type a browser would sniff against the declared Content-Type, and flags the upload cross site scripting trap where a file declared as an image or as plain bytes sniffs to HTML and runs script when nosniff is absent. All analysis happens in the browser.",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "publisher": { "@type": "Organization", "name": "UnboundCompute", "url": "https://unboundcompute.com/" }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is MIME sniffing?",
+          "acceptedAnswer": { "@type": "Answer", "text": "MIME sniffing is the browser behaviour of inspecting the first bytes of a response to decide its real type, instead of trusting the Content-Type header the server sent. It exists because many older servers sent the wrong type, so browsers learned to guess. The downside is that a file a server declares as an image can be sniffed to HTML if its bytes look like markup, and the browser then renders it and runs any script inside." }
+        },
+        {
+          "@type": "Question",
+          "name": "Does this checker send my file anywhere?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. The sniffing logic runs entirely in your browser with JavaScript. When you drop a file the page reads only its leading bytes locally with the FileReader interface, and the bytes are never uploaded, logged, or sent to any server. You can test a real upload sample safely without it leaving your machine." }
+        },
+        {
+          "@type": "Question",
+          "name": "What does X-Content-Type-Options nosniff actually do?",
+          "acceptedAnswer": { "@type": "Answer", "text": "The header value nosniff tells the browser to trust the declared Content-Type and not sniff the body. With it set, a response declared as image/png is treated as an image even if the bytes look like HTML, so the markup is not rendered as a page and its script does not run. Without it, the browser may sniff the body and that is where content type confusion turns an upload into stored cross site scripting." }
+        },
+        {
+          "@type": "Question",
+          "name": "Is sniffing to HTML really exploitable?",
+          "acceptedAnswer": { "@type": "Answer", "text": "When the file is served same origin and a victim opens it directly, yes. If an attacker uploads a file whose bytes begin with markup like a doctype or a script tag, declares it as an image, and the response has no nosniff header, a browser that follows the file can sniff it to text/html and execute the script in the origin that served it. The standard fixes are to send the correct Content-Type, always set nosniff, serve uploads from a separate origin, and force a download." }
+        },
+        {
+          "@type": "Question",
+          "name": "Is this the same as the security headers analyzer?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. The security headers analyzer checks whether headers like nosniff are present on a response. This tool goes one level deeper: it reads the actual bytes, runs the sniffing rules a browser would run, and tells you whether those specific bytes can be sniffed to a dangerous type given the Content-Type you declared. The two are complementary." }
+        }
+      ]
+    }
+  ]
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600&family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0a0b; --bg-2:#070708; --panel:#0e0e10; --panel-2:#131315;
+    --ink:#f4f2ec; --ink-hi:#fbf9f3; --ink-soft:#9b988f; --ink-faint:#5e5b54;
+    --line:rgba(244,242,236,.13); --line-2:rgba(244,242,236,.07);
+    --accent:#fb5b46; --accent-2:#ff7d6b; --accent-wash:rgba(251,91,70,.12); --on-accent:#1a0c09; --accent-line:rgba(251,91,70,.42);
+    --pass:#5fd6a4; --pass-wash:rgba(95,214,164,.1); --warn:#e8b04b; --warn-wash:rgba(232,176,75,.1); --fail:#fb5b46; --fail-wash:rgba(251,91,70,.1); --info:#7c93ff; --info-wash:rgba(124,147,255,.1);
+    --serif:'Newsreader',Georgia,serif; --mono:'JetBrains Mono',ui-monospace,monospace; --sans:'Inter',system-ui,sans-serif;
+    --maxw:920px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;line-height:1.6}
+  ::selection{background:var(--accent);color:var(--on-accent)}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+
+  nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);background:rgba(10,10,11,.72);border-bottom:1px solid var(--line-2)}
+  nav .wrap{height:64px;display:flex;align-items:center;justify-content:space-between}
+  nav a.brand{display:flex;align-items:center;gap:11px;font-family:var(--mono);font-weight:600;font-size:15px;color:var(--ink);letter-spacing:-.01em}
+  nav a.brand:hover{text-decoration:none}
+  nav .badge{width:27px;height:27px;border-radius:7px;border:1px solid var(--accent-line);display:grid;place-items:center}
+  nav a.cta{font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:9px 16px;border-radius:8px;background:var(--accent);color:var(--on-accent)}
+  nav a.cta:hover{filter:brightness(1.08);text-decoration:none}
+
+  header.hero{padding:64px 0 28px}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:18px}
+  h1{font-family:var(--serif);font-weight:400;font-size:clamp(32px,5vw,52px);line-height:1.08;letter-spacing:-.015em;color:var(--ink-hi)}
+  .lede{margin-top:18px;font-size:18px;color:var(--ink-soft);max-width:660px}
+  .privacy{margin-top:18px;display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);border:1px solid var(--line);border-radius:8px;padding:8px 13px;background:var(--panel)}
+  .privacy svg{width:14px;height:14px;flex:none}
+
+  .tool{margin:30px 0 12px;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px}
+  label.fld{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:10px}
+  input.text{width:100%;background:var(--bg-2);border:1px solid var(--line);border-radius:11px;padding:13px 15px;color:var(--ink);font-family:var(--mono);font-size:13.5px;outline:none;transition:border-color .2s,box-shadow .2s}
+  input.text:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-wash)}
+  input.text::placeholder{color:var(--ink-faint)}
+  textarea{width:100%;min-height:110px;resize:vertical;background:var(--bg-2);border:1px solid var(--line);border-radius:11px;padding:15px;color:var(--ink);font-family:var(--mono);font-size:13.5px;line-height:1.55;outline:none;transition:border-color .2s,box-shadow .2s;word-break:break-all}
+  textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-wash)}
+  textarea::placeholder{color:var(--ink-faint)}
+  .field{margin-bottom:16px}
+  .drop{margin-top:10px;border:1.5px dashed var(--line);border-radius:11px;padding:22px;text-align:center;background:var(--bg-2);transition:border-color .2s,background .2s;cursor:pointer}
+  .drop.over{border-color:var(--accent);background:var(--accent-wash)}
+  .drop p{font-family:var(--mono);font-size:13px;color:var(--ink-soft)}
+  .drop p b{color:var(--ink-hi)}
+  .drop .small{font-size:11.5px;color:var(--ink-faint);margin-top:6px}
+  .opts{display:flex;gap:18px;flex-wrap:wrap;align-items:center;margin-top:14px}
+  .check-opt{display:flex;align-items:center;gap:9px;font-family:var(--mono);font-size:13px;color:var(--ink);cursor:pointer}
+  .check-opt input{width:17px;height:17px;accent-color:var(--accent);cursor:pointer}
+  .seg-pick{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+  .seg-pick button{padding:8px 14px;font-size:11px}
+  .seg-pick button.on{background:var(--accent-wash);border-color:var(--accent-line);color:var(--ink-hi)}
+  .row{display:flex;gap:11px;flex-wrap:wrap;margin-top:14px;align-items:center}
+  button{font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;padding:13px 22px;border-radius:9px;cursor:pointer;border:1px solid var(--line);background:transparent;color:var(--ink);transition:filter .15s,border-color .15s,background .15s}
+  button.primary{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+  button.primary:hover{filter:brightness(1.08)}
+  button.ghost:hover{border-color:var(--accent-line);color:var(--ink-hi)}
+  .hint{font-family:var(--mono);font-size:12px;color:var(--ink-faint);margin-left:auto}
+
+  #results{margin-top:8px}
+  .decoded{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0}
+  .seg{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:16px 18px;min-width:0}
+  .seg h3{font-family:var(--mono);font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+  .seg pre{font-family:var(--mono);font-size:13px;line-height:1.55;color:var(--ink);white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere}
+  .seg .claims{margin-top:11px;border-top:1px solid var(--line-2);padding-top:10px;display:flex;flex-direction:column;gap:5px}
+  .seg .claims div{font-family:var(--mono);font-size:12px;color:var(--ink-soft)}
+  .seg .claims b{color:var(--ink)}
+
+  .grade-card{display:flex;align-items:center;gap:22px;background:var(--panel-2);border:1px solid var(--line);border-radius:16px;padding:22px 24px;margin:20px 0}
+  .grade{font-family:var(--serif);font-size:30px;line-height:1.05;width:auto;min-width:96px;padding:0 18px;height:96px;border-radius:18px;display:grid;place-items:center;flex:none;border:1.5px solid;text-align:center}
+  .grade.g-safe{color:var(--pass);border-color:var(--pass);background:var(--pass-wash)}
+  .grade.g-warn{color:var(--warn);border-color:var(--warn);background:var(--warn-wash)}
+  .grade.g-risk{color:var(--fail);border-color:var(--fail);background:var(--fail-wash)}
+  .grade-meta h2{font-family:var(--serif);font-weight:400;font-size:24px;color:var(--ink-hi);margin-bottom:4px}
+  .grade-meta p{color:var(--ink-soft);font-size:14.5px}
+
+  .checks{display:flex;flex-direction:column;gap:11px}
+  .check{border:1px solid var(--line);border-radius:13px;padding:16px 18px;background:var(--panel)}
+  .check .top{display:flex;align-items:flex-start;gap:13px}
+  .dot{width:20px;height:20px;border-radius:6px;flex:none;display:grid;place-items:center;font-size:13px;font-weight:700;margin-top:1px}
+  .dot.pass{background:var(--pass-wash);color:var(--pass)}
+  .dot.warn{background:var(--warn-wash);color:var(--warn)}
+  .dot.fail{background:var(--fail-wash);color:var(--fail)}
+  .dot.info{background:var(--info-wash);color:var(--info)}
+  .check h3{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--ink-hi);letter-spacing:-.01em}
+  .check .finding{margin-top:5px;font-size:14.5px;color:var(--ink)}
+  .check .why{margin-top:9px;font-size:13.5px;color:var(--ink-soft)}
+  .check .fix{margin-top:9px;font-size:13px;color:var(--ink-soft);font-family:var(--mono);background:var(--bg-2);border:1px solid var(--line-2);border-radius:8px;padding:9px 11px;white-space:pre-wrap;word-break:break-word}
+  .check .more{margin-top:9px;font-size:13px}
+  .sub{margin-top:11px;padding-left:15px;border-left:2px solid var(--line);display:flex;flex-direction:column;gap:7px}
+  .sub div{font-size:13.5px;color:var(--ink-soft)}
+  .sub b{color:var(--ink)}
+  .empty{color:var(--ink-faint);font-family:var(--mono);font-size:13px;text-align:center;padding:30px}
+
+  .prose{padding:44px 0 20px}
+  .prose h2{font-family:var(--serif);font-weight:400;font-size:30px;color:var(--ink-hi);margin:36px 0 14px;letter-spacing:-.01em}
+  .prose h3{font-family:var(--mono);font-size:15px;color:var(--ink-hi);margin:24px 0 8px}
+  .prose p{color:var(--ink-soft);margin-bottom:14px;font-size:16px}
+  .prose ul{color:var(--ink-soft);margin:0 0 14px 20px;font-size:16px}
+  .prose li{margin-bottom:7px}
+  .prose code{font-family:var(--mono);font-size:13.5px;background:var(--panel-2);border:1px solid var(--line-2);border-radius:5px;padding:1px 6px;color:var(--ink)}
+  .related{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:8px}
+  .related a{display:block;border:1px solid var(--line);border-radius:11px;padding:14px 16px;color:var(--ink);font-size:14.5px;background:var(--panel)}
+  .related a:hover{border-color:var(--accent-line);text-decoration:none}
+  .related a span{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:5px}
+
+  footer{border-top:1px solid var(--line-2);margin-top:40px;padding:30px 0;color:var(--ink-faint);font-family:var(--mono);font-size:12.5px}
+  footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px}
+  footer a{color:var(--ink-soft)}
+  @media (max-width:560px){
+    .related{grid-template-columns:1fr}
+    .decoded{grid-template-columns:1fr}
+    .grade-card{flex-direction:column;align-items:flex-start;gap:16px}
+    .hint{margin-left:0;width:100%}
+  }
+</style>
+</head>
+<body>
+
+<nav><div class="wrap">
+  <a class="brand" href="https://unboundcompute.com/">
+    <span class="badge"><svg viewBox="0 0 24 24" fill="none" style="width:15px;height:15px"><line x1="12" y1="3" x2="12" y2="21" stroke="var(--accent)" stroke-width="1.8" stroke-dasharray="2.6 2.6"/><circle cx="12" cy="12" r="3" fill="var(--accent)"/></svg></span>
+    UnboundCompute
+  </a>
+  <a class="cta" href="https://unboundcompute.com/#cta">Request access</a>
+</div></nav>
+
+<header class="hero"><div class="wrap">
+  <div class="eyebrow">Free tool</div>
+  <h1>MIME Sniffing Checker</h1>
+  <p class="lede">Declare a Content-Type, drop a file or paste its leading bytes, and see what a browser would actually sniff the response to. It catches the upload trap where a file declared as an image is really markup, no <code>nosniff</code> is set, and the browser runs the script inside it.</p>
+  <div class="privacy">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6l8-4z" stroke="var(--accent)" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Your file stays local. Only the leading bytes are read in your browser. Nothing is sent to any server.
+  </div>
+</div></header>
+
+<div class="wrap">
+  <div class="tool">
+    <div class="field">
+      <label class="fld" for="ctype">Declared Content-Type header</label>
+      <input class="text" id="ctype" spellcheck="false" autocomplete="off" placeholder="image/png" value="">
+    </div>
+
+    <div class="field">
+      <label class="fld">Leading bytes of the file</label>
+      <div class="seg-pick" id="modePick">
+        <button class="ghost on" data-mode="text" type="button">Paste as text</button>
+        <button class="ghost" data-mode="hex" type="button">Paste as hex</button>
+        <button class="ghost" data-mode="file" type="button">Drop a file</button>
+      </div>
+      <div id="paneText">
+        <textarea id="bytesText" spellcheck="false" placeholder="Paste the start of the file as text, for example: &lt;!DOCTYPE html&gt;&lt;script&gt;alert(1)&lt;/script&gt;"></textarea>
+      </div>
+      <div id="paneHex" style="display:none">
+        <textarea id="bytesHex" spellcheck="false" placeholder="Paste the first bytes as hex, for example: 89 50 4E 47 0D 0A 1A 0A"></textarea>
+      </div>
+      <div id="paneFile" style="display:none">
+        <div class="drop" id="drop">
+          <p><b>Drop a file here</b> or click to choose one</p>
+          <p class="small">Only the first 512 bytes are read, locally, with FileReader. The file is never uploaded.</p>
+          <input type="file" id="fileInput" style="display:none">
+        </div>
+      </div>
+    </div>
+
+    <div class="opts">
+      <label class="check-opt"><input type="checkbox" id="nosniff"> <code>X-Content-Type-Options: nosniff</code> is set</label>
+    </div>
+
+    <div class="row">
+      <button class="primary" id="analyze">Check sniffing</button>
+      <button class="ghost" id="exRisk">Risky example</button>
+      <button class="ghost" id="exSafe">Safe example</button>
+      <button class="ghost" id="clear">Clear</button>
+      <span class="hint" id="hint">No data leaves this page</span>
+    </div>
+  </div>
+  <div id="results"><div class="empty">Your sniffing verdict will appear here.</div></div>
+</div>
+
+<div class="wrap prose">
+  <h2>What this MIME sniffing checker does</h2>
+  <p>A server sends a <code>Content-Type</code> header to tell the browser what a response is. The catch is that browsers do not always trust it. When the header looks wrong or generic, a browser may run a content sniffing step that inspects the first bytes of the body and decides the type for itself. That behaviour is standardised in the <a href="https://mimesniff.spec.whatwg.org/" rel="noopener" target="_blank">WHATWG mime sniffing standard</a>, and it is the root of a whole class of upload bugs. This tool runs a simplified version of those rules over the bytes you give it and tells you what the browser would conclude.</p>
+
+  <h3>How a benign upload becomes script</h3>
+  <p>Imagine an app that lets users upload an avatar and serves it back with <code>Content-Type: image/png</code>. An attacker uploads a file whose first bytes are not a real PNG but a snippet of markup, something starting with a doctype or a script tag. If the response carries no <code>nosniff</code> header and a victim opens the file directly, a browser that sniffs the body can decide it is <code>text/html</code>, render it as a page, and run the script in the origin that served it. That is stored cross site scripting delivered through an image field, a textbook case of content type confusion.</p>
+
+  <h3>What the leading bytes can sniff to</h3>
+  <p>The checker recognises the patterns a browser keys on:</p>
+  <ul>
+    <li>HTML markup such as a leading doctype, an <code>&lt;html&gt;</code>, <code>&lt;head&gt;</code>, <code>&lt;script&gt;</code>, or a bare leading <code>&lt;</code> followed by a tag name. These can sniff to <code>text/html</code>, which runs script.</li>
+    <li>An SVG root, which is markup that can also carry script.</li>
+    <li>Image magic numbers for PNG, JPEG, and GIF, which sniff to a safe image type.</li>
+    <li>A PDF header (<code>%PDF</code>) and a ZIP header (<code>PK</code>), which are container types.</li>
+    <li>Anything else that is mostly readable characters falls back to plain text, and binary that matches nothing stays as a generic byte stream.</li>
+  </ul>
+
+  <h3>What nosniff changes</h3>
+  <p>The header value <code>nosniff</code> on <code>X-Content-Type-Options</code> tells the browser to stop guessing and honour the declared type. With it set, a response declared <code>image/png</code> is treated as an image even when the bytes look like a page, so the markup is not rendered and the script does not run. The verdict below reflects this: the same risky bytes are flagged loudly when <code>nosniff</code> is absent and marked as held back when it is present.</p>
+
+  <h2>How to read the verdict</h2>
+  <p>The tool reports the type it sniffed from the bytes, the type you declared, and whether they agree. The loud flag fires in one specific situation: the bytes sniff to an executable type like <code>text/html</code> while you declared something benign such as an image, plain text, or a generic byte stream, and <code>nosniff</code> is not set. That is the combination an attacker needs. The fixes are always the same: send the correct <code>Content-Type</code>, always set <code>X-Content-Type-Options: nosniff</code>, serve user uploads from a separate origin so a sniffed page cannot reach your real one, and force a download with <code>Content-Disposition</code> for files that should never render. Judging whether a real upload pipeline is safe means understanding how the whole flow stores and serves files, which is the kind of context an <a href="https://security.unboundcompute.com/ai-security-testing/" rel="noopener">AI security testing</a> approach reasons about rather than matching one byte string. For the wider set of injection and rendering boundaries attackers probe, see the <a href="https://security.unboundcompute.com/what-is-web-application-security/" rel="noopener">web application security</a> writing.</p>
+
+  <h2>Related reading</h2>
+  <div class="related">
+    <a href="https://security.unboundcompute.com/what-is-web-application-security/"><span>Guide</span>What is web application security</a>
+    <a href="https://security.unboundcompute.com/what-is-csrf/"><span>Deep dive</span>What is CSRF</a>
+    <a href="https://security.unboundcompute.com/ai-security-testing/"><span>Guide</span>AI security testing</a>
+    <a href="https://security.unboundcompute.com/web-security-glossary/"><span>Reference</span>Web security glossary</a>
+  </div>
+
+  <h2>More free tools</h2>
+  <div class="related">
+    <a href="https://unboundcompute.com/tools/security-headers-analyzer.html"><span>Free tool</span>Security Headers and CSP Analyzer</a>
+    <a href="https://unboundcompute.com/tools/csp-evaluator.html"><span>Free tool</span>CSP Evaluator</a>
+    <a href="https://unboundcompute.com/tools/cookie-security-auditor.html"><span>Free tool</span>Cookie Security Auditor</a>
+    <a href="https://unboundcompute.com/tools/"><span>Hub</span>All free security tools</a>
+  </div>
+</div>
+
+<footer><div class="wrap">
+  <div>Built by <a href="https://unboundcompute.com/">UnboundCompute</a>, autonomous security research for web apps and APIs.</div>
+  <div><a href="https://unboundcompute.com/#cta">Request access</a></div>
+</div></footer>
+
+<script>
+(function(){
+  "use strict";
+  var $ = function(s){ return document.querySelector(s); };
+  var bytes = null;        // Uint8Array of leading bytes, or null
+  var byteSource = "";     // human note about where bytes came from
+  var mode = "text";
+
+  // ---- byte helpers ---------------------------------------------------
+  function strToBytes(str){
+    var out = [];
+    for (var i=0;i<str.length;i++){
+      var c = str.charCodeAt(i);
+      if (c < 256) out.push(c);
+      else { out.push(0xEF,0xBF,0xBD); } // replacement for non latin1, keeps length sane
+    }
+    return new Uint8Array(out.slice(0,512));
+  }
+
+  function hexToBytes(str){
+    var clean = str.replace(/0x/gi,"").replace(/[^0-9a-fA-F]/g,"");
+    if (clean.length % 2) clean = clean.slice(0, clean.length-1);
+    var out = [];
+    for (var i=0;i<clean.length;i+=2) out.push(parseInt(clean.substr(i,2),16));
+    return new Uint8Array(out.slice(0,512));
+  }
+
+  function bytesToHex(b){
+    var s = [];
+    for (var i=0;i<b.length && i<48;i++){
+      var h = b[i].toString(16).toUpperCase();
+      s.push(h.length<2 ? "0"+h : h);
+    }
+    return s.join(" ") + (b.length>48 ? " ..." : "");
+  }
+
+  function bytesToAscii(b){
+    var s = "";
+    for (var i=0;i<b.length && i<64;i++){
+      var c = b[i];
+      s += (c >= 0x20 && c < 0x7f) ? String.fromCharCode(c) : ".";
+    }
+    return s + (b.length>64 ? "..." : "");
+  }
+
+  // ---- the simplified sniffing algorithm ------------------------------
+  // Returns { type, label, exec, family }. exec=true means it can run script.
+  function startsWith(b, sig){
+    if (b.length < sig.length) return false;
+    for (var i=0;i<sig.length;i++) if (b[i] !== sig[i]) return false;
+    return true;
+  }
+  function bytesOf(str){ var o=[]; for (var i=0;i<str.length;i++) o.push(str.charCodeAt(i)); return o; }
+
+  // skip leading whitespace bytes (tab, lf, ff, cr, space) like the spec does
+  function trimmedFrom(b){
+    var i = 0, ws = [0x09,0x0A,0x0C,0x0D,0x20];
+    while (i < b.length && ws.indexOf(b[i]) !== -1) i++;
+    return b.subarray(i);
+  }
+
+  // case insensitive tag match against the trimmed buffer
+  function tagMatch(t, lit){
+    var sig = bytesOf(lit);
+    if (t.length < sig.length) return false;
+    for (var i=0;i<sig.length;i++){
+      var c = t[i], s = sig[i];
+      if (c >= 0x41 && c <= 0x5A) c += 0x20; // lower
+      var sl = (s >= 0x41 && s <= 0x5A) ? s + 0x20 : s;
+      if (c !== sl) return false;
+    }
+    // tag patterns must be followed by a tag terminator (space or >)
+    var nxt = t[sig.length];
+    return nxt === undefined || nxt === 0x20 || nxt === 0x3E || nxt === 0x09 || nxt === 0x0A || nxt === 0x0C || nxt === 0x0D;
+  }
+
+  function sniff(b){
+    if (!b || b.length === 0) return { type:"(none)", label:"No bytes", exec:false, family:"none" };
+    var t = trimmedFrom(b);
+
+    // HTML markup patterns (these can render and run script)
+    var htmlTags = ["<!DOCTYPE HTML","<HTML","<HEAD","<SCRIPT","<IFRAME","<H1","<DIV","<FONT","<TABLE","<A","<STYLE","<TITLE","<B","<BODY","<BR","<P","<!--"];
+    for (var i=0;i<htmlTags.length;i++){
+      if (tagMatch(t, htmlTags[i])) return { type:"text/html", label:"HTML markup ("+htmlTags[i]+")", exec:true, family:"html" };
+    }
+    // SVG is XML markup that can also carry script
+    if (tagMatch(t, "<?XML") || tagMatch(t, "<SVG")){
+      // peek for an svg root within the first bytes
+      var head = "";
+      for (var k=0;k<t.length && k<256;k++) head += String.fromCharCode(t[k]).toLowerCase();
+      if (head.indexOf("<svg") !== -1) return { type:"image/svg+xml", label:"SVG markup", exec:true, family:"svg" };
+      return { type:"text/xml", label:"XML markup", exec:false, family:"xml" };
+    }
+    // a bare leading "<" followed by a letter is still markup
+    if (t[0] === 0x3C && t.length > 1 && ((t[1]>=0x41&&t[1]<=0x5A)||(t[1]>=0x61&&t[1]<=0x7A))){
+      return { type:"text/html", label:"Leading < tag (markup)", exec:true, family:"html" };
+    }
+
+    // image magic numbers (safe types)
+    if (startsWith(b, [0x89,0x50,0x4E,0x47,0x0D,0x0A,0x1A,0x0A])) return { type:"image/png", label:"PNG magic", exec:false, family:"image" };
+    if (startsWith(b, [0xFF,0xD8,0xFF])) return { type:"image/jpeg", label:"JPEG magic", exec:false, family:"image" };
+    if (startsWith(b, bytesOf("GIF87a")) || startsWith(b, bytesOf("GIF89a"))) return { type:"image/gif", label:"GIF magic", exec:false, family:"image" };
+    if (startsWith(b, [0x42,0x4D])) return { type:"image/bmp", label:"BMP magic", exec:false, family:"image" };
+    if (startsWith(b, bytesOf("RIFF")) && b.length>=12 && startsWith(b.subarray(8), bytesOf("WEBP"))) return { type:"image/webp", label:"WEBP magic", exec:false, family:"image" };
+
+    // documents and containers
+    if (startsWith(b, bytesOf("%PDF"))) return { type:"application/pdf", label:"PDF header (%PDF)", exec:false, family:"doc" };
+    if (startsWith(b, [0x50,0x4B,0x03,0x04]) || startsWith(b, [0x50,0x4B,0x05,0x06])) return { type:"application/zip", label:"ZIP header (PK)", exec:false, family:"archive" };
+    if (startsWith(b, [0x1F,0x8B])) return { type:"application/gzip", label:"GZIP header", exec:false, family:"archive" };
+
+    // BOM marked text
+    if (startsWith(b, [0xEF,0xBB,0xBF]) || startsWith(b, [0xFF,0xFE]) || startsWith(b, [0xFE,0xFF])) return { type:"text/plain", label:"Text (byte order mark)", exec:false, family:"text" };
+
+    // is it mostly text? scan for binary control bytes
+    var binary = false;
+    for (var j=0;j<b.length && j<512;j++){
+      var c = b[j];
+      // allow tab, lf, cr, ff, esc; treat other low control bytes as binary
+      if (c <= 0x08 || c === 0x0B || (c >= 0x0E && c <= 0x1A) || (c >= 0x1C && c <= 0x1F)){ binary = true; break; }
+    }
+    if (!binary) return { type:"text/plain", label:"Plain text", exec:false, family:"text" };
+    return { type:"application/octet-stream", label:"Unknown binary", exec:false, family:"binary" };
+  }
+
+  // ---- declared type classification -----------------------------------
+  function normType(ct){
+    return (ct||"").split(";")[0].trim().toLowerCase();
+  }
+  function declaredFamily(ct){
+    var n = normType(ct);
+    if (!n) return "none";
+    if (n === "text/html" || n === "application/xhtml+xml") return "html";
+    if (n === "image/svg+xml") return "svg";
+    if (n.indexOf("image/") === 0) return "image";
+    if (n === "application/pdf") return "doc";
+    if (n === "application/zip" || n === "application/gzip" || n.indexOf("application/x-") === 0) return "archive";
+    if (n === "text/plain") return "text";
+    if (n.indexOf("text/") === 0) return "text";
+    if (n === "application/octet-stream") return "binary";
+    if (n === "application/javascript" || n === "text/javascript") return "script";
+    return "other";
+  }
+  // declared types that are benign carriers an attacker hides HTML behind
+  function isBenignCarrier(fam){
+    return fam === "image" || fam === "text" || fam === "binary" || fam === "doc" || fam === "archive" || fam === "none";
+  }
+
+  // ---- build the verdict ----------------------------------------------
+  function buildChecks(ct, b, nosniff){
+    var checks = [];
+    var sniffed = sniff(b);
+    var dn = normType(ct);
+    var df = declaredFamily(ct);
+    var agree = dn !== "" && (dn === sniffed.type || df === sniffed.family);
+
+    // headline risk logic
+    var sniffable = sniffed.exec && !agree && isBenignCarrier(df);
+
+    var level; // safe | warn | risk
+    var headline, lead;
+
+    if (!b || b.length === 0){
+      level = "warn"; headline = "No bytes to sniff";
+      lead = "Add the leading bytes of the file, by pasting text or hex or by dropping a file, so the sniffing rules have something to read.";
+    } else if (sniffable && !nosniff){
+      level = "risk"; headline = "Sniffable to HTML, script can run";
+      lead = "These bytes sniff to "+sniffed.type+" while you declared "+(dn||"nothing")+", and no nosniff header is set. A browser that follows this file directly can render it as a page and run its script in your origin. This is the upload cross site scripting trap.";
+    } else if (sniffable && nosniff){
+      level = "warn"; headline = "Risky bytes, held back by nosniff";
+      lead = "These bytes sniff to "+sniffed.type+", which could run script, but nosniff is set so the browser honours your declared type and will not render them as a page. Keep nosniff in place and still send the correct type.";
+    } else if (!agree && dn){
+      level = "warn"; headline = "Declared type does not match the bytes";
+      lead = "You declared "+dn+" but the bytes sniff to "+sniffed.type+". This mismatch will not run script, but it can cause the file to display or download wrong. Send the type that matches the real bytes.";
+    } else {
+      level = "safe"; headline = "Declared type matches the bytes";
+      lead = dn ? ("You declared "+dn+" and the bytes sniff to "+sniffed.type+", which agree.") : ("The bytes sniff to "+sniffed.type+". Declare that type explicitly so the browser never has to guess.");
+    }
+
+    // 1. The sniff result
+    checks.push({
+      s: sniffed.exec ? (nosniff ? "warn" : (sniffable ? "fail" : "warn")) : "info",
+      h: "Sniffed type from the bytes",
+      f: "A browser running the sniffing rules over these bytes would see "+sniffed.label+", giving "+sniffed.type+"."+(sniffed.exec?" This is an executable rendering type: it can run script.":" This type does not run script."),
+      why: "Sniffing reads the first bytes, not the header. The type here is what the body looks like, regardless of what you declared."
+    });
+
+    // 2. Declared vs sniffed
+    checks.push({
+      s: agree ? "pass" : (dn ? "warn" : "info"),
+      h: "Declared Content-Type",
+      f: dn ? ("You declared "+dn+". The sniffed type "+(agree?"matches":"does not match")+" it.") : ("No Content-Type declared. With no declared type, a browser is more likely to fall back to sniffing the body."),
+      fix: agree ? null : "Send a Content-Type that matches the real bytes, for example "+sniffed.type+" for this content.",
+      why: agree ? "When the header and the bytes agree, there is nothing for sniffing to override." : "A mismatch is what makes content sniffing meaningful, and a benign declared type over executable bytes is the dangerous shape."
+    });
+
+    // 3. nosniff
+    checks.push({
+      s: nosniff ? "pass" : (sniffable ? "fail" : "warn"),
+      h: "X-Content-Type-Options",
+      f: nosniff ? "nosniff is set, so the browser honours your declared type and does not sniff the body. The risky rendering path is closed for this response." : "No nosniff header. The browser is free to sniff the body and may override your declared type.",
+      fix: nosniff ? null : "Set X-Content-Type-Options: nosniff on every response, especially anything serving user controlled files.",
+      why: "nosniff is the single switch that turns off body sniffing. It is cheap to set and closes the whole class of content type confusion."
+    });
+
+    // 4. the loud flag, only when it actually applies
+    if (sniffable && !nosniff){
+      checks.push({
+        s: "fail",
+        h: "Upload cross site scripting risk",
+        f: "Benign declared type, executable bytes, and no nosniff is exactly the combination that turns a file upload into stored cross site scripting. If an attacker can place these bytes and a victim opens the file same origin, the script runs as your site.",
+        subs: [
+          "<b>Send the correct Content-Type.</b> Serve the file as the type it really is, not a guessed or generic one.",
+          "<b>Always set X-Content-Type-Options: nosniff.</b> This stops the browser overriding your declared type.",
+          "<b>Serve user uploads from a separate origin.</b> A sniffed page on an upload origin cannot script your main site.",
+          "<b>Force a download with Content-Disposition: attachment.</b> Files that should never render are then saved instead of opened."
+        ],
+        why: "Any one of these fixes breaks the chain. Together they make content type confusion a dead end.",
+        link: "https://security.unboundcompute.com/what-is-web-application-security/",
+        linkText: "Why upload handling matters"
+      });
+    } else if (sniffed.exec && df === "html"){
+      checks.push({
+        s: "info",
+        h: "Markup served as markup",
+        f: "These bytes are markup and you declared an HTML type, so this is content meant to render. Make sure this path is never reachable with attacker controlled bytes from an upload field.",
+        why: "Serving real HTML is fine. The danger is only when markup arrives through a field that was supposed to hold a file."
+      });
+    }
+
+    return { checks: checks, level: level, headline: headline, lead: lead, sniffed: sniffed, declared: dn, nosniff: nosniff, agree: agree };
+  }
+
+  function esc(s){ return String(s).replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];}); }
+
+  function renderBytes(b){
+    var html = '<div class="decoded">';
+    html += '<div class="seg"><h3>Leading bytes (hex)</h3><pre>'+esc(b&&b.length?bytesToHex(b):"(no bytes)")+'</pre></div>';
+    html += '<div class="seg"><h3>Leading bytes (ascii)</h3><pre>'+esc(b&&b.length?bytesToAscii(b):"(no bytes)")+'</pre>';
+    if (byteSource) html += '<div class="claims"><div><b>source</b> '+esc(byteSource)+'</div></div>';
+    html += '</div></div>';
+    return html;
+  }
+
+  function render(res, b){
+    var html = renderBytes(b);
+    var gClass = res.level === "safe" ? "g-safe" : res.level === "warn" ? "g-warn" : "g-risk";
+    var gLabel = res.level === "safe" ? "SAFE" : res.level === "warn" ? "CHECK" : "RISK";
+
+    html += '<div class="grade-card">';
+    html += '<div class="grade '+gClass+'">'+gLabel+'</div>';
+    html += '<div class="grade-meta"><h2>'+esc(res.headline)+'</h2>';
+    html += '<p>'+esc(res.lead)+'</p></div></div>';
+
+    html += '<div class="checks">';
+    res.checks.forEach(function(c){
+      var sym = c.s==="pass"?"&#10003;":c.s==="warn"?"!":c.s==="fail"?"&#10007;":"i";
+      html += '<div class="check"><div class="top"><span class="dot '+c.s+'">'+sym+'</span><div style="flex:1">';
+      html += '<h3>'+esc(c.h)+'</h3>';
+      html += '<div class="finding">'+esc(c.f)+'</div>';
+      if (c.subs && c.subs.length){
+        html += '<div class="sub">';
+        c.subs.forEach(function(s){ html += '<div>'+s+'</div>'; }); // subs may contain <b>
+        html += '</div>';
+      }
+      if (c.why) html += '<div class="why">'+esc(c.why)+'</div>';
+      if (c.fix && c.s !== "pass") html += '<div class="fix">'+esc(c.fix)+'</div>';
+      if (c.link) html += '<div class="more"><a href="'+c.link+'" rel="noopener">'+esc(c.linkText||"Learn more")+' &rarr;</a></div>';
+      html += '</div></div></div>';
+    });
+    html += '</div>';
+    return html;
+  }
+
+  // ---- input plumbing -------------------------------------------------
+  function currentBytes(){
+    if (mode === "file") return bytes; // set by FileReader
+    if (mode === "hex"){ byteSource = "pasted hex"; return hexToBytes($("#bytesHex").value); }
+    byteSource = "pasted text"; return strToBytes($("#bytesText").value);
+  }
+
+  function run(){
+    var ct = $("#ctype").value;
+    var b = currentBytes();
+    var nosniff = $("#nosniff").checked;
+    if ((!b || b.length === 0) && !ct){
+      $("#results").innerHTML = '<div class="empty">Declare a Content-Type and add the leading bytes to check.</div>';
+      return;
+    }
+    var res = buildChecks(ct, b, nosniff);
+    $("#results").innerHTML = render(res, b);
+    $("#results").scrollIntoView({ behavior:"smooth", block:"start" });
+  }
+
+  // mode switch
+  $("#modePick").addEventListener("click", function(e){
+    var btn = e.target.closest("button"); if (!btn) return;
+    mode = btn.getAttribute("data-mode");
+    [].forEach.call(this.querySelectorAll("button"), function(x){ x.classList.toggle("on", x===btn); });
+    $("#paneText").style.display = mode==="text" ? "" : "none";
+    $("#paneHex").style.display = mode==="hex" ? "" : "none";
+    $("#paneFile").style.display = mode==="file" ? "" : "none";
+  });
+
+  // file drop / pick
+  var drop = $("#drop"), fileInput = $("#fileInput");
+  function readFile(file){
+    if (!file) return;
+    var slice = file.slice(0, 512);
+    var fr = new FileReader();
+    fr.onload = function(){
+      var buf = new Uint8Array(fr.result);
+      bytes = buf;
+      byteSource = "file: " + file.name + " (" + file.size + " bytes, first " + buf.length + " read)";
+      run();
+    };
+    fr.readAsArrayBuffer(slice);
+  }
+  drop.addEventListener("click", function(){ fileInput.click(); });
+  fileInput.addEventListener("change", function(){ readFile(this.files[0]); });
+  ["dragenter","dragover"].forEach(function(ev){ drop.addEventListener(ev, function(e){ e.preventDefault(); drop.classList.add("over"); }); });
+  ["dragleave","drop"].forEach(function(ev){ drop.addEventListener(ev, function(e){ e.preventDefault(); drop.classList.remove("over"); }); });
+  drop.addEventListener("drop", function(e){ if (e.dataTransfer && e.dataTransfer.files[0]) readFile(e.dataTransfer.files[0]); });
+
+  // buttons
+  $("#analyze").addEventListener("click", run);
+  $("#clear").addEventListener("click", function(){
+    $("#ctype").value=""; $("#bytesText").value=""; $("#bytesHex").value=""; $("#nosniff").checked=false; bytes=null; byteSource="";
+    $("#results").innerHTML='<div class="empty">Your sniffing verdict will appear here.</div>';
+    $("#ctype").focus();
+  });
+
+  $("#exRisk").addEventListener("click", function(){
+    mode = "text";
+    $("#modePick").querySelector('[data-mode="text"]').click();
+    $("#ctype").value = "image/png";
+    $("#bytesText").value = '<!DOCTYPE html>\n<script>alert(document.domain)<\/script>';
+    $("#nosniff").checked = false;
+    run();
+  });
+
+  $("#exSafe").addEventListener("click", function(){
+    mode = "hex";
+    $("#modePick").querySelector('[data-mode="hex"]').click();
+    $("#ctype").value = "image/png";
+    // real PNG magic + IHDR start
+    $("#bytesHex").value = "89 50 4E 47 0D 0A 1A 0A 00 00 00 0D 49 48 44 52";
+    $("#nosniff").checked = true;
+    run();
+  });
+
+  $("#ctype").addEventListener("keydown", function(e){ if ((e.metaKey||e.ctrlKey) && e.key==="Enter") run(); });
+})();
+</script>
+</body>
+</html>

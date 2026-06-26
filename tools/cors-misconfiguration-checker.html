@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>CORS Misconfiguration Checker | UnboundCompute</title>
+<meta name="description" content="Paste your CORS response headers and get a security graded report. Flags origin reflection with credentials, a null origin, wildcard misuse, and missing Vary on Origin. Runs fully in your browser." />
+<meta name="keywords" content="cors checker, cors misconfiguration, access control allow origin, cors security, origin reflection, cors credentials, acao acac, cross origin checker" />
+<meta name="robots" content="index, follow" />
+<meta name="author" content="UnboundCompute" />
+<meta name="theme-color" content="#0a0a0b" />
+<link rel="canonical" href="https://unboundcompute.com/tools/cors-misconfiguration-checker.html" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a0a0b'/%3E%3Cline x1='16' y1='4' x2='16' y2='28' stroke='%23fb5b46' stroke-width='2' stroke-dasharray='3 3'/%3E%3Ccircle cx='16' cy='16' r='3.4' fill='%23fb5b46'/%3E%3C/svg%3E" />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="UnboundCompute" />
+<meta property="og:title" content="CORS Misconfiguration Checker" />
+<meta property="og:description" content="Check your CORS response headers and get a security graded report. Runs fully in your browser, nothing is sent to any server." />
+<meta property="og:url" content="https://unboundcompute.com/tools/cors-misconfiguration-checker.html" />
+<meta property="og:image" content="https://unboundcompute.com/og.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="CORS Misconfiguration Checker" />
+<meta name="twitter:description" content="Check your CORS response headers and get a security graded report. Runs fully in your browser." />
+<meta name="twitter:image" content="https://unboundcompute.com/og.png" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "CORS Misconfiguration Checker",
+      "applicationCategory": "SecurityApplication",
+      "operatingSystem": "Web",
+      "browserRequirements": "Requires JavaScript. Runs entirely client side.",
+      "url": "https://unboundcompute.com/tools/cors-misconfiguration-checker.html",
+      "description": "A free tool that reads your CORS response headers and grades their security. Flags origin reflection combined with credentials, a forgeable null origin, wildcard misuse, multiple allowed origins, and a missing Vary on Origin. All analysis happens in the browser.",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "publisher": { "@type": "Organization", "name": "UnboundCompute", "url": "https://unboundcompute.com/" }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is CORS?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Cross Origin Resource Sharing is a set of HTTP response headers a server uses to tell the browser which other origins are allowed to read its responses. By default the same origin policy stops a page on one origin from reading a response from another origin. CORS is the controlled, opt in way a server relaxes that rule, mostly through the Access-Control-Allow-Origin header." }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the dangerous CORS misconfiguration?",
+          "acceptedAnswer": { "@type": "Answer", "text": "The classic exploitable bug is reflecting the request Origin back in Access-Control-Allow-Origin while also setting Access-Control-Allow-Credentials to true. That combination tells the browser that any origin, including an attacker site, is allowed to make credentialed requests and read the authenticated response. An attacker page can then read a logged in victim's data. The fix is to allowlist a fixed set of trusted origins instead of echoing whatever Origin arrives." }
+        },
+        {
+          "@type": "Question",
+          "name": "Does this CORS checker send my headers anywhere?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. The parsing and the security checks run entirely in your browser with JavaScript. The headers you paste are never uploaded, logged, or sent to any server. The tool reasons about the headers exactly as you paste them and cannot see how the endpoint is actually deployed." }
+        },
+        {
+          "@type": "Question",
+          "name": "Can a wildcard origin be combined with credentials?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. The browser blocks the combination of Access-Control-Allow-Origin set to a wildcard and Access-Control-Allow-Credentials set to true, so a credentialed request will fail rather than succeed. Because of that block, a server that wants credentialed cross origin access has to name a specific origin, which is why a misconfigured server tends to reflect the arbitrary request Origin instead, and that reflection is the real risk." }
+        }
+      ]
+    }
+  ]
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600&family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0a0b; --bg-2:#070708; --panel:#0e0e10; --panel-2:#131315;
+    --ink:#f4f2ec; --ink-hi:#fbf9f3; --ink-soft:#9b988f; --ink-faint:#5e5b54;
+    --line:rgba(244,242,236,.13); --line-2:rgba(244,242,236,.07);
+    --accent:#fb5b46; --accent-2:#ff7d6b; --accent-wash:rgba(251,91,70,.12); --on-accent:#1a0c09; --accent-line:rgba(251,91,70,.42);
+    --pass:#5fd6a4; --pass-wash:rgba(95,214,164,.1); --warn:#e8b04b; --warn-wash:rgba(232,176,75,.1); --fail:#fb5b46; --fail-wash:rgba(251,91,70,.1); --info:#7c93ff; --info-wash:rgba(124,147,255,.1);
+    --serif:'Newsreader',Georgia,serif; --mono:'JetBrains Mono',ui-monospace,monospace; --sans:'Inter',system-ui,sans-serif;
+    --maxw:920px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;line-height:1.6}
+  ::selection{background:var(--accent);color:var(--on-accent)}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+
+  nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);background:rgba(10,10,11,.72);border-bottom:1px solid var(--line-2)}
+  nav .wrap{height:64px;display:flex;align-items:center;justify-content:space-between}
+  nav a.brand{display:flex;align-items:center;gap:11px;font-family:var(--mono);font-weight:600;font-size:15px;color:var(--ink);letter-spacing:-.01em}
+  nav a.brand:hover{text-decoration:none}
+  nav .badge{width:27px;height:27px;border-radius:7px;border:1px solid var(--accent-line);display:grid;place-items:center}
+  nav a.cta{font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:9px 16px;border-radius:8px;background:var(--accent);color:var(--on-accent)}
+  nav a.cta:hover{filter:brightness(1.08);text-decoration:none}
+
+  header.hero{padding:64px 0 28px}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:18px}
+  h1{font-family:var(--serif);font-weight:400;font-size:clamp(32px,5vw,52px);line-height:1.08;letter-spacing:-.015em;color:var(--ink-hi)}
+  .lede{margin-top:18px;font-size:18px;color:var(--ink-soft);max-width:660px}
+  .privacy{margin-top:18px;display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);border:1px solid var(--line);border-radius:8px;padding:8px 13px;background:var(--panel)}
+  .privacy svg{width:14px;height:14px;flex:none}
+
+  .tool{margin:30px 0 12px;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px}
+  label.fld{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:10px}
+  textarea{width:100%;min-height:150px;resize:vertical;background:var(--bg-2);border:1px solid var(--line);border-radius:11px;padding:15px;color:var(--ink);font-family:var(--mono);font-size:13.5px;line-height:1.55;outline:none;transition:border-color .2s,box-shadow .2s;word-break:break-all}
+  textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-wash)}
+  textarea::placeholder{color:var(--ink-faint)}
+  input.txt{width:100%;background:var(--bg-2);border:1px solid var(--line);border-radius:11px;padding:13px 15px;color:var(--ink);font-family:var(--mono);font-size:13.5px;line-height:1.55;outline:none;transition:border-color .2s,box-shadow .2s}
+  input.txt:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-wash)}
+  input.txt::placeholder{color:var(--ink-faint)}
+  .field{margin-top:16px}
+  .row{display:flex;gap:11px;flex-wrap:wrap;margin-top:14px;align-items:center}
+  button{font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;padding:13px 22px;border-radius:9px;cursor:pointer;border:1px solid var(--line);background:transparent;color:var(--ink);transition:filter .15s,border-color .15s,background .15s}
+  button.primary{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+  button.primary:hover{filter:brightness(1.08)}
+  button.ghost:hover{border-color:var(--accent-line);color:var(--ink-hi)}
+  .hint{font-family:var(--mono);font-size:12px;color:var(--ink-faint);margin-left:auto}
+
+  #results{margin-top:8px}
+  .decoded{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0}
+  .seg{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:16px 18px;min-width:0}
+  .seg h3{font-family:var(--mono);font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+  .seg pre{font-family:var(--mono);font-size:13px;line-height:1.55;color:var(--ink);white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere}
+  .seg .claims{margin-top:11px;border-top:1px solid var(--line-2);padding-top:10px;display:flex;flex-direction:column;gap:5px}
+  .seg .claims div{font-family:var(--mono);font-size:12px;color:var(--ink-soft)}
+  .seg .claims b{color:var(--ink)}
+  .seg .err{color:var(--fail);font-family:var(--mono);font-size:13px}
+
+  .grade-card{display:flex;align-items:center;gap:22px;background:var(--panel-2);border:1px solid var(--line);border-radius:16px;padding:22px 24px;margin:20px 0}
+  .grade{font-family:var(--serif);font-size:62px;line-height:1;width:96px;height:96px;border-radius:18px;display:grid;place-items:center;flex:none;border:1.5px solid}
+  .grade.g-A,.grade.g-B{color:var(--pass);border-color:var(--pass);background:var(--pass-wash)}
+  .grade.g-C{color:var(--warn);border-color:var(--warn);background:var(--warn-wash)}
+  .grade.g-D,.grade.g-F{color:var(--fail);border-color:var(--fail);background:var(--fail-wash)}
+  .grade-meta h2{font-family:var(--serif);font-weight:400;font-size:24px;color:var(--ink-hi);margin-bottom:4px}
+  .grade-meta p{color:var(--ink-soft);font-size:14.5px}
+  .score-bar{height:7px;border-radius:99px;background:var(--line-2);margin-top:12px;overflow:hidden;max-width:340px}
+  .score-bar > i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--accent-2))}
+
+  .checks{display:flex;flex-direction:column;gap:11px}
+  .check{border:1px solid var(--line);border-radius:13px;padding:16px 18px;background:var(--panel)}
+  .check .top{display:flex;align-items:flex-start;gap:13px}
+  .dot{width:20px;height:20px;border-radius:6px;flex:none;display:grid;place-items:center;font-size:13px;font-weight:700;margin-top:1px}
+  .dot.pass{background:var(--pass-wash);color:var(--pass)}
+  .dot.warn{background:var(--warn-wash);color:var(--warn)}
+  .dot.fail{background:var(--fail-wash);color:var(--fail)}
+  .dot.info{background:var(--info-wash);color:var(--info)}
+  .check h3{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--ink-hi);letter-spacing:-.01em}
+  .check .finding{margin-top:5px;font-size:14.5px;color:var(--ink)}
+  .check .why{margin-top:9px;font-size:13.5px;color:var(--ink-soft)}
+  .check .fix{margin-top:9px;font-size:13px;color:var(--ink-soft);font-family:var(--mono);background:var(--bg-2);border:1px solid var(--line-2);border-radius:8px;padding:9px 11px;white-space:pre-wrap;word-break:break-word}
+  .check .more{margin-top:9px;font-size:13px}
+  .sub{margin-top:11px;padding-left:15px;border-left:2px solid var(--line);display:flex;flex-direction:column;gap:7px}
+  .sub div{font-size:13.5px;color:var(--ink-soft)}
+  .sub b{color:var(--ink)}
+  .empty{color:var(--ink-faint);font-family:var(--mono);font-size:13px;text-align:center;padding:30px}
+
+  .prose{padding:44px 0 20px}
+  .prose h2{font-family:var(--serif);font-weight:400;font-size:30px;color:var(--ink-hi);margin:36px 0 14px;letter-spacing:-.01em}
+  .prose h3{font-family:var(--mono);font-size:15px;color:var(--ink-hi);margin:24px 0 8px}
+  .prose p{color:var(--ink-soft);margin-bottom:14px;font-size:16px}
+  .prose ul{color:var(--ink-soft);margin:0 0 14px 20px;font-size:16px}
+  .prose li{margin-bottom:7px}
+  .prose code{font-family:var(--mono);font-size:13.5px;background:var(--panel-2);border:1px solid var(--line-2);border-radius:5px;padding:1px 6px;color:var(--ink)}
+  .related{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:8px}
+  .related a{display:block;border:1px solid var(--line);border-radius:11px;padding:14px 16px;color:var(--ink);font-size:14.5px;background:var(--panel)}
+  .related a:hover{border-color:var(--accent-line);text-decoration:none}
+  .related a span{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:5px}
+
+  footer{border-top:1px solid var(--line-2);margin-top:40px;padding:30px 0;color:var(--ink-faint);font-family:var(--mono);font-size:12.5px}
+  footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px}
+  footer a{color:var(--ink-soft)}
+  @media (max-width:560px){
+    .related{grid-template-columns:1fr}
+    .decoded{grid-template-columns:1fr}
+    .grade-card{flex-direction:column;align-items:flex-start;gap:16px}
+    .hint{margin-left:0;width:100%}
+  }
+</style>
+</head>
+<body>
+
+<nav><div class="wrap">
+  <a class="brand" href="https://unboundcompute.com/">
+    <span class="badge"><svg viewBox="0 0 24 24" fill="none" style="width:15px;height:15px"><line x1="12" y1="3" x2="12" y2="21" stroke="var(--accent)" stroke-width="1.8" stroke-dasharray="2.6 2.6"/><circle cx="12" cy="12" r="3" fill="var(--accent)"/></svg></span>
+    UnboundCompute
+  </a>
+  <a class="cta" href="https://unboundcompute.com/#cta">Request access</a>
+</div></nav>
+
+<header class="hero"><div class="wrap">
+  <div class="eyebrow">Free tool</div>
+  <h1>CORS Misconfiguration Checker</h1>
+  <p class="lede">Paste your CORS response headers to read a graded security report. It flags the headline bug, an allow origin that reflects the caller while credentials are allowed, along with a forgeable null origin, wildcard misuse, multiple allowed origins, and a missing Vary on Origin.</p>
+  <div class="privacy">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6l8-4z" stroke="var(--accent)" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Everything runs in your browser. Nothing is sent to any server.
+  </div>
+</div></header>
+
+<div class="wrap">
+  <div class="tool">
+    <label class="fld" for="headers">Paste your CORS response headers</label>
+    <textarea id="headers" spellcheck="false" placeholder="Access-Control-Allow-Origin: https://app.acme.example&#10;Access-Control-Allow-Credentials: true&#10;Access-Control-Allow-Methods: GET, POST, OPTIONS&#10;Vary: Origin&#10;&#10;Paste the response headers as they came back. They are parsed locally and never sent anywhere."></textarea>
+    <div class="field">
+      <label class="fld" for="origin">Origin you sent in the request (optional, helps detect reflection)</label>
+      <input class="txt" id="origin" spellcheck="false" placeholder="https://evil.example" />
+    </div>
+    <div class="row">
+      <button class="primary" id="analyze">Check headers</button>
+      <button class="ghost" id="example">Load example</button>
+      <button class="ghost" id="clear">Clear</button>
+      <span class="hint" id="hint">No data leaves this page</span>
+    </div>
+  </div>
+  <div id="results"><div class="empty">Your parsed headers and graded report will appear here.</div></div>
+</div>
+
+<div class="wrap prose">
+  <h2>What this CORS checker looks at</h2>
+  <p>Cross Origin Resource Sharing is the controlled way a server lets a page on one origin read responses from another origin. By default the browser same origin policy stops that, so a script on one site cannot read a response that came back from a different site. CORS is the opt in that relaxes the rule, and it is driven almost entirely by a handful of response headers. This tool parses those headers exactly as you paste them and audits the parts that decide whether the relaxation is safe, drawing on the <a href="https://fetch.spec.whatwg.org/#http-cors-protocol" rel="noopener" target="_blank">Fetch standard CORS protocol</a> and the guidance in the <a href="https://owasp.org/www-community/attacks/CORS_OriginHeaderScrutiny" rel="noopener" target="_blank">OWASP CORS notes</a>.</p>
+
+  <h3>The same origin policy and why CORS exists</h3>
+  <p>Two URLs share an origin when their scheme, host, and port all match. The same origin policy lets a page send a request to another origin, but it stops the page from reading the response unless that other origin opts in. CORS is that opt in. The server answers with <code>Access-Control-Allow-Origin</code> to name who may read the response, and for anything beyond a simple request the browser first sends a pre flight <code>OPTIONS</code> request to ask permission. The headers you paste here are the server's side of that conversation.</p>
+
+  <h3>The dangerous pattern: reflecting Origin with credentials</h3>
+  <p>The headline misconfiguration is a server that takes whatever <code>Origin</code> arrived on the request and echoes it straight back in <code>Access-Control-Allow-Origin</code>, while also sending <code>Access-Control-Allow-Credentials: true</code>. To a browser this reads as "any origin you came from is allowed to make a logged in request and read the answer". An attacker page at evil.example then makes a credentialed request to the victim API, the victim's cookies ride along, the server reflects evil.example as allowed, and the attacker script reads the authenticated response. The fix is never to reflect: keep a fixed allowlist of trusted origins and compare against it, returning a single fixed origin only when it matches.</p>
+
+  <h3>Why a wildcard with credentials does not save you</h3>
+  <p>A natural question is whether <code>Access-Control-Allow-Origin: *</code> plus credentials is the risk. It is not, because the browser refuses that exact combination: a credentialed request against a wildcard origin simply fails. That is precisely why a server that wants credentialed cross origin access cannot use the wildcard and instead has to echo a specific origin, which is how the reflection bug creeps in. A bare wildcard with no credentials is fine for a genuinely public read only API, but it is the wrong choice for anything that depends on the caller being logged in.</p>
+
+  <h3>The null origin and multiple values</h3>
+  <p>Allowlisting the literal value <code>null</code> looks harmless but is forgeable: a sandboxed iframe, a <code>data:</code> URL, or certain redirects send <code>Origin: null</code>, so an attacker can put their page in that state and slip through. Equally, the spec permits exactly one origin or the wildcard in <code>Access-Control-Allow-Origin</code>. A header carrying several space or comma separated origins is not valid CORS, and usually signals a broken attempt at reflection that the browser will reject anyway. The checker flags both.</p>
+
+  <h3>CORS controls reads, not writes</h3>
+  <p>A common misunderstanding is that CORS protects you from cross site requests. It does not. CORS governs whether a script may read a cross origin response; it does almost nothing to stop the request being sent in the first place. A state changing request can still leave the browser and hit your server before any CORS check applies. That is why CORS is not a defense against <a href="https://security.unboundcompute.com/what-is-csrf/" rel="noopener">cross site request forgery</a>, which is about unwanted writes and needs its own protections like anti forgery tokens and same site cookies. Loosening CORS to fix a CSRF problem only widens your read surface.</p>
+
+  <h2>How to read the grade</h2>
+  <p>Each graded check contributes a weighted share of a score out of one hundred. A pass earns its full weight, a weak setting earns part of it, and a dangerous one earns none. The grade is a fast signal about the headers as you pasted them, not a verdict on the whole system. This tool reasons about the headers as text and cannot see how the endpoint is actually deployed, whether the API is authenticated, or what the server does on a non matching origin. Judging whether a configuration is truly safe means understanding how the server decides each origin, which is the kind of context an <a href="https://security.unboundcompute.com/ai-security-testing/" rel="noopener">AI security testing</a> approach reasons about rather than pattern matching one header. For the wider set of trust boundaries attackers probe, see the <a href="https://security.unboundcompute.com/category/access-control/" rel="noopener">access control</a> writing.</p>
+
+  <h2>Related reading</h2>
+  <div class="related">
+    <a href="https://security.unboundcompute.com/what-is-csrf/"><span>Deep dive</span>What is CSRF</a>
+    <a href="https://security.unboundcompute.com/what-is-ssrf/"><span>Deep dive</span>What is SSRF</a>
+    <a href="https://security.unboundcompute.com/what-is-web-application-security/"><span>Guide</span>What is web application security</a>
+    <a href="https://security.unboundcompute.com/web-security-glossary/"><span>Reference</span>Web security glossary</a>
+  </div>
+
+  <h2>More free tools</h2>
+  <div class="related">
+    <a href="https://unboundcompute.com/tools/security-headers-analyzer.html"><span>Free tool</span>Security Headers and CSP Analyzer</a>
+    <a href="https://unboundcompute.com/tools/cookie-security-auditor.html"><span>Free tool</span>Cookie Security Auditor</a>
+    <a href="https://unboundcompute.com/tools/jwt-security-inspector.html"><span>Free tool</span>JWT Security Inspector</a>
+      <a href="https://unboundcompute.com/tools/"><span>All tools</span>Free security tools hub</a>
+  </div>
+</div>
+
+<footer><div class="wrap">
+  <div>Built by <a href="https://unboundcompute.com/">UnboundCompute</a>, autonomous security research for web apps and APIs.</div>
+  <div><a href="https://unboundcompute.com/#cta">Request access</a></div>
+</div></footer>
+
+<script>
+(function(){
+  "use strict";
+  var $ = function(s){ return document.querySelector(s); };
+
+  // A deliberately weak demo: the API reflects the attacker Origin and allows
+  // credentials, with a broad method set. Expect a failing grade.
+  var EXAMPLE_HEADERS = [
+    "Access-Control-Allow-Origin: https://evil.example",
+    "Access-Control-Allow-Credentials: true",
+    "Access-Control-Allow-Methods: GET, POST, PUT, DELETE, PATCH, OPTIONS",
+    "Access-Control-Allow-Headers: *"
+  ].join("\n");
+  var EXAMPLE_ORIGIN = "https://evil.example";
+
+  function esc(s){ return String(s).replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];}); }
+
+  // Parse pasted header text into a map of lower-cased name -> raw value.
+  // Tolerates "Name: value", curl style "< Name: value", and quoted values.
+  function parseHeaders(text){
+    var out = { _present:false, _lines:0 };
+    if (!text) return out;
+    text.split(/\r?\n/).forEach(function(raw){
+      var line = raw.replace(/^\s*<\s*/, "").trim();          // strip curl "< "
+      if (!line) return;
+      var idx = line.indexOf(":");
+      if (idx < 1) return;
+      var name = line.slice(0, idx).trim().toLowerCase();
+      var val  = line.slice(idx+1).trim();
+      if (!/^access-control-|^vary$/.test(name)) {
+        // still record vary and ac-* only; ignore unrelated headers quietly
+      }
+      out[name] = val;
+      out._lines++;
+      if (/^access-control-allow-origin$/.test(name)) out._present = true;
+      if (/^access-control-/.test(name) || name === "vary") out._present = true;
+    });
+    return out;
+  }
+
+  function normOrigin(s){ return (s||"").trim().replace(/\/+$/,"").toLowerCase(); }
+
+  // status: pass | warn | fail | info. weight 0 => advisory (not graded).
+  function buildChecks(h, sentOrigin){
+    var checks = [];
+    var acao = h["access-control-allow-origin"];
+    var acac = h["access-control-allow-credentials"];
+    var methods = h["access-control-allow-methods"];
+    var allowHeaders = h["access-control-allow-headers"];
+    var vary = h["vary"] || "";
+    var hasAcao = acao !== undefined && acao !== "";
+    var credsTrue = (acac !== undefined) && /^true$/i.test(String(acac).trim());
+    var acaoTrim = hasAcao ? String(acao).trim() : "";
+    var isWildcard = acaoTrim === "*";
+    var isNull = /^null$/i.test(acaoTrim);
+    var multi = hasAcao && /[\s,]/.test(acaoTrim) && !isWildcard;   // more than one token
+    var reflects = false;
+    if (hasAcao && sentOrigin){ reflects = normOrigin(acaoTrim) === normOrigin(sentOrigin); }
+    var isSingleHttps = hasAcao && !isWildcard && !isNull && !multi && /^https:\/\/[^\s,]+$/i.test(acaoTrim);
+
+    // No CORS headers at all (advisory).
+    if (!h._present || !hasAcao){
+      checks.push({w:0,s:"info",h:"No CORS headers found",f:"No Access-Control-Allow-Origin was found in what you pasted. With no CORS headers, the resource is same origin only by default, which is the safe baseline.",why:"The browser same origin policy blocks cross origin reads unless a server opts in. No opt in means no cross origin read surface to misconfigure. If you expected CORS headers here, the response may have stripped them or you pasted the wrong response."});
+      return checks;
+    }
+
+    // 1. Allow-Origin + credentials (headline, weight 30).
+    (function(){
+      var weight = 30;
+      if (credsTrue && reflects){
+        checks.push({w:weight,s:"fail",h:"Origin reflection with credentials",f:"Access-Control-Allow-Origin echoes the exact Origin you sent ("+esc(acaoTrim)+") and Access-Control-Allow-Credentials is true. Any site can read authenticated responses from this endpoint. This is the classic exploitable CORS bug.",fix:"Never reflect the request Origin. Keep a fixed allowlist of trusted origins, compare the incoming Origin against it, and only echo back an origin that matches.",why:"Reflecting the caller plus credentials tells the browser that an attacker page may make a logged in request and read the answer, so a victim's authenticated data leaks cross origin.",link:"https://security.unboundcompute.com/category/access-control/",linkText:"More on access control"});
+        return;
+      }
+      if (credsTrue && isWildcard){
+        checks.push({w:weight,s:"fail",h:"Wildcard origin with credentials",f:"Access-Control-Allow-Origin is * and Access-Control-Allow-Credentials is true. Browsers actually block this exact combination, so a credentialed request fails rather than succeeds. In practice this pairing signals a server that will instead reflect an arbitrary Origin to make credentialed requests work, which is the real danger.",fix:"Decide whether the endpoint truly needs credentials. If it does, name a fixed trusted origin and never the wildcard or a reflected one. If it does not, drop Access-Control-Allow-Credentials.",why:"The wildcard plus credentials is invalid to the browser, but the workaround servers reach for, echoing the caller, is exactly the reflection bug.",link:"https://security.unboundcompute.com/category/access-control/",linkText:"More on access control"});
+        return;
+      }
+      if (credsTrue && isNull){
+        checks.push({w:weight,s:"fail",h:"null origin with credentials",f:"Access-Control-Allow-Origin is null and credentials are allowed. The null origin is forgeable from a sandboxed iframe or a data URL, so an attacker can reach this state and read authenticated responses.",fix:"Remove null from the allowlist entirely and only ever allow specific, fully trusted https origins.",why:"A forgeable origin combined with credentials is just as exploitable as reflecting the caller."});
+        return;
+      }
+      if (credsTrue && multi){
+        checks.push({w:weight,s:"fail",h:"Multiple allowed origins with credentials",f:"Access-Control-Allow-Origin carries more than one value ("+esc(acaoTrim)+") while credentials are allowed. The spec permits exactly one origin, so this is invalid and usually a broken reflection that some clients may still honor.",fix:"Return a single fixed origin from a server side allowlist, not a list, and only when the incoming Origin matches it.",why:"A multi valued allow origin is not valid CORS and points at reflection logic gone wrong, which is dangerous alongside credentials."});
+        return;
+      }
+      if (credsTrue && isSingleHttps){
+        checks.push({w:weight,s:"pass",h:"Allow-Origin with credentials",f:"Credentials are allowed and Access-Control-Allow-Origin is a single fixed https origin ("+esc(acaoTrim)+"). That is the correct shape for a credentialed endpoint. Confirm that origin is one you fully trust and that the server does not switch to reflecting other origins.",why:"A single fixed, trusted origin is the only safe way to allow credentialed cross origin reads."});
+        return;
+      }
+      if (credsTrue){
+        checks.push({w:weight,s:"warn",h:"Allow-Origin with credentials",f:"Credentials are allowed and Access-Control-Allow-Origin is "+esc(acaoTrim)+". Confirm this is a single, fixed, fully trusted origin and never a reflected or attacker influenced value.",fix:"Allow credentials only against a fixed allowlist of trusted origins. Paste the Origin you sent above so this tool can check for reflection.",why:"Whether this is safe depends entirely on whether the origin is fixed and trusted, which the header alone cannot prove."});
+        return;
+      }
+      // credentials not true
+      checks.push({w:weight,s:"pass",h:"Credentials not allowed",f:"Access-Control-Allow-Credentials is not true, so the browser will not attach cookies or send a credentialed response cross origin. That removes the headline reflection risk.",why:"Without credentials, even a reflected or wildcard origin can only read responses that contain no logged in data."});
+    })();
+
+    // 2. ACAO = null (weight 18).
+    (function(){
+      var weight = 18;
+      if (isNull){
+        checks.push({w:weight,s:"fail",h:"Allow-Origin is null",f:"Access-Control-Allow-Origin is the literal value null. The null origin is sent by sandboxed iframes, data URLs, and some redirects, so it is forgeable. Never allowlist null.",fix:"Drop null from the set of allowed origins. Allow only explicit https origins you control.",why:"An attacker can put their own page into a state that emits Origin: null, so allowlisting null effectively allowlists the attacker.",link:"https://security.unboundcompute.com/web-security-glossary/",linkText:"More security terms"});
+        return;
+      }
+      checks.push({w:weight,s:"pass",h:"Allow-Origin is not null",f:"Access-Control-Allow-Origin is not the forgeable null value.",why:"Avoiding null keeps a class of forgeable origins out of your allowlist."});
+    })();
+
+    // 3. Wildcard without credentials (weight 12).
+    (function(){
+      var weight = 12;
+      if (isWildcard && !credsTrue){
+        checks.push({w:weight,s:"info",h:"Wildcard origin, no credentials",f:"Access-Control-Allow-Origin is * with no credentials. That is acceptable for a genuinely public, read only API where every response is safe to share with any site. It is the wrong choice if the endpoint is authenticated or returns anything per user. This tool cannot see whether the endpoint is authenticated, so judge that yourself.",fix:"If the data is public, the wildcard is fine. If any response depends on who is calling, name specific trusted origins instead.",why:"A wildcard with no credentials only ever exposes data that is already public, but only you know whether that is actually true for this endpoint."});
+        return;
+      }
+      if (isWildcard){
+        checks.push({w:weight,s:"warn",h:"Wildcard origin",f:"Access-Control-Allow-Origin is *. Confirm this endpoint serves only public, non sensitive data.",fix:"Restrict to named origins for anything that is not fully public.",why:"A wildcard shares responses with every site, which is only safe when the data is genuinely public."});
+        return;
+      }
+      checks.push({w:weight,s:"pass",h:"No bare wildcard origin",f:"Access-Control-Allow-Origin is set to a specific value rather than a bare wildcard.",why:"Naming a specific origin keeps the read surface narrow instead of open to every site."});
+    })();
+
+    // 4. Multiple values in ACAO (weight 10).
+    (function(){
+      var weight = 10;
+      if (multi){
+        checks.push({w:weight,s:"fail",h:"Multiple values in Allow-Origin",f:"Access-Control-Allow-Origin contains more than one value ("+esc(acaoTrim)+"). The spec permits exactly one origin or the wildcard, so this is invalid and usually means a broken reflection.",fix:"Return a single origin, chosen server side from an allowlist by matching the incoming Origin, or the wildcard for fully public data.",why:"Browsers expect a single token here, and a list is a strong sign that origin matching logic is misbehaving."});
+        return;
+      }
+      checks.push({w:weight,s:"pass",h:"Single Allow-Origin value",f:"Access-Control-Allow-Origin carries a single value, as the spec requires.",why:"Exactly one origin or the wildcard is the only valid shape for this header."});
+    })();
+
+    // 5. Vary: Origin when reflecting (weight 8).
+    (function(){
+      var weight = 8;
+      var varyHasOrigin = /(^|[\s,])origin([\s,]|$)/i.test(vary);
+      if (reflects && !varyHasOrigin){
+        checks.push({w:weight,s:"warn",h:"Vary on Origin missing while reflecting",f:"Access-Control-Allow-Origin reflects the request Origin but Vary does not include Origin. A shared cache may then store one origin's CORS headers and serve them to a request from another origin.",fix:"Always send Vary: Origin when the CORS response depends on the request Origin, so caches key on it.",why:"Without Vary: Origin, a cache can hand an attacker a cached response that was tailored for a trusted origin, a cache poisoning angle on top of the reflection."});
+        return;
+      }
+      if (reflects && varyHasOrigin){
+        checks.push({w:weight,s:"pass",h:"Vary on Origin present",f:"The response reflects Origin and Vary includes Origin, so caches will key on the origin.",why:"Vary: Origin stops a shared cache from mixing up CORS responses meant for different origins."});
+        return;
+      }
+      checks.push({w:weight,s:"pass",h:"Vary on Origin",f:hasAcao && !reflects ? "The allow origin does not appear to be reflected, so cache keying on Origin is less critical here." : "No origin reflection detected, so the Vary on Origin caching risk does not apply.",why:"Vary: Origin matters most when the allow origin changes per request. A fixed origin is the same for every cache entry."});
+    })();
+
+    // 6. Allow-Methods / Allow-Headers breadth (weight 8).
+    (function(){
+      var weight = 8;
+      var headersWildcard = allowHeaders !== undefined && String(allowHeaders).trim() === "*";
+      var methodList = (methods || "").split(/[\s,]+/).map(function(m){return m.trim().toUpperCase();}).filter(Boolean);
+      var writeMethods = methodList.filter(function(m){ return /^(PUT|DELETE|PATCH|POST)$/.test(m); });
+      var broadMethods = methodList.length >= 5 || writeMethods.length >= 3;
+      if ((headersWildcard || broadMethods) && credsTrue){
+        var bits = [];
+        if (headersWildcard) bits.push("Access-Control-Allow-Headers is the wildcard *, which lets the caller send any request header.");
+        if (broadMethods) bits.push("the allowed method set is broad ("+esc(methodList.join(", "))+").");
+        checks.push({w:weight,s:"warn",h:"Broad methods or headers with credentials",f:"With credentials allowed, "+bits.join(" Also, ")+" A wide surface plus credentials gives a successful cross origin attacker more to do.",fix:"Allow only the methods and request headers the endpoint actually needs, and pair a narrow surface with a strict origin allowlist.",why:"Breadth is not a flaw on its own, but combined with credentials it widens what an attacker who slips past the origin check can reach."});
+        return;
+      }
+      if (headersWildcard || broadMethods){
+        var notes = [];
+        if (headersWildcard) notes.push("Access-Control-Allow-Headers is *");
+        if (broadMethods) notes.push("the method set is broad ("+esc(methodList.join(", "))+")");
+        checks.push({w:weight,s:"pass",h:"Methods and headers breadth",f:"This response is wide ("+notes.join("; ")+"), but credentials are not allowed, so the exposure stays within public data. Still keep the surface to what the endpoint needs.",why:"Without credentials, a broad method and header set only affects public responses."});
+        return;
+      }
+      checks.push({w:weight,s:"pass",h:"Methods and headers breadth",f:methodList.length ? "The allowed methods ("+esc(methodList.join(", "))+") and request headers are reasonably scoped." : "No unusually broad method or header allowance detected.",why:"A narrow set of allowed methods and headers limits what a cross origin caller can attempt."});
+    })();
+
+    return checks;
+  }
+
+  function grade(checks){
+    var earned = 0, possible = 0;
+    checks.forEach(function(ch){
+      if (!ch.w) return;
+      possible += ch.w;
+      earned += ch.s === "pass" ? ch.w : ch.s === "warn" ? ch.w*0.5 : ch.s === "info" ? ch.w : 0;
+    });
+    var pct = possible ? Math.round(earned/possible*100) : 0;
+    var letter = pct>=90?"A":pct>=80?"B":pct>=70?"C":pct>=60?"D":"F";
+    return { pct: pct, letter: letter };
+  }
+
+  var PARSED_ORDER = [
+    ["access-control-allow-origin","Access-Control-Allow-Origin"],
+    ["access-control-allow-credentials","Access-Control-Allow-Credentials"],
+    ["access-control-allow-methods","Access-Control-Allow-Methods"],
+    ["access-control-allow-headers","Access-Control-Allow-Headers"],
+    ["access-control-expose-headers","Access-Control-Expose-Headers"],
+    ["access-control-max-age","Access-Control-Max-Age"],
+    ["vary","Vary"]
+  ];
+
+  function renderParsed(h, sentOrigin){
+    var html = '<div class="decoded">';
+    html += '<div class="seg"><h3>Parsed CORS headers</h3>';
+    var rows = "";
+    PARSED_ORDER.forEach(function(p){
+      if (h[p[0]] !== undefined) rows += '<div><b>'+esc(p[1])+':</b> '+esc(h[p[0]] || "(empty)")+'</div>';
+    });
+    if (rows) html += '<div class="claims">'+rows+'</div>';
+    else html += '<div class="err">No CORS related headers were found in what you pasted.</div>';
+    html += '</div>';
+    html += '<div class="seg"><h3>Request origin</h3>';
+    if (sentOrigin) html += '<pre>'+esc(sentOrigin)+'</pre>';
+    else html += '<div class="claims"><div>None provided. Add the Origin you sent to detect reflection.</div></div>';
+    html += '</div></div>';
+    return html;
+  }
+
+  function render(h, sentOrigin, checks){
+    var html = renderParsed(h, sentOrigin);
+    var g = grade(checks);
+    var sum = { pass:0, warn:0, fail:0 };
+    checks.forEach(function(c){ if (c.w && sum[c.s]!==undefined) sum[c.s]++; });
+
+    html += '<div class="grade-card">';
+    html += '<div class="grade g-'+g.letter+'">'+g.letter+'</div>';
+    html += '<div class="grade-meta"><h2>Score '+g.pct+' out of 100</h2>';
+    html += '<p>'+sum.pass+' strong, '+sum.warn+' to improve, '+sum.fail+' dangerous. This reasons about the headers as pasted. It cannot see how the endpoint is actually deployed.</p>';
+    html += '<div class="score-bar"><i style="width:'+g.pct+'%"></i></div></div></div>';
+
+    html += '<div class="checks">';
+    checks.forEach(function(c){
+      var sym = c.s==="pass"?"&#10003;":c.s==="warn"?"!":c.s==="fail"?"&#10007;":"i";
+      html += '<div class="check"><div class="top"><span class="dot '+c.s+'">'+sym+'</span><div style="flex:1">';
+      html += '<h3>'+esc(c.h)+'</h3>';
+      html += '<div class="finding">'+esc(c.f)+'</div>';
+      if (c.subs && c.subs.length){
+        html += '<div class="sub">';
+        c.subs.forEach(function(s){ html += '<div>'+s+'</div>'; });   // subs may contain <b>
+        html += '</div>';
+      }
+      if (c.why) html += '<div class="why">'+esc(c.why)+'</div>';
+      if (c.fix && c.s !== "pass") html += '<div class="fix">'+esc(c.fix)+'</div>';
+      if (c.link) html += '<div class="more"><a href="'+c.link+'" rel="noopener">'+esc(c.linkText||"Learn more")+' &rarr;</a></div>';
+      html += '</div></div></div>';
+    });
+    html += '</div>';
+    return html;
+  }
+
+  function run(){
+    var text = $("#headers").value;
+    var sentOrigin = $("#origin").value.trim();
+    if (!text.trim()){ $("#results").innerHTML = '<div class="empty">Paste your CORS response headers first.</div>'; return; }
+    var h = parseHeaders(text);
+    var checks = buildChecks(h, sentOrigin);
+    $("#results").innerHTML = render(h, sentOrigin, checks);
+    $("#results").scrollIntoView({ behavior:"smooth", block:"start" });
+  }
+
+  $("#analyze").addEventListener("click", run);
+  $("#example").addEventListener("click", function(){ $("#headers").value = EXAMPLE_HEADERS; $("#origin").value = EXAMPLE_ORIGIN; run(); });
+  $("#clear").addEventListener("click", function(){ $("#headers").value=""; $("#origin").value=""; $("#results").innerHTML='<div class="empty">Your parsed headers and graded report will appear here.</div>'; $("#headers").focus(); });
+  $("#headers").addEventListener("keydown", function(e){ if ((e.metaKey||e.ctrlKey) && e.key==="Enter") run(); });
+  $("#origin").addEventListener("keydown", function(e){ if ((e.metaKey||e.ctrlKey) && e.key==="Enter") run(); });
+})();
+</script>
+</body>
+</html>

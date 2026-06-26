@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>File Entropy and Magic Byte Analyzer | UnboundCompute</title>
+<meta name="description" content="Drop a file to compute its Shannon entropy, see a sliding window entropy graph, identify the real file type by magic bytes, read a hex viewer, and flag appended or embedded payloads. Runs fully in your browser." />
+<meta name="keywords" content="file entropy analyzer, shannon entropy, magic bytes, file signature identification, hex viewer, hexdump, packed file detection, encrypted file detection, malware triage, polyglot file detection" />
+<meta name="robots" content="index, follow" />
+<meta name="author" content="UnboundCompute" />
+<meta name="theme-color" content="#0a0a0b" />
+<link rel="canonical" href="https://unboundcompute.com/tools/file-entropy-magic-analyzer.html" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a0a0b'/%3E%3Cline x1='16' y1='4' x2='16' y2='28' stroke='%23fb5b46' stroke-width='2' stroke-dasharray='3 3'/%3E%3Ccircle cx='16' cy='16' r='3.4' fill='%23fb5b46'/%3E%3C/svg%3E" />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="UnboundCompute" />
+<meta property="og:title" content="File Entropy and Magic Byte Analyzer" />
+<meta property="og:description" content="Compute Shannon entropy, identify a file by its magic bytes, read a hex viewer, and flag appended payloads. Runs fully in your browser, nothing is sent to any server." />
+<meta property="og:url" content="https://unboundcompute.com/tools/file-entropy-magic-analyzer.html" />
+<meta property="og:image" content="https://unboundcompute.com/og.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="File Entropy and Magic Byte Analyzer" />
+<meta name="twitter:description" content="Compute Shannon entropy, identify a file by its magic bytes, and flag appended payloads. Runs fully in your browser." />
+<meta name="twitter:image" content="https://unboundcompute.com/og.png" />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "File Entropy and Magic Byte Analyzer",
+      "applicationCategory": "SecurityApplication",
+      "operatingSystem": "Web",
+      "browserRequirements": "Requires JavaScript. Runs entirely client side.",
+      "url": "https://unboundcompute.com/tools/file-entropy-magic-analyzer.html",
+      "description": "A free static triage tool that reads a file locally and reports its overall Shannon entropy, a sliding window entropy graph that reveals packed or encrypted regions, the real file type detected from magic bytes versus the extension, a classic hex viewer of the first bytes, and any appended or embedded file signatures that suggest a polyglot or hidden payload. The file is read in the browser and never uploaded.",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "publisher": { "@type": "Organization", "name": "UnboundCompute", "url": "https://unboundcompute.com/" }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What does file entropy tell me?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Shannon entropy measures how unpredictable the bytes in a file are, on a scale from 0 to 8 bits per byte. Plain text and structured formats sit low, often between 4 and 6. Compressed, encrypted, or packed data pushes close to 8 because every byte value appears about equally often. High entropy is not proof of anything malicious, since a normal zip or a JPEG is also high entropy, but a region of near maximum entropy where you would not expect it is a strong reason to look closer." }
+        },
+        {
+          "@type": "Question",
+          "name": "Is my file uploaded anywhere?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. The file is read in your browser with the FileReader API as an ArrayBuffer, and every calculation runs in local JavaScript. Nothing is uploaded, logged, or sent to any server. That is the point of a client side triage tool: you can inspect a suspicious sample or an internal artifact without it leaving your machine." }
+        },
+        {
+          "@type": "Question",
+          "name": "What are magic bytes and why check them against the extension?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Magic bytes are a short, fixed signature at the start of a file that names its real format, like the bytes 50 4B for a zip or 7F 45 4C 46 for an ELF binary. The file extension is just a label that anyone can rename. When the magic bytes disagree with the extension, for example an executable carrying an image extension, that mismatch is a classic triage signal worth investigating." }
+        },
+        {
+          "@type": "Question",
+          "name": "How does it find appended or embedded payloads?",
+          "acceptedAnswer": { "@type": "Answer", "text": "The tool scans the file for known format signatures that appear after the start rather than at offset zero. A zip header sitting deep inside an image, for instance, can mean a polyglot file or a payload appended to a benign carrier. The scan reports the offset where each extra signature was found so you can carve it out and examine it. A match is a lead to verify, not a verdict." }
+        },
+        {
+          "@type": "Question",
+          "name": "Does high entropy mean a file is packed or malicious?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Not on its own. Many ordinary files are high entropy by design, including archives, encrypted containers, and most modern media. What matters is context: a normally low entropy format that contains a high entropy region, an executable section that is far more random than the rest of the binary, or appended high entropy data after a clean file. The entropy graph exists so you can see where the surprise is, then decide if it deserves a closer look." }
+        }
+      ]
+    }
+  ]
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600&family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0a0b; --bg-2:#070708; --panel:#0e0e10; --panel-2:#131315;
+    --ink:#f4f2ec; --ink-hi:#fbf9f3; --ink-soft:#9b988f; --ink-faint:#5e5b54;
+    --line:rgba(244,242,236,.13); --line-2:rgba(244,242,236,.07);
+    --accent:#fb5b46; --accent-2:#ff7d6b; --accent-wash:rgba(251,91,70,.12); --on-accent:#1a0c09; --accent-line:rgba(251,91,70,.42);
+    --pass:#5fd6a4; --pass-wash:rgba(95,214,164,.1); --warn:#e8b04b; --warn-wash:rgba(232,176,75,.1); --fail:#fb5b46; --fail-wash:rgba(251,91,70,.1); --info:#7c93ff; --info-wash:rgba(124,147,255,.1);
+    --serif:'Newsreader',Georgia,serif; --mono:'JetBrains Mono',ui-monospace,monospace; --sans:'Inter',system-ui,sans-serif;
+    --maxw:920px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;line-height:1.6}
+  ::selection{background:var(--accent);color:var(--on-accent)}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+
+  nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);background:rgba(10,10,11,.72);border-bottom:1px solid var(--line-2)}
+  nav .wrap{height:64px;display:flex;align-items:center;justify-content:space-between}
+  nav a.brand{display:flex;align-items:center;gap:11px;font-family:var(--mono);font-weight:600;font-size:15px;color:var(--ink);letter-spacing:-.01em}
+  nav a.brand:hover{text-decoration:none}
+  nav .badge{width:27px;height:27px;border-radius:7px;border:1px solid var(--accent-line);display:grid;place-items:center}
+  nav a.cta{font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:9px 16px;border-radius:8px;background:var(--accent);color:var(--on-accent)}
+  nav a.cta:hover{filter:brightness(1.08);text-decoration:none}
+
+  header.hero{padding:64px 0 28px}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:18px}
+  h1{font-family:var(--serif);font-weight:400;font-size:clamp(32px,5vw,52px);line-height:1.08;letter-spacing:-.015em;color:var(--ink-hi)}
+  .lede{margin-top:18px;font-size:18px;color:var(--ink-soft);max-width:660px}
+  .privacy{margin-top:18px;display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);border:1px solid var(--line);border-radius:8px;padding:8px 13px;background:var(--panel)}
+  .privacy svg{width:14px;height:14px;flex:none}
+
+  .tool{margin:30px 0 12px;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px}
+  label.fld{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:10px}
+  .drop{border:1.5px dashed var(--line);border-radius:13px;padding:40px 22px;text-align:center;background:var(--bg-2);transition:border-color .2s,background .2s;cursor:pointer}
+  .drop:hover{border-color:var(--accent-line)}
+  .drop.over{border-color:var(--accent);background:var(--accent-wash)}
+  .drop .big{font-family:var(--serif);font-size:21px;color:var(--ink-hi);margin-bottom:6px}
+  .drop .small{font-family:var(--mono);font-size:12.5px;color:var(--ink-faint)}
+  .drop input[type=file]{display:none}
+  .row{display:flex;gap:11px;flex-wrap:wrap;margin-top:14px;align-items:center}
+  button{font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;padding:13px 22px;border-radius:9px;cursor:pointer;border:1px solid var(--line);background:transparent;color:var(--ink);transition:filter .15s,border-color .15s,background .15s}
+  button.primary{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+  button.primary:hover{filter:brightness(1.08)}
+  button.ghost:hover{border-color:var(--accent-line);color:var(--ink-hi)}
+  .hint{font-family:var(--mono);font-size:12px;color:var(--ink-faint);margin-left:auto}
+
+  #results{margin-top:8px}
+  .decoded{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0}
+  .seg{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:16px 18px;min-width:0}
+  .seg h3{font-family:var(--mono);font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+  .seg pre{font-family:var(--mono);font-size:13px;line-height:1.55;color:var(--ink);white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere}
+  .seg .claims{margin-top:11px;border-top:1px solid var(--line-2);padding-top:10px;display:flex;flex-direction:column;gap:5px}
+  .seg .claims div{font-family:var(--mono);font-size:12px;color:var(--ink-soft)}
+  .seg .claims b{color:var(--ink)}
+  .seg .err{color:var(--fail);font-family:var(--mono);font-size:13px}
+
+  .grade-card{display:flex;align-items:center;gap:22px;background:var(--panel-2);border:1px solid var(--line);border-radius:16px;padding:22px 24px;margin:20px 0}
+  .grade{font-family:var(--mono);font-weight:700;font-size:30px;line-height:1;width:96px;height:96px;border-radius:18px;display:grid;place-items:center;flex:none;border:1.5px solid}
+  .grade.lo{color:var(--pass);border-color:var(--pass);background:var(--pass-wash)}
+  .grade.mid{color:var(--warn);border-color:var(--warn);background:var(--warn-wash)}
+  .grade.hi{color:var(--fail);border-color:var(--fail);background:var(--fail-wash)}
+  .grade small{display:block;font-size:11px;font-weight:500;color:var(--ink-soft);margin-top:5px}
+  .grade-meta h2{font-family:var(--serif);font-weight:400;font-size:24px;color:var(--ink-hi);margin-bottom:4px}
+  .grade-meta p{color:var(--ink-soft);font-size:14.5px}
+  .score-bar{height:7px;border-radius:99px;background:var(--line-2);margin-top:12px;overflow:hidden;max-width:340px}
+  .score-bar > i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--accent-2))}
+
+  .canvas-wrap{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:18px;margin:20px 0}
+  .canvas-wrap h3{font-family:var(--mono);font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+  canvas{display:block;width:100%;height:180px;border-radius:8px;background:var(--bg-2);border:1px solid var(--line-2)}
+  .axis{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--ink-faint);margin-top:8px}
+  .legend{font-family:var(--mono);font-size:11.5px;color:var(--ink-soft);margin-top:10px}
+
+  .hexwrap{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:16px 18px;margin:20px 0;overflow-x:auto}
+  .hexwrap h3{font-family:var(--mono);font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+  .hex{font-family:var(--mono);font-size:12.5px;line-height:1.6;color:var(--ink);white-space:pre}
+  .hex .off{color:var(--ink-faint)}
+  .hex .asc{color:var(--ink-soft)}
+
+  .checks{display:flex;flex-direction:column;gap:11px}
+  .check{border:1px solid var(--line);border-radius:13px;padding:16px 18px;background:var(--panel)}
+  .check .top{display:flex;align-items:flex-start;gap:13px}
+  .dot{width:20px;height:20px;border-radius:6px;flex:none;display:grid;place-items:center;font-size:13px;font-weight:700;margin-top:1px}
+  .dot.pass{background:var(--pass-wash);color:var(--pass)}
+  .dot.warn{background:var(--warn-wash);color:var(--warn)}
+  .dot.fail{background:var(--fail-wash);color:var(--fail)}
+  .dot.info{background:var(--info-wash);color:var(--info)}
+  .check h3{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--ink-hi);letter-spacing:-.01em}
+  .check .finding{margin-top:5px;font-size:14.5px;color:var(--ink)}
+  .check .why{margin-top:9px;font-size:13.5px;color:var(--ink-soft)}
+  .check .fix{margin-top:9px;font-size:13px;color:var(--ink-soft);font-family:var(--mono);background:var(--bg-2);border:1px solid var(--line-2);border-radius:8px;padding:9px 11px;white-space:pre-wrap;word-break:break-word}
+  .check .more{margin-top:9px;font-size:13px}
+  .sub{margin-top:11px;padding-left:15px;border-left:2px solid var(--line);display:flex;flex-direction:column;gap:7px}
+  .sub div{font-size:13.5px;color:var(--ink-soft)}
+  .sub b{color:var(--ink)}
+  .empty{color:var(--ink-faint);font-family:var(--mono);font-size:13px;text-align:center;padding:30px}
+
+  .prose{padding:44px 0 20px}
+  .prose h2{font-family:var(--serif);font-weight:400;font-size:30px;color:var(--ink-hi);margin:36px 0 14px;letter-spacing:-.01em}
+  .prose h3{font-family:var(--mono);font-size:15px;color:var(--ink-hi);margin:24px 0 8px}
+  .prose p{color:var(--ink-soft);margin-bottom:14px;font-size:16px}
+  .prose ul{color:var(--ink-soft);margin:0 0 14px 20px;font-size:16px}
+  .prose li{margin-bottom:7px}
+  .prose code{font-family:var(--mono);font-size:13.5px;background:var(--panel-2);border:1px solid var(--line-2);border-radius:5px;padding:1px 6px;color:var(--ink)}
+  .related{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:8px}
+  .related a{display:block;border:1px solid var(--line);border-radius:11px;padding:14px 16px;color:var(--ink);font-size:14.5px;background:var(--panel)}
+  .related a:hover{border-color:var(--accent-line);text-decoration:none}
+  .related a span{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:5px}
+
+  footer{border-top:1px solid var(--line-2);margin-top:40px;padding:30px 0;color:var(--ink-faint);font-family:var(--mono);font-size:12.5px}
+  footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px}
+  footer a{color:var(--ink-soft)}
+  @media (max-width:560px){
+    .related{grid-template-columns:1fr}
+    .decoded{grid-template-columns:1fr}
+    .grade-card{flex-direction:column;align-items:flex-start;gap:16px}
+    .hint{margin-left:0;width:100%}
+  }
+</style>
+</head>
+<body>
+
+<nav><div class="wrap">
+  <a class="brand" href="https://unboundcompute.com/">
+    <span class="badge"><svg viewBox="0 0 24 24" fill="none" style="width:15px;height:15px"><line x1="12" y1="3" x2="12" y2="21" stroke="var(--accent)" stroke-width="1.8" stroke-dasharray="2.6 2.6"/><circle cx="12" cy="12" r="3" fill="var(--accent)"/></svg></span>
+    UnboundCompute
+  </a>
+  <a class="cta" href="https://unboundcompute.com/#cta">Request access</a>
+</div></nav>
+
+<header class="hero"><div class="wrap">
+  <div class="eyebrow">Free tool</div>
+  <h1>File Entropy and Magic Byte Analyzer</h1>
+  <p class="lede">Drop a file to read it locally and triage it in seconds. You get its overall Shannon entropy, a sliding window entropy graph that reveals packed or encrypted regions, the real file type detected from its magic bytes against the extension, a classic hex viewer, and a scan for appended or embedded signatures that hint at a polyglot or hidden payload.</p>
+  <div class="privacy">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6l8-4z" stroke="var(--accent)" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    The file is read in your browser. Nothing is uploaded, logged, or sent to any server.
+  </div>
+</div></header>
+
+<div class="wrap">
+  <div class="tool">
+    <label class="fld">Drop a file to analyze</label>
+    <div class="drop" id="drop">
+      <div class="big">Drop a file here</div>
+      <div class="small">or click to choose. The file stays on your machine, read locally as an ArrayBuffer.</div>
+      <input type="file" id="file" />
+    </div>
+    <div class="row">
+      <button class="ghost" id="clear">Clear</button>
+      <span class="hint" id="hint">No data leaves this page</span>
+    </div>
+  </div>
+  <div id="results"><div class="empty">Your entropy report, type identification, hex viewer, and payload scan will appear here.</div></div>
+</div>
+
+<div class="wrap prose">
+  <h2>What this analyzer reports</h2>
+  <p>Static triage starts before you ever run a sample. You look at the raw bytes and ask a few cheap questions: what is this file really, how random are its contents, and is anything hiding inside it. This tool answers those questions in the browser, reading the file as an <code>ArrayBuffer</code> with the FileReader API so the bytes never leave your machine. It is a first look, meant to point you at the parts worth a closer look, not a sandbox or a full reverse engineering suite.</p>
+
+  <h3>Shannon entropy and what high entropy means</h3>
+  <p>Shannon entropy scores how unpredictable the byte values are, from 0 to 8 bits per byte. A file of one repeated byte scores 0. A file where every value from 0 to 255 appears about equally often scores close to 8. Plain text and structured formats land in the middle. Data that is compressed, encrypted, or packed sits near the top, because those transforms flatten the byte distribution. The tool reports the overall figure and grades how far it is from the high end, so you can read at a glance whether the file looks random.</p>
+
+  <h3>The sliding window entropy graph</h3>
+  <p>One number for a whole file hides where the randomness lives. The graph computes entropy over a sliding window of blocks across the file offset and draws it, so a packed section, an encrypted blob, or data appended after a clean file shows up as a step or a spike. A benign executable that is mostly low entropy code with one near maximum region is a classic packed or encrypted section pattern. The horizontal axis is the byte offset from start to end, and the vertical axis is entropy from 0 to 8.</p>
+
+  <h3>Magic bytes against the extension</h3>
+  <p>The first few bytes of most formats are a fixed signature, the magic bytes. A PNG starts with <code>89 50 4E 47</code>, a zip with <code>50 4B</code>, an ELF binary with <code>7F 45 4C 46</code>, a Windows executable with <code>4D 5A</code>. The extension is only a label and can be renamed to anything. The analyzer reads the signature, names the real format, and compares it to the extension. A mismatch, like an executable wearing an image extension, is a well known triage signal.</p>
+
+  <h3>The hex viewer</h3>
+  <p>A classic hexdump of the first bytes shows the offset, the hex values, and an ASCII gutter side by side. Headers, embedded strings, and the shape of a format are often readable straight from the dump. The view is capped to the first block so it stays fast on large files.</p>
+
+  <h3>Appended and embedded payload detection</h3>
+  <p>The scan looks for known format signatures that appear after offset zero rather than at the very start. A zip header buried inside an image can mean a polyglot, a single file that is valid as two formats at once, or a payload simply appended to a benign carrier. Each extra signature is reported with the byte offset where it was found, so you can carve it out and inspect it. As with entropy, a hit is a lead to verify, not a verdict.</p>
+
+  <h2>How to read the result</h2>
+  <p>The headline number scores the overall entropy from low to high. The detail rows then break down the file type, any extension mismatch, the entropy reading in plain language, and any appended signatures. None of these is a malware verdict by itself: archives and media are high entropy by design, and many formats legitimately embed others. The value is in the combination, a low entropy format that hides a high entropy region, an extension that lies about the format, or random data tacked onto the end. The kind of contextual judgment that turns these signals into a conclusion is what an <a href="https://security.unboundcompute.com/ai-security-testing/" rel="noopener">AI security testing</a> approach reasons about rather than matching one byte pattern. For the wider set of attacker techniques that hide code in plain files, the <a href="https://security.unboundcompute.com/web-security-glossary/" rel="noopener">web security glossary</a> is a good starting point.</p>
+
+  <h2>Related reading</h2>
+  <div class="related">
+    <a href="https://security.unboundcompute.com/what-is-web-application-security/"><span>Guide</span>What is web application security</a>
+    <a href="https://security.unboundcompute.com/ai-security-testing/"><span>Guide</span>AI security testing</a>
+    <a href="https://security.unboundcompute.com/web-security-glossary/"><span>Reference</span>Web security glossary</a>
+    <a href="https://security.unboundcompute.com/category/access-control/"><span>Deep dive</span>Access control</a>
+  </div>
+
+  <h2>More free tools</h2>
+  <div class="related">
+    <a href="https://unboundcompute.com/tools/secret-scanner.html"><span>Free tool</span>Secret and Credential Scanner</a>
+    <a href="https://unboundcompute.com/tools/ioc-defanger-extractor.html"><span>Free tool</span>IOC Defanger and Extractor</a>
+    <a href="https://unboundcompute.com/tools/sri-hash-generator.html"><span>Free tool</span>Subresource Integrity Hash Generator</a>
+    <a href="https://unboundcompute.com/tools/"><span>Free tools</span>All security tools</a>
+  </div>
+</div>
+
+<footer><div class="wrap">
+  <div>Built by <a href="https://unboundcompute.com/">UnboundCompute</a>, autonomous security research for web apps and APIs.</div>
+  <div><a href="https://unboundcompute.com/#cta">Request access</a></div>
+</div></footer>
+
+<script>
+(function(){
+  "use strict";
+  var $ = function(s){ return document.querySelector(s); };
+
+  // ---- pure: Shannon entropy of a byte slice (Uint8Array) ----
+  function shannonEntropy(bytes, start, end){
+    start = start || 0;
+    end = (end === undefined) ? bytes.length : end;
+    var n = end - start;
+    if (n <= 0) return 0;
+    var counts = new Uint32Array(256);
+    for (var i=start;i<end;i++) counts[bytes[i]]++;
+    var h = 0;
+    for (var v=0;v<256;v++){
+      var c = counts[v];
+      if (!c) continue;
+      var p = c / n;
+      h -= p * (Math.log(p) / Math.LN2);
+    }
+    return h; // 0 .. 8
+  }
+
+  // ---- pure: magic byte signature table ----
+  // Each entry: name, ext hint, bytes (array of ints, or null in a slot = wildcard), offset.
+  var SIGS = [
+    { name:"PNG image",            ext:"png",  off:0, bytes:[0x89,0x50,0x4E,0x47,0x0D,0x0A,0x1A,0x0A] },
+    { name:"JPEG image",           ext:"jpg",  off:0, bytes:[0xFF,0xD8,0xFF] },
+    { name:"GIF image",            ext:"gif",  off:0, bytes:[0x47,0x49,0x46,0x38] },
+    { name:"BMP image",            ext:"bmp",  off:0, bytes:[0x42,0x4D] },
+    { name:"PDF document",         ext:"pdf",  off:0, bytes:[0x25,0x50,0x44,0x46,0x2D] },
+    { name:"ZIP archive (PK)",     ext:"zip",  off:0, bytes:[0x50,0x4B,0x03,0x04] },
+    { name:"ZIP empty archive",    ext:"zip",  off:0, bytes:[0x50,0x4B,0x05,0x06] },
+    { name:"GZIP archive",         ext:"gz",   off:0, bytes:[0x1F,0x8B] },
+    { name:"BZIP2 archive",        ext:"bz2",  off:0, bytes:[0x42,0x5A,0x68] },
+    { name:"XZ archive",           ext:"xz",   off:0, bytes:[0xFD,0x37,0x7A,0x58,0x5A,0x00] },
+    { name:"RAR archive",          ext:"rar",  off:0, bytes:[0x52,0x61,0x72,0x21,0x1A,0x07] },
+    { name:"7z archive",           ext:"7z",   off:0, bytes:[0x37,0x7A,0xBC,0xAF,0x27,0x1C] },
+    { name:"ELF binary",           ext:"elf",  off:0, bytes:[0x7F,0x45,0x4C,0x46] },
+    { name:"PE / DOS executable (MZ)", ext:"exe", off:0, bytes:[0x4D,0x5A] },
+    { name:"Mach-O 32 bit",        ext:"macho",off:0, bytes:[0xFE,0xED,0xFA,0xCE] },
+    { name:"Mach-O 64 bit",        ext:"macho",off:0, bytes:[0xFE,0xED,0xFA,0xCF] },
+    { name:"Mach-O reverse 64 bit",ext:"macho",off:0, bytes:[0xCF,0xFA,0xED,0xFE] },
+    { name:"Mach-O universal",     ext:"macho",off:0, bytes:[0xCA,0xFE,0xBA,0xBE] },
+    { name:"Java class",           ext:"class",off:0, bytes:[0xCA,0xFE,0xBA,0xBE] },
+    { name:"WebAssembly module",   ext:"wasm", off:0, bytes:[0x00,0x61,0x73,0x6D] },
+    { name:"SQLite database",      ext:"sqlite",off:0, bytes:[0x53,0x51,0x4C,0x69,0x74,0x65,0x20,0x66,0x6F,0x72,0x6D,0x61,0x74,0x20,0x33,0x00] },
+    { name:"OLE / CFB (legacy Office)", ext:"doc", off:0, bytes:[0xD0,0xCF,0x11,0xE0,0xA1,0xB1,0x1A,0xE1] },
+    { name:"Windows shortcut (LNK)", ext:"lnk", off:0, bytes:[0x4C,0x00,0x00,0x00,0x01,0x14,0x02,0x00] },
+    { name:"WAV / AVI (RIFF)",     ext:"wav",  off:0, bytes:[0x52,0x49,0x46,0x46] },
+    { name:"OGG media",            ext:"ogg",  off:0, bytes:[0x4F,0x67,0x67,0x53] },
+    { name:"ICO icon",             ext:"ico",  off:0, bytes:[0x00,0x00,0x01,0x00] }
+  ];
+
+  function matchAt(bytes, sig, pos){
+    var b = sig.bytes;
+    if (pos + b.length > bytes.length) return false;
+    for (var i=0;i<b.length;i++){
+      if (b[i] === null) continue;
+      if (bytes[pos+i] !== b[i]) return false;
+    }
+    return true;
+  }
+
+  // Identify the file by signatures anchored at offset 0.
+  function identify(bytes){
+    var out = [];
+    for (var i=0;i<SIGS.length;i++){
+      if (SIGS[i].off === 0 && matchAt(bytes, SIGS[i], 0)) out.push(SIGS[i]);
+    }
+    return out; // may be empty, or several (e.g. Mach-O universal vs Java class share bytes)
+  }
+
+  // Scan for embedded/appended signatures that start AFTER offset 0.
+  // We focus on a useful subset (archives and images), capped to a budget.
+  var EMBED = SIGS.filter(function(s){
+    return /ZIP|GZIP|RAR|7z|PNG|JPEG|GIF|PDF|BZIP2|XZ/.test(s.name);
+  });
+  function scanEmbedded(bytes, limit){
+    var hits = [], cap = limit || 64;
+    var end = bytes.length;
+    for (var pos=1; pos<end; pos++){
+      for (var s=0;s<EMBED.length;s++){
+        if (matchAt(bytes, EMBED[s], pos)){
+          hits.push({ name: EMBED[s].name, offset: pos });
+          if (hits.length >= cap) return hits;
+          // skip ahead a little to avoid runaway dense matches of the same sig
+          break;
+        }
+      }
+    }
+    return hits;
+  }
+
+  function esc(s){ return String(s).replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];}); }
+
+  function fmtBytes(n){
+    if (n < 1024) return n + " B";
+    if (n < 1048576) return (n/1024).toFixed(1) + " KB";
+    if (n < 1073741824) return (n/1048576).toFixed(1) + " MB";
+    return (n/1073741824).toFixed(2) + " GB";
+  }
+
+  function fmtHex(n, width){
+    var s = n.toString(16).toUpperCase();
+    while (s.length < (width||0)) s = "0" + s;
+    return s;
+  }
+
+  function extOf(name){
+    var m = /\.([A-Za-z0-9]+)$/.exec(name || "");
+    return m ? m[1].toLowerCase() : "";
+  }
+
+  // ---- sliding window entropy series for the graph ----
+  function entropySeries(bytes, blocks){
+    blocks = blocks || 256;
+    var n = bytes.length;
+    if (n === 0) return [];
+    var block = Math.max(1, Math.floor(n / blocks));
+    var series = [];
+    for (var b=0;b<blocks;b++){
+      var start = b * block;
+      if (start >= n) break;
+      var end = Math.min(n, start + block);
+      series.push(shannonEntropy(bytes, start, end));
+    }
+    return series;
+  }
+
+  function drawGraph(canvas, series){
+    var dpr = window.devicePixelRatio || 1;
+    var cssW = canvas.clientWidth, cssH = canvas.clientHeight;
+    canvas.width = Math.round(cssW * dpr);
+    canvas.height = Math.round(cssH * dpr);
+    var ctx = canvas.getContext("2d");
+    ctx.scale(dpr, dpr);
+    var W = cssW, H = cssH, pad = 8;
+    ctx.clearRect(0,0,W,H);
+
+    // gridlines at entropy 2,4,6
+    ctx.strokeStyle = "rgba(244,242,236,.07)";
+    ctx.lineWidth = 1;
+    [2,4,6].forEach(function(lvl){
+      var y = H - pad - (lvl/8)*(H-2*pad);
+      ctx.beginPath(); ctx.moveTo(pad,y); ctx.lineTo(W-pad,y); ctx.stroke();
+    });
+
+    if (!series.length) return;
+    var n = series.length;
+    var x = function(i){ return pad + (i/(n-1||1))*(W-2*pad); };
+    var y = function(v){ return H - pad - (v/8)*(H-2*pad); };
+
+    // area fill
+    ctx.beginPath();
+    ctx.moveTo(x(0), H-pad);
+    for (var i=0;i<n;i++) ctx.lineTo(x(i), y(series[i]));
+    ctx.lineTo(x(n-1), H-pad);
+    ctx.closePath();
+    var grad = ctx.createLinearGradient(0,0,0,H);
+    grad.addColorStop(0, "rgba(251,91,70,.32)");
+    grad.addColorStop(1, "rgba(251,91,70,.02)");
+    ctx.fillStyle = grad;
+    ctx.fill();
+
+    // line
+    ctx.beginPath();
+    for (var j=0;j<n;j++){ if (j===0) ctx.moveTo(x(j),y(series[j])); else ctx.lineTo(x(j),y(series[j])); }
+    ctx.strokeStyle = "#fb5b46";
+    ctx.lineWidth = 1.6;
+    ctx.stroke();
+  }
+
+  function hexDump(bytes, count){
+    count = Math.min(count || 256, bytes.length);
+    var lines = [];
+    for (var off=0; off<count; off+=16){
+      var hexParts = [], asc = "";
+      for (var i=0;i<16;i++){
+        if (off+i < count){
+          var b = bytes[off+i];
+          hexParts.push(fmtHex(b,2));
+          asc += (b>=32 && b<=126) ? String.fromCharCode(b) : ".";
+        } else {
+          hexParts.push("  ");
+          asc += " ";
+        }
+        if (i===7) hexParts.push("");
+      }
+      var hexStr = hexParts.join(" ");
+      lines.push(
+        '<span class="off">' + fmtHex(off,8) + '</span>  ' +
+        esc(hexStr) +
+        '  <span class="asc">|' + esc(asc) + '|</span>'
+      );
+    }
+    return lines.join("\n");
+  }
+
+  // ---- analysis driver ----
+  function analyze(file, buf){
+    var bytes = new Uint8Array(buf);
+    var overall = shannonEntropy(bytes);
+    var ext = extOf(file.name);
+    var ids = identify(bytes);
+    var series = entropySeries(bytes, 256);
+    var embedded = scanEmbedded(bytes, 64);
+
+    return { file:file, bytes:bytes, overall:overall, ext:ext, ids:ids, series:series, embedded:embedded };
+  }
+
+  function entropyBand(h){
+    if (h >= 7.5) return { cls:"hi", word:"very high" };
+    if (h >= 6.5) return { cls:"mid", word:"high" };
+    if (h >= 4.5) return { cls:"mid", word:"moderate" };
+    return { cls:"lo", word:"low" };
+  }
+
+  function buildChecks(a){
+    var checks = [];
+    var bytes = a.bytes;
+
+    // 1. file type vs extension
+    (function(){
+      if (!a.ids.length){
+        checks.push({ s:"info", h:"File type by magic bytes",
+          f:"No known signature matched the first bytes. The format is unrecognized by this tool, which can be normal for plain text, custom formats, or raw data.",
+          why:"A missing signature is not suspicious on its own. Check the hex viewer and the entropy reading to characterize it." });
+        return;
+      }
+      var names = a.ids.map(function(s){ return s.name; }).join(" or ");
+      var exts = a.ids.map(function(s){ return s.ext; });
+      var extMatches = a.ext && exts.indexOf(a.ext) !== -1;
+      if (a.ext && !extMatches){
+        checks.push({ s:"warn", h:"File type by magic bytes",
+          f:"Detected " + names + " from the magic bytes, but the file extension is ." + a.ext + ". The bytes and the label disagree.",
+          fix:"Treat the magic bytes as the truth and the extension as a claim. A renamed executable or document is a classic way to slip a file past a filter.",
+          why:"The extension is only a label anyone can change. When it disagrees with the real format, that mismatch is worth investigating." });
+        return;
+      }
+      checks.push({ s:"pass", h:"File type by magic bytes",
+        f:"Detected " + names + (a.ext ? ", consistent with the ." + a.ext + " extension." : "."),
+        why:"The signature at the start of the file names its real format, regardless of the extension." });
+    })();
+
+    // 2. overall entropy
+    (function(){
+      var band = entropyBand(a.overall);
+      var val = a.overall.toFixed(3);
+      if (band.word === "very high"){
+        checks.push({ s:"warn", h:"Overall entropy",
+          f:"Entropy is " + val + " bits per byte, which is very high. The bytes are close to uniformly random.",
+          fix:"Very high entropy is expected for archives, encrypted containers, and most media. If the detected type is a normally low entropy format, this is a reason to look closer.",
+          why:"Compression, encryption, and packing all flatten the byte distribution toward maximum entropy. High entropy where you would not expect it is a triage signal." });
+        return;
+      }
+      if (band.word === "high"){
+        checks.push({ s:"info", h:"Overall entropy",
+          f:"Entropy is " + val + " bits per byte, which is high but not at the ceiling. Some compressed or encoded content is likely.",
+          why:"Many ordinary files sit in this range. Use the graph to see whether the randomness is spread out or concentrated in one region." });
+        return;
+      }
+      checks.push({ s:"pass", h:"Overall entropy",
+        f:"Entropy is " + val + " bits per byte, which is " + band.word + ". This is typical of text or structured data rather than packed or encrypted content.",
+        why:"Lower entropy means byte values repeat and cluster, the hallmark of plain text and structured formats." });
+    })();
+
+    // 3. entropy distribution from the graph series
+    (function(){
+      if (a.series.length < 4) return;
+      var max = Math.max.apply(null, a.series);
+      var min = Math.min.apply(null, a.series);
+      var spread = max - min;
+      if (spread >= 3 && max >= 7){
+        checks.push({ s:"warn", h:"Entropy distribution",
+          f:"Entropy varies a lot across the file (low near " + min.toFixed(2) + ", peaking near " + max.toFixed(2) + "). One or more regions are far more random than the rest.",
+          fix:"Look at the graph for the high entropy region. A packed or encrypted section inside an otherwise ordinary file shows up exactly like this.",
+          why:"A localized spike often marks a packed section, an embedded encrypted blob, or appended random data on an otherwise normal carrier." });
+        return;
+      }
+      checks.push({ s:"pass", h:"Entropy distribution",
+        f:"Entropy is fairly even across the file (between " + min.toFixed(2) + " and " + max.toFixed(2) + "). No single region stands out as far more random than the rest.",
+        why:"A flat profile means the file is uniform in nature, with no obvious packed or appended high entropy region." });
+    })();
+
+    // 4. embedded / appended signatures
+    (function(){
+      if (!a.embedded.length){
+        checks.push({ s:"pass", h:"Embedded or appended payloads",
+          f:"No known archive or image signature was found after the start of the file.",
+          why:"Nothing in the scan suggests a polyglot or a payload appended to a benign carrier. The scan covers a common subset of signatures, so it is not exhaustive." });
+        return;
+      }
+      var subs = a.embedded.slice(0,12).map(function(h){
+        return "<b>" + esc(h.name) + "</b> signature found at byte offset 0x" + fmtHex(h.offset,0) + " (" + h.offset + ").";
+      });
+      if (a.embedded.length > 12) subs.push("and " + (a.embedded.length - 12) + " more.");
+      checks.push({ s:"warn", h:"Embedded or appended payloads",
+        f:"Found " + a.embedded.length + " known signature" + (a.embedded.length===1?"":"s") + " after the start of the file. This can indicate a polyglot, an archive embedded in another format, or a payload appended to a benign carrier.",
+        subs:subs,
+        fix:"Carve out the data at each reported offset and inspect it separately. A zip header deep inside an image is the textbook polyglot pattern.",
+        why:"Some matches are benign: container formats like zip based documents legitimately embed signatures. Treat each as a lead to verify, not a verdict." });
+    })();
+
+    return checks;
+  }
+
+  function renderHeadline(a){
+    var band = entropyBand(a.overall);
+    var html = '<div class="grade-card">';
+    html += '<div class="grade ' + band.cls + '">' + a.overall.toFixed(2) + '<small>bits / byte</small></div>';
+    html += '<div class="grade-meta"><h2>' + band.word.charAt(0).toUpperCase() + band.word.slice(1) + ' entropy</h2>';
+    var typeWord = a.ids.length ? esc(a.ids.map(function(s){return s.name;}).join(" or ")) : "unrecognized format";
+    html += '<p>' + esc(a.file.name) + ' &middot; ' + fmtBytes(a.bytes.length) + ' &middot; detected as ' + typeWord + '. Entropy runs from 0 (uniform) to 8 (random). This is triage, not a malware verdict.</p>';
+    html += '<div class="score-bar"><i style="width:' + Math.round(a.overall/8*100) + '%"></i></div></div></div>';
+    return html;
+  }
+
+  function renderGraph(){
+    return '<div class="canvas-wrap"><h3>Sliding window entropy</h3>' +
+      '<canvas id="egraph"></canvas>' +
+      '<div class="axis"><span>offset 0</span><span>byte offset across file</span><span>end</span></div>' +
+      '<div class="legend">The line is entropy per block from 0 to 8. A step or spike marks a region that is far more random than its surroundings, such as a packed section or appended encrypted data.</div></div>';
+  }
+
+  function renderHex(a){
+    return '<div class="hexwrap"><h3>Hex viewer (first ' + Math.min(256, a.bytes.length) + ' bytes)</h3>' +
+      '<div class="hex">' + hexDump(a.bytes, 256) + '</div></div>';
+  }
+
+  function renderChecks(checks){
+    var html = '<div class="checks">';
+    checks.forEach(function(c){
+      var sym = c.s==="pass"?"&#10003;":c.s==="warn"?"!":c.s==="fail"?"&#10007;":"i";
+      html += '<div class="check"><div class="top"><span class="dot '+c.s+'">'+sym+'</span><div style="flex:1">';
+      html += '<h3>'+esc(c.h)+'</h3>';
+      html += '<div class="finding">'+esc(c.f)+'</div>';
+      if (c.subs && c.subs.length){
+        html += '<div class="sub">';
+        c.subs.forEach(function(s){ html += '<div>'+s+'</div>'; });   // subs may contain <b>
+        html += '</div>';
+      }
+      if (c.why) html += '<div class="why">'+esc(c.why)+'</div>';
+      if (c.fix && c.s !== "pass") html += '<div class="fix">'+esc(c.fix)+'</div>';
+      html += '</div></div></div>';
+    });
+    html += '</div>';
+    return html;
+  }
+
+  function render(a){
+    var checks = buildChecks(a);
+    var html = renderHeadline(a) + renderGraph() + renderChecks(checks) + renderHex(a);
+    $("#results").innerHTML = html;
+    var canvas = $("#egraph");
+    if (canvas) drawGraph(canvas, a.series);
+    $("#results").scrollIntoView({ behavior:"smooth", block:"start" });
+    // redraw on resize so the graph stays crisp
+    if (render._resize) window.removeEventListener("resize", render._resize);
+    render._resize = function(){ var c = $("#egraph"); if (c) drawGraph(c, a.series); };
+    window.addEventListener("resize", render._resize);
+  }
+
+  function handleFile(file){
+    if (!file) return;
+    $("#results").innerHTML = '<div class="empty">Reading ' + esc(file.name) + ' locally...</div>';
+    var reader = new FileReader();
+    reader.onload = function(e){
+      try {
+        var a = analyze(file, e.target.result);
+        render(a);
+      } catch(err){
+        $("#results").innerHTML = '<div class="empty">Could not read this file: ' + esc(String(err && err.message || err)) + '</div>';
+      }
+    };
+    reader.onerror = function(){
+      $("#results").innerHTML = '<div class="empty">The browser could not read this file.</div>';
+    };
+    reader.readAsArrayBuffer(file);
+  }
+
+  var drop = $("#drop"), fileInput = $("#file");
+  drop.addEventListener("click", function(){ fileInput.click(); });
+  fileInput.addEventListener("change", function(e){ if (e.target.files && e.target.files[0]) handleFile(e.target.files[0]); });
+  ["dragenter","dragover"].forEach(function(ev){
+    drop.addEventListener(ev, function(e){ e.preventDefault(); e.stopPropagation(); drop.classList.add("over"); });
+  });
+  ["dragleave","drop"].forEach(function(ev){
+    drop.addEventListener(ev, function(e){ e.preventDefault(); e.stopPropagation(); drop.classList.remove("over"); });
+  });
+  drop.addEventListener("drop", function(e){
+    var dt = e.dataTransfer;
+    if (dt && dt.files && dt.files[0]) handleFile(dt.files[0]);
+  });
+  $("#clear").addEventListener("click", function(){
+    fileInput.value = "";
+    $("#results").innerHTML = '<div class="empty">Your entropy report, type identification, hex viewer, and payload scan will appear here.</div>';
+  });
+
+  // expose pure functions for headless self test (no effect in browser)
+  if (typeof module !== "undefined" && module.exports){
+    module.exports = { shannonEntropy:shannonEntropy, identify:identify, scanEmbedded:scanEmbedded, SIGS:SIGS };
+  }
+})();
+</script>
+</body>
+</html>
