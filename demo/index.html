@@ -497,6 +497,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 const SC={crit:'var(--crit)',high:'var(--high)',med:'var(--med)',low:'var(--low)'};
 const FINDINGS={
   pickle:{sev:'crit',sevL:'Critical',cls:'insecure_deserialization',title:'Insecure deserialization → remote code execution (Python pickle)',
+    plain:{what:'The import feature rebuilds a saved object from data you send — and that data can smuggle in instructions the server then runs.',impact:'An attacker could run their own commands on your server and take it over completely.',fix:'Never rebuild objects from untrusted input; accept a safe data format like JSON instead.'},
     target:'vaultkeep.dev',ep:'POST /api/config/import',conf:'blind · creative',via:'Creative agent · proven_technical',confidence:'proven_technical',cvss:'9.8',ago:'creative',
     summary:'The config-import endpoint deserializes attacker-supplied data with Python <code>pickle</code>. The deterministic oracle returned <b>inconclusive</b> on this endpoint; the creative agent picked it up from the long tail and proved code execution over a <b>25-step</b> loop, recording a <code>proven_technical</code> verdict.',
     note:'From disk (creative_findings.json): endpoint, step count (25) and the proven_technical RCE verdict. The intermediate payload/transcript was not persisted in this run, so the steps below are summarised — not reconstructed token-for-token.',
@@ -521,6 +522,7 @@ Content-Type: application/octet-stream
 }`},
 
   idor:{sev:'high',sevL:'High',cls:'idor',title:'IDOR — one tenant reads another tenant\'s project',
+    plain:{what:'A logged-in user can open another customer’s project just by changing an ID in the web address.',impact:'An attacker could read other tenants’ private projects and data as if they were their own.',fix:'On every request, check that the logged-in user actually owns the record they’re asking for.'},
     target:'vaultkeep.dev',ep:'GET /api/projects/{project_id}',conf:'differential · ×2',via:'Oracle · multi-identity',confidence:'strong',cvss:'7.7',ago:'oracle',
     summary:'Access to <code>/api/projects/{project_id}</code> is gated on authentication, not ownership. Acting as <b>alice</b>, the oracle read <b>bob\'s</b> project verbatim. Proven by a four-way identity differential against a baseline the oracle built first, reproduced twice.',
     trace:[
@@ -546,6 +548,7 @@ GET /api/projects/3   anon  → 401  {"detail":"Missing bearer token"}`,
 <span class="dim"># alice owns project 2 — not 3. ownership check absent.</span>`},
 
   graphql:{sev:'med',sevL:'Medium',cls:'graphql',title:'GraphQL introspection enabled in production',
+    plain:{what:'The API publishes a full map of itself — every type and operation — to anyone who asks for it.',impact:'An attacker gets a blueprint of your private API, making every other attack easier to plan.',fix:'Turn off GraphQL introspection in production.'},
     target:'vaultkeep.dev',ep:'POST /graphql',conf:'in-band · ×2',via:'Oracle · deterministic',confidence:'strong',cvss:'5.3',ago:'oracle',
     summary:'The <code>/graphql</code> endpoint executes introspection and returns its own schema — <b>14 types</b> and <b>2 callable operations</b> across 1 root type. This hands an attacker the full map of the API\'s privileged surface.',
     trace:[
@@ -601,6 +604,14 @@ function renderFinding(id){
     </div>
     <div class="fd-cols">
       <div class="reading">
+        ${f.plain?`<div class="block" style="background:rgba(251,91,70,.1);border:1px solid rgba(251,91,70,.28);border-radius:12px;padding:16px 18px">
+          <span class="eyebrow" style="color:var(--accent-2)">In plain English</span>
+          <p style="font-size:14.5px;color:var(--ink-hi);line-height:1.55;margin-top:9px">${f.plain.what}</p>
+          <div style="display:flex;flex-direction:column;gap:11px;margin-top:15px">
+            <div><span style="font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-faint)">What could happen</span><div style="font-size:13.5px;color:var(--ink);margin-top:3px">${f.plain.impact}</div></div>
+            <div><span style="font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-faint)">How to fix it</span><div style="font-size:13.5px;color:var(--ink);margin-top:3px">${f.plain.fix}</div></div>
+          </div>
+        </div>`:''}
         <div class="block"><span class="eyebrow">Summary</span><p class="lead">${f.summary}</p>${f.note?`<p style="font-family:var(--mono);font-size:11.5px;color:var(--ink-faint);margin-top:16px;line-height:1.55;border-left:1px solid var(--line-2);padding-left:13px">${f.note}</p>`:''}</div>
         <div class="block"><span class="eyebrow">How it reasoned</span><div class="trace">${traceHTML(f.trace)}</div></div>
         <div class="block"><span class="eyebrow">Evidence · the request fired</span><div class="code"><div class="ch"><span class="dots"><i></i><i></i><i></i></span><span class="ttl">${f.reqTitle}</span><span class="copy">copy</span></div><pre>${f.req}</pre></div></div>

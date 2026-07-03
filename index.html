@@ -217,6 +217,31 @@
     </div>
   </section>
 
+  <!-- ===================== PLAIN SIGHT ===================== -->
+  <section style="border-top:1px solid var(--line-2)">
+    <div style="max-width:var(--maxw);margin:0 auto;padding:96px 32px;display:grid;grid-template-columns:.92fr 1.08fr;gap:64px;align-items:center">
+      <div>
+        <svg viewBox="0 0 12 12" style="width:11px;height:11px;color:var(--ink-faint);margin-bottom:20px"><path d="M6 0V12M0 6H12" stroke="currentColor" stroke-width="1"/></svg>
+        <p style="font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:20px">Proof in plain sight</p>
+        <h2 style="font-family:var(--serif);font-weight:300;font-size:clamp(34px,4.4vw,52px);line-height:1.03;letter-spacing:-.025em;color:var(--ink-hi);margin-bottom:22px">Proof your whole<br>team can act on.</h2>
+        <p style="font-size:17px;color:var(--ink-soft);max-width:44ch;line-height:1.6;margin-bottom:24px">Every finding ships a plain-English read — what it is, what an attacker could do, and how to fix it — right next to the hard evidence. Your engineers get the exact request; everyone else gets the point.</p>
+        <div style="display:flex;gap:26px;font-family:var(--mono);font-size:11.5px;color:var(--ink-faint);letter-spacing:.04em;border-top:1px solid var(--line-2);padding-top:18px;flex-wrap:wrap">
+          <span><span style="color:var(--ink-soft)">read by</span> &nbsp;engineers &amp; PMs</span>
+          <span><span style="color:var(--ink-soft)">export</span> &nbsp;PoC &middot; ticket &middot; report</span>
+        </div>
+      </div>
+      <!-- plain-english card -->
+      <div style="border:1px solid rgba(251,91,70,.28);background:rgba(251,91,70,.07);border-radius:16px;padding:26px 28px;box-shadow:0 40px 100px -50px rgba(0,0,0,.9)">
+        <p style="font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-2);margin-bottom:14px">In plain English</p>
+        <p style="font-family:var(--serif);font-size:21px;line-height:1.36;color:var(--ink-hi);margin-bottom:22px">A logged-in user can open another customer&rsquo;s project just by changing an ID in the address.</p>
+        <div style="display:grid;gap:15px">
+          <div style="display:flex;gap:12px"><span style="color:var(--accent);font-family:var(--mono)">&rarr;</span><div><div style="font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-faint);margin-bottom:3px">What could happen</div><div style="font-size:14px;color:var(--ink)">An attacker could read other tenants&rsquo; private projects and data.</div></div></div>
+          <div style="display:flex;gap:12px"><span style="color:#76c79b;font-family:var(--mono)">&rarr;</span><div><div style="font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-faint);margin-bottom:3px">How to fix it</div><div style="font-size:14px;color:var(--ink)">Check on every request that the user owns the record they ask for.</div></div></div>
+        </div>
+        <div style="margin-top:22px;padding-top:16px;border-top:1px solid var(--line-2);font-family:var(--mono);font-size:11px;color:var(--ink-faint);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><span>idor &middot; GET /api/projects/{id}</span><span style="color:var(--accent)">&#9679; proven &middot; reproduced &times;2</span></div>
+      </div>
+    </div>
+  </section>
   <!-- ===================== CAPABILITIES ===================== -->
   <section id="capabilities" style="border-top:1px solid var(--line)">
     <div style="max-width:var(--maxw);margin:0 auto;padding:96px 32px">
