@@ -37,39 +37,179 @@
       "name": "Free Security Tools",
       "url": "https://unboundcompute.com/tools/",
       "description": "A collection of free, fully client side security tools from UnboundCompute across web application security, AI and LLM security, digital forensics, and cryptography. Every tool runs entirely in the browser.",
-      "publisher": { "@type": "Organization", "name": "UnboundCompute", "url": "https://unboundcompute.com/" }
+      "publisher": {
+        "@type": "Organization",
+        "@id": "https://unboundcompute.com/#organization",
+        "name": "UnboundCompute",
+        "url": "https://unboundcompute.com/",
+        "sameAs": [
+          "https://www.linkedin.com/company/unboundcompute",
+          "https://github.com/UnboundCompute",
+          "https://x.com/unboundcompute"
+        ]
+      }
     },
     {
       "@type": "ItemList",
       "itemListOrder": "https://schema.org/ItemListUnordered",
       "numberOfItems": 26,
       "itemListElement": [
-        { "@type": "ListItem", "position": 1, "name": "Security Headers and CSP Analyzer", "url": "https://unboundcompute.com/tools/security-headers-analyzer.html" },
-        { "@type": "ListItem", "position": 2, "name": "Content Security Policy Generator", "url": "https://unboundcompute.com/tools/csp-generator.html" },
-        { "@type": "ListItem", "position": 3, "name": "CSP Evaluator", "url": "https://unboundcompute.com/tools/csp-evaluator.html" },
-        { "@type": "ListItem", "position": 4, "name": "Permissions Policy Builder", "url": "https://unboundcompute.com/tools/permissions-policy-builder.html" },
-        { "@type": "ListItem", "position": 5, "name": "Cookie Security Auditor", "url": "https://unboundcompute.com/tools/cookie-security-auditor.html" },
-        { "@type": "ListItem", "position": 6, "name": "CORS Misconfiguration Checker", "url": "https://unboundcompute.com/tools/cors-misconfiguration-checker.html" },
-        { "@type": "ListItem", "position": 7, "name": "JWT Security Inspector", "url": "https://unboundcompute.com/tools/jwt-security-inspector.html" },
-        { "@type": "ListItem", "position": 8, "name": "SSRF IP and URL Normalizer", "url": "https://unboundcompute.com/tools/ssrf-ip-url-normalizer.html" },
-        { "@type": "ListItem", "position": 9, "name": "URL Parser Confusion Analyzer", "url": "https://unboundcompute.com/tools/url-parser-confusion-analyzer.html" },
-        { "@type": "ListItem", "position": 10, "name": "MIME Sniffing Checker", "url": "https://unboundcompute.com/tools/mime-sniffing-checker.html" },
-        { "@type": "ListItem", "position": 11, "name": "ReDoS Regex Analyzer", "url": "https://unboundcompute.com/tools/redos-regex-analyzer.html" },
-        { "@type": "ListItem", "position": 12, "name": "Subresource Integrity Hash Generator", "url": "https://unboundcompute.com/tools/sri-hash-generator.html" },
-        { "@type": "ListItem", "position": 13, "name": "security.txt Generator and Validator", "url": "https://unboundcompute.com/tools/security-txt-generator-validator.html" },
-        { "@type": "ListItem", "position": 14, "name": "Subdomain Takeover Fingerprint Checker", "url": "https://unboundcompute.com/tools/subdomain-takeover-checker.html" },
-        { "@type": "ListItem", "position": 15, "name": "Prompt Template Injection Linter", "url": "https://unboundcompute.com/tools/prompt-template-injection-linter.html" },
-        { "@type": "ListItem", "position": 16, "name": "MCP Server Security Auditor", "url": "https://unboundcompute.com/tools/mcp-server-security-auditor.html" },
-        { "@type": "ListItem", "position": 17, "name": "OWASP LLM Top 10 Scorecard", "url": "https://unboundcompute.com/tools/owasp-llm-top10-scorecard.html" },
-        { "@type": "ListItem", "position": 18, "name": "IOC Extractor and Defanger", "url": "https://unboundcompute.com/tools/ioc-defanger-extractor.html" },
-        { "@type": "ListItem", "position": 19, "name": "Encoded Payload Deobfuscator", "url": "https://unboundcompute.com/tools/encoded-payload-deobfuscator.html" },
-        { "@type": "ListItem", "position": 20, "name": "File Entropy and Magic Byte Analyzer", "url": "https://unboundcompute.com/tools/file-entropy-magic-analyzer.html" },
-        { "@type": "ListItem", "position": 21, "name": "Forensic Timestamp Converter", "url": "https://unboundcompute.com/tools/forensic-timestamp-converter.html" },
-        { "@type": "ListItem", "position": 22, "name": "X.509 Certificate Decoder", "url": "https://unboundcompute.com/tools/x509-certificate-decoder.html" },
-        { "@type": "ListItem", "position": 23, "name": "Classical Cipher Solver", "url": "https://unboundcompute.com/tools/classical-cipher-solver.html" },
-        { "@type": "ListItem", "position": 24, "name": "EXIF Metadata Viewer and Scrubber", "url": "https://unboundcompute.com/tools/exif-metadata-viewer-scrubber.html" },
-        { "@type": "ListItem", "position": 25, "name": "Hardcoded Secret Scanner", "url": "https://unboundcompute.com/tools/secret-scanner.html" },
-        { "@type": "ListItem", "position": 26, "name": "Password Strength and Entropy Analyzer", "url": "https://unboundcompute.com/tools/password-strength-analyzer.html" }
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Security Headers and CSP Analyzer",
+          "url": "https://unboundcompute.com/tools/security-headers-analyzer.html"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Content Security Policy Generator",
+          "url": "https://unboundcompute.com/tools/csp-generator.html"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "CSP Evaluator",
+          "url": "https://unboundcompute.com/tools/csp-evaluator.html"
+        },
+        {
+          "@type": "ListItem",
+          "position": 4,
+          "name": "Permissions Policy Builder",
+          "url": "https://unboundcompute.com/tools/permissions-policy-builder.html"
+        },
+        {
+          "@type": "ListItem",
+          "position": 5,
+          "name": "Cookie Security Auditor",
+          "url": "https://unboundcompute.com/tools/cookie-security-auditor.html"
+        },
+        {
+          "@type": "ListItem",
+          "position": 6,
+          "name": "CORS Misconfiguration Checker",
+          "url": "https://unboundcompute.com/tools/cors-misconfiguration-checker.html"
+        },
+        {
+          "@type": "ListItem",
+          "position": 7,
+          "name": "JWT Security Inspector",
+          "url": "https://unboundcompute.com/tools/jwt-security-inspector.html"
+        },
+        {
+          "@type": "ListItem",
+          "position": 8,
+          "name": "SSRF IP and URL Normalizer",
+          "url": "https://unboundcompute.com/tools/ssrf-ip-url-normalizer.html"
+        },
+        {
+          "@type": "ListItem",
+          "position": 9,
+          "name": "URL Parser Confusion Analyzer",
+          "url": "https://unboundcompute.com/tools/url-parser-confusion-analyzer.html"
+        },
+        {
+          "@type": "ListItem",
+          "position": 10,
+          "name": "MIME Sniffing Checker",
+          "url": "https://unboundcompute.com/tools/mime-sniffing-checker.html"
+        },
+        {
+          "@type": "ListItem",
+          "position": 11,
+          "name": "ReDoS Regex Analyzer",
+          "url": "https://unboundcompute.com/tools/redos-regex-analyzer.html"
+        },
+        {
+          "@type": "ListItem",
+          "position": 12,
+          "name": "Subresource Integrity Hash Generator",
+          "url": "https://unboundcompute.com/tools/sri-hash-generator.html"
+        },
+        {
+          "@type": "ListItem",
+          "position": 13,
+          "name": "security.txt Generator and Validator",
+          "url": "https://unboundcompute.com/tools/security-txt-generator-validator.html"
+        },
+        {
+          "@type": "ListItem",
+          "position": 14,
+          "name": "Subdomain Takeover Fingerprint Checker",
+          "url": "https://unboundcompute.com/tools/subdomain-takeover-checker.html"
+        },
+        {
+          "@type": "ListItem",
+          "position": 15,
+          "name": "Prompt Template Injection Linter",
+          "url": "https://unboundcompute.com/tools/prompt-template-injection-linter.html"
+        },
+        {
+          "@type": "ListItem",
+          "position": 16,
+          "name": "MCP Server Security Auditor",
+          "url": "https://unboundcompute.com/tools/mcp-server-security-auditor.html"
+        },
+        {
+          "@type": "ListItem",
+          "position": 17,
+          "name": "OWASP LLM Top 10 Scorecard",
+          "url": "https://unboundcompute.com/tools/owasp-llm-top10-scorecard.html"
+        },
+        {
+          "@type": "ListItem",
+          "position": 18,
+          "name": "IOC Extractor and Defanger",
+          "url": "https://unboundcompute.com/tools/ioc-defanger-extractor.html"
+        },
+        {
+          "@type": "ListItem",
+          "position": 19,
+          "name": "Encoded Payload Deobfuscator",
+          "url": "https://unboundcompute.com/tools/encoded-payload-deobfuscator.html"
+        },
+        {
+          "@type": "ListItem",
+          "position": 20,
+          "name": "File Entropy and Magic Byte Analyzer",
+          "url": "https://unboundcompute.com/tools/file-entropy-magic-analyzer.html"
+        },
+        {
+          "@type": "ListItem",
+          "position": 21,
+          "name": "Forensic Timestamp Converter",
+          "url": "https://unboundcompute.com/tools/forensic-timestamp-converter.html"
+        },
+        {
+          "@type": "ListItem",
+          "position": 22,
+          "name": "X.509 Certificate Decoder",
+          "url": "https://unboundcompute.com/tools/x509-certificate-decoder.html"
+        },
+        {
+          "@type": "ListItem",
+          "position": 23,
+          "name": "Classical Cipher Solver",
+          "url": "https://unboundcompute.com/tools/classical-cipher-solver.html"
+        },
+        {
+          "@type": "ListItem",
+          "position": 24,
+          "name": "EXIF Metadata Viewer and Scrubber",
+          "url": "https://unboundcompute.com/tools/exif-metadata-viewer-scrubber.html"
+        },
+        {
+          "@type": "ListItem",
+          "position": 25,
+          "name": "Hardcoded Secret Scanner",
+          "url": "https://unboundcompute.com/tools/secret-scanner.html"
+        },
+        {
+          "@type": "ListItem",
+          "position": 26,
+          "name": "Password Strength and Entropy Analyzer",
+          "url": "https://unboundcompute.com/tools/password-strength-analyzer.html"
+        }
       ]
     }
   ]
@@ -348,7 +488,7 @@
         <p style="font-size:13px;color:var(--ink-faint);line-height:1.6;max-width:30ch">An autonomous security researcher that finds the line, crosses it, and proves it.</p>
       </div>
       <div style="display:flex;flex-direction:column;gap:11px;font-size:13.5px;color:var(--ink-soft)"><span style="font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-faint);margin-bottom:5px">Product</span><a href="../index.html#proof" style-hover="color:var(--ink)">Proof</a><a href="../index.html#capabilities" style-hover="color:var(--ink)">Capabilities</a><a href="../design-partners.html" style-hover="color:var(--ink)">Design partners</a><a href="../tools/" style-hover="color:var(--ink)">Tools</a><a href="../index.html#cta" style-hover="color:var(--ink)">Become a design partner</a></div>
-      <div style="display:flex;flex-direction:column;gap:11px;font-size:13.5px;color:var(--ink-soft)"><span style="font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-faint);margin-bottom:5px">Company</span><a href="../about.html" style-hover="color:var(--ink)">About</a><a href="../research.html" style-hover="color:var(--ink)">Research</a><a href="../careers.html" style-hover="color:var(--ink)">Careers</a><a href="https://linkedin.com/company/unboundcomputes" style-hover="color:var(--ink)">LinkedIn</a></div>
+      <div style="display:flex;flex-direction:column;gap:11px;font-size:13.5px;color:var(--ink-soft)"><span style="font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-faint);margin-bottom:5px">Company</span><a href="../about.html" style-hover="color:var(--ink)">About</a><a href="../research.html" style-hover="color:var(--ink)">Research</a><a href="../careers.html" style-hover="color:var(--ink)">Careers</a><a href="https://www.linkedin.com/company/unboundcompute" style-hover="color:var(--ink)">LinkedIn</a></div>
       <div style="display:flex;flex-direction:column;gap:11px;font-size:13.5px;color:var(--ink-soft)"><span style="font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-faint);margin-bottom:5px">Legal</span><a href="../trust.html" style-hover="color:var(--ink)">Trust center</a><a href="../privacy.html" style-hover="color:var(--ink)">Privacy</a><a href="../terms.html" style-hover="color:var(--ink)">Terms</a></div>
     </div>
     <div class="footer-meta" style="position:relative;z-index:1;max-width:var(--maxw);margin:0 auto;padding:22px 32px 28px;display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--ink-faint);flex-wrap:wrap;gap:10px">
