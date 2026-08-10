@@ -45,32 +45,100 @@ Client side only, nothing you paste leaves the page.
 
 ## Blog: AI and agent security
 
+- [Adversarial Suffix Attacks: The Gibberish String That Jailbreaks a Model](https://security.unboundcompute.com/adversarial-suffix-attack/): focus on adversarial suffix attack.
+- [Agent Collusion in Multi Agent Systems](https://security.unboundcompute.com/agent-collusion/): focus on agent collusion.
+- [Agent Delegation Limits as a Defense](https://security.unboundcompute.com/agent-delegation-limits/): focus on agent delegation limits.
+- [Agent Hijacking Explained](https://security.unboundcompute.com/agent-hijacking/): focus on agent hijacking.
+- [Agent Impersonation Attacks Explained](https://security.unboundcompute.com/agent-impersonation-attack/): focus on agent impersonation attack.
+- [Agent in the Middle Attacks Explained](https://security.unboundcompute.com/agent-in-the-middle-attack/): focus on agent in the middle attack.
 - [Agent Memory Poisoning: When an AI Agent Remembers an Attacker's Instruction](https://security.unboundcompute.com/agent-memory-poisoning/): focus on agent memory poisoning.
+- [Agent Swarm Attacks in Multi Agent Systems](https://security.unboundcompute.com/agent-swarm-attack/): focus on agent swarm attack.
+- [Agent to Agent Authentication as a Defense](https://security.unboundcompute.com/agent-to-agent-authentication/): focus on agent to agent authentication.
+- [AI Agent Memory Poisoning: When a Planted Note Attacks Later](https://security.unboundcompute.com/ai-agent-memory-poisoning/): focus on ai agent memory poisoning.
+- [AI Agent Sandbox Escape: Why a Box Is Not Containment](https://security.unboundcompute.com/ai-agent-sandbox-escape/): focus on AI agent sandbox escape.
+- [AI Agent Sandboxing: Containing Code and Tool Execution](https://security.unboundcompute.com/agent-sandboxing-explained/): focus on ai agent sandboxing.
 - [AI in Security Testing: What It Actually Does and Where It Falls Down](https://security.unboundcompute.com/ai-in-security-testing/): focus on ai in security testing.
 - [AI Security Testing: A Vendor Neutral Guide to Where AI Helps and Where It Fails](https://security.unboundcompute.com/ai-security-testing/): focus on ai security testing.
+- [ANSI Escape Injection: Attacking AI Agents That Print to a Terminal](https://security.unboundcompute.com/ansi-escape-injection-terminals/): focus on ansi escape injection.
 - [ASCII Smuggling: Invisible Unicode Prompt Injection That Humans Cannot See](https://security.unboundcompute.com/ascii-smuggling-prompt-injection/): focus on ASCII smuggling.
+- [Audit Logging for AI Agents](https://security.unboundcompute.com/ai-agent-audit-logging/): focus on audit logging for ai agents.
+- [Browser Agent Prompt Injection: When a Web Page Drives Your Logged In Agent](https://security.unboundcompute.com/browser-agent-prompt-injection/): focus on browser agent prompt injection.
+- [CaMeL: A Capabilities Based Defense Against Prompt Injection](https://security.unboundcompute.com/camel-prompt-injection-defense/): focus on camel prompt injection defense.
+- [Canary Tokens for Prompt Injection Detection](https://security.unboundcompute.com/prompt-injection-canary-tokens/): focus on prompt injection canary tokens.
+- [Code Interpreter Escape: Breaking Out of an AI Agent's Sandbox](https://security.unboundcompute.com/code-interpreter-sandbox-escape/): focus on code interpreter sandbox escape.
+- [Context Compliance Attack: Faking the Assistant's Own Past Replies](https://security.unboundcompute.com/context-compliance-attack/): focus on context compliance attack.
+- [Crescendo: The Multi Turn Jailbreak That Escalates Slowly](https://security.unboundcompute.com/crescendo-multi-turn-jailbreak/): focus on crescendo multi turn jailbreak.
+- [Cross Plugin Request Forgery: When One AI Plugin Drives Another](https://security.unboundcompute.com/cross-plugin-request-forgery/): focus on cross plugin request forgery.
 - [Denial of Wallet: When Attackers Run Up Your AI Agent's Bill](https://security.unboundcompute.com/denial-of-wallet-ai-agents/): focus on denial of wallet.
+- [Egress Filtering for AI Agents](https://security.unboundcompute.com/ai-agent-egress-filtering/): focus on egress filtering for ai agents.
+- [Embedding Inversion: Reading Text Back Out of a Vector Database](https://security.unboundcompute.com/embedding-inversion-attack/): focus on embedding inversion attack.
+- [Excessive Agency in AI Agents: The Risk That Turns a Trick Into a Breach](https://security.unboundcompute.com/excessive-agency-ai-agents/): focus on excessive agency.
 - [Excessive Agency in AI Agents: When a Tool Can Do Too Much](https://security.unboundcompute.com/excessive-agency-in-ai-agents/): focus on excessive agency.
+- [Glitch Tokens: The Words That Break a Language Model](https://security.unboundcompute.com/glitch-token-attack/): focus on glitch token attack.
+- [Human in the Loop for AI Agents: Confirmation on Sensitive Actions](https://security.unboundcompute.com/human-in-the-loop-ai-agents/): focus on human in the loop ai agents.
+- [Insecure Output Handling: When Apps Trust the Model's Words](https://security.unboundcompute.com/llm-insecure-output-handling/): focus on insecure output handling.
+- [Least Privilege for AI Agent Tools](https://security.unboundcompute.com/least-privilege-for-ai-agent-tools/): focus on least privilege for ai agent tools.
+- [LLM Backdoors: Hiding a Trigger in the Training Data](https://security.unboundcompute.com/llm-backdoor-attack/): focus on llm backdoor attack.
 - [LLM Data Exfiltration Through Markdown Image Rendering](https://security.unboundcompute.com/llm-data-exfiltration-markdown/): focus on LLM data exfiltration.
+- [LLM Guardrail Models: What Input and Output Filters Can and Cannot Do](https://security.unboundcompute.com/llm-guardrail-models/): focus on llm guardrail models.
+- [LLM Search Result Poisoning: When a Planted Page Writes the Answer](https://security.unboundcompute.com/llm-search-result-poisoning/): focus on LLM search result poisoning.
 - [LLM Security Testing Tools: A Vendor Neutral Landscape Guide](https://security.unboundcompute.com/llm-security-testing-tools/): focus on llm security testing tools.
+- [Many Shot Jailbreaking: How a Long Context Window Becomes an Attack Surface](https://security.unboundcompute.com/many-shot-jailbreaking/): focus on many shot jailbreaking.
+- [Markdown Image Exfiltration: How a Chat UI Leaks Your Data](https://security.unboundcompute.com/markdown-image-data-exfiltration/): focus on markdown image exfiltration.
+- [MCP Command Injection: When a Tool Argument Becomes a Remote Shell](https://security.unboundcompute.com/mcp-command-injection/): focus on MCP command injection.
+- [MCP Line Jumping: Tool Descriptions That Attack Before You Call Them](https://security.unboundcompute.com/mcp-line-jumping-attack/): focus on mcp line jumping.
+- [MCP Token Passthrough: How an Agent Hands Over Its Access](https://security.unboundcompute.com/mcp-token-passthrough/): focus on mcp token passthrough.
+- [MCP Tool Pinning: Locking Down Tool Definitions](https://security.unboundcompute.com/mcp-tool-pinning/): focus on mcp tool pinning.
 - [MCP Tool Poisoning: When the Tool Description Is the Attack](https://security.unboundcompute.com/mcp-tool-poisoning-explained/): focus on mcp tool poisoning.
 - [MCP Tool Shadowing: When One Server Hijacks Another's Tools](https://security.unboundcompute.com/mcp-tool-shadowing/): focus on MCP tool shadowing.
+- [Membership Inference Attack: Proving a Record Was in Training Data](https://security.unboundcompute.com/membership-inference-attack/): focus on membership inference attack.
+- [Model Extraction Attack: Stealing a Model Through Its API](https://security.unboundcompute.com/model-extraction-attack/): focus on model extraction attack.
+- [Multi Agent Prompt Injection Explained](https://security.unboundcompute.com/multi-agent-prompt-injection/): focus on multi agent prompt injection.
+- [Multimodal Prompt Injection: Hiding Instructions in an Image](https://security.unboundcompute.com/multimodal-prompt-injection/): focus on multimodal prompt injection.
+- [Orchestrator Injection in Multi Agent Systems](https://security.unboundcompute.com/orchestrator-injection/): focus on orchestrator injection.
+- [PDF Prompt Injection: Hidden Instructions in Documents Your Assistant Reads](https://security.unboundcompute.com/pdf-prompt-injection/): focus on PDF prompt injection.
+- [Prompt Injection in Shared Documents: The Wiki and Ticket Attack](https://security.unboundcompute.com/prompt-injection-in-shared-documents/): focus on prompt injection in shared documents.
+- [Prompt Injection in Source Code: When a Comment Commands Your Coding Agent](https://security.unboundcompute.com/prompt-injection-in-source-code/): focus on prompt injection in source code.
+- [Prompt Injection to XSS: When Model Output Becomes the Payload](https://security.unboundcompute.com/prompt-injection-to-xss/): focus on prompt injection to xss.
 - [RAG Data Poisoning: How Attackers Corrupt the Knowledge Base Behind an LLM](https://security.unboundcompute.com/rag-data-poisoning/): focus on RAG data poisoning.
+- [RAG Poisoning Attack: When Retrieved Documents Hijack the Model](https://security.unboundcompute.com/rag-poisoning-attack/): focus on rag poisoning attack.
+- [Recursive Delegation Loop Attacks on AI Agents](https://security.unboundcompute.com/recursive-delegation-loop/): focus on recursive delegation loop.
+- [Rogue Agent Delegation Explained](https://security.unboundcompute.com/rogue-agent-delegation/): focus on rogue agent delegation.
+- [Skeleton Key: The Jailbreak That Rewrites a Model's Own Rules](https://security.unboundcompute.com/skeleton-key-jailbreak/): focus on skeleton key jailbreak.
 - [Slopsquatting: When Attackers Register the Packages AI Hallucinates](https://security.unboundcompute.com/slopsquatting-attack/): focus on slopsquatting.
+- [Spotlighting: How to Defend an LLM Against Prompt Injection](https://security.unboundcompute.com/spotlighting-prompt-injection-defense/): focus on spotlighting prompt injection.
 - [System Prompt Extraction: Why Keeping the Prompt Secret Is Not Security](https://security.unboundcompute.com/system-prompt-extraction/): focus on system prompt extraction.
 - [The AI Agent Attack Surface, Mapped Component by Component](https://security.unboundcompute.com/ai-agent-attack-surface/): focus on ai agent attack surface.
+- [The AI Agent Security Field Guide: Every Attack, Explained](https://security.unboundcompute.com/ai-agent-security-field-guide/): focus on ai agent security.
+- [The AI Prompt Injection Worm That Spreads Between Agents](https://security.unboundcompute.com/ai-prompt-injection-worm/): focus on ai prompt injection worm.
 - [The Confused Deputy Attack in AI Agents Explained](https://security.unboundcompute.com/confused-deputy-ai-agents/): focus on confused deputy attack.
+- [The Dual LLM Pattern: Isolating Untrusted Content From Privileged Actions](https://security.unboundcompute.com/dual-llm-pattern/): focus on dual llm pattern.
+- [The Fine Tuning Jailbreak: How Training Strips Safety Alignment](https://security.unboundcompute.com/fine-tuning-jailbreak/): focus on fine tuning jailbreak.
 - [The lethal trifecta in AI agents](https://security.unboundcompute.com/the-lethal-trifecta/): focus on the lethal trifecta.
 - [The MCP Rug Pull: When an Approved Tool Changes After You Trust It](https://security.unboundcompute.com/mcp-rug-pull-attack/): focus on MCP rug pull attack.
+- [The Policy Puppetry Attack: When User Text Pretends to Be System Policy](https://security.unboundcompute.com/policy-puppetry-attack/): focus on policy puppetry attack.
+- [Tool Chaining Attacks on AI Agents](https://security.unboundcompute.com/tool-chaining-attack/): focus on tool chaining attack.
+- [Tool Output Injection: When an Agent's Own Tools Lie to It](https://security.unboundcompute.com/tool-output-injection/): focus on tool output injection.
+- [Vibe Coded App Security: What Can a Stranger Read Right Now?](https://security.unboundcompute.com/vibe-coded-app-security/): focus on vibe coded app security.
+- [Voice Prompt Injection: When a Speaker in the Room Gives the Orders](https://security.unboundcompute.com/voice-prompt-injection/): focus on voice prompt injection.
 - [What Is Indirect Prompt Injection and Why It Is So Hard to Stop](https://security.unboundcompute.com/what-is-indirect-prompt-injection/): focus on indirect prompt injection.
+- [Zero Click Prompt Injection: The Attack With No Click To Stop](https://security.unboundcompute.com/zero-click-prompt-injection/): focus on zero click prompt injection.
 
 ## Blog: Deep dives: web, network, cloud, kernel, crypto
 
 - [AES GCM Nonce Reuse: The Forbidden Attack Explained](https://security.unboundcompute.com/aes-gcm-nonce-reuse/): focus on AES GCM nonce reuse.
+- [BadUSB Attack: When a USB Stick Pretends to Be Your Keyboard](https://security.unboundcompute.com/badusb-hid-injection/): focus on BadUSB attack.
+- [Blind SSRF: Exploiting Requests You Cannot See](https://security.unboundcompute.com/blind-ssrf-explained/): focus on blind ssrf.
 - [Client Side Path Traversal: When the Browser Sends Your Fetch Somewhere Else](https://security.unboundcompute.com/client-side-path-traversal/): focus on client side path traversal.
+- [Cold Boot Attack: How Encryption Keys Survive a Power Off](https://security.unboundcompute.com/cold-boot-attack/): focus on cold boot attack.
+- [Cross Site Leaks: Reading Secrets You Are Never Allowed to See](https://security.unboundcompute.com/cross-site-leaks/): focus on cross site leaks.
 - [Cross Site WebSocket Hijacking: The CSRF of WebSockets](https://security.unboundcompute.com/cross-site-websocket-hijacking/): focus on cross site WebSocket hijacking.
 - [Dependency Confusion Attack Explained](https://security.unboundcompute.com/dependency-confusion-attack/): focus on dependency confusion attack.
+- [DMA Attack Over Thunderbolt: Reading Memory Past the Lock Screen](https://security.unboundcompute.com/dma-attack-thunderbolt/): focus on DMA attack.
 - [Double Clickjacking: The Clickjacking Revival That Beats Frame Defenses](https://security.unboundcompute.com/double-clickjacking/): focus on double clickjacking.
+- [ECDSA Nonce Reuse: How One Repeated Number Leaks the Private Key](https://security.unboundcompute.com/ecdsa-nonce-reuse/): focus on ECDSA nonce reuse.
+- [Evil Maid Attack: What Brief Physical Access Really Costs You](https://security.unboundcompute.com/evil-maid-attack/): focus on evil maid attack.
+- [Exposed .env File: How Secrets Leak and How to Recover](https://security.unboundcompute.com/exposed-env-file/): focus on exposed .env file.
 - [Hash Length Extension Attack: How to Forge a MAC Without the Secret](https://security.unboundcompute.com/hash-length-extension-attack/): focus on hash length extension attack.
 - [How a Container Escape Works: The cgroups v1 release_agent Technique](https://security.unboundcompute.com/how-a-container-escape-works/): focus on container escape.
 - [How a Device Decides to Trust Its Own Firmware](https://security.unboundcompute.com/how-secure-boot-works/): focus on secure boot.
@@ -81,14 +149,23 @@ Client side only, nothing you paste leaves the page.
 - [How Rowhammer Works: Flipping Bits in Memory You Were Never Allowed to Touch](https://security.unboundcompute.com/how-rowhammer-works/): focus on rowhammer.
 - [How the eBPF verifier works, and where its proof has broken](https://security.unboundcompute.com/how-the-ebpf-verifier-works/): focus on ebpf verifier.
 - [How TLS Fingerprinting Works: JA3, JA4, and the ClientHello](https://security.unboundcompute.com/how-tls-fingerprinting-works/): focus on tls fingerprinting.
+- [HTTP/2 Rapid Reset: How a Cancel Frame Became a Record DDoS](https://security.unboundcompute.com/http2-rapid-reset-attack/): focus on HTTP/2 Rapid Reset.
 - [Instance metadata service: the 169.254.169.254 credential leak](https://security.unboundcompute.com/instance-metadata-service-explained/): focus on instance metadata service.
+- [Juice Jacking: Can a Public USB Port Really Steal Your Data?](https://security.unboundcompute.com/juice-jacking-explained/): focus on juice jacking.
+- [JWKS Spoofing: When a JWT Header Tells the Server Which Key to Trust](https://security.unboundcompute.com/jwt-jwks-spoofing/): focus on JWKS spoofing.
 - [JWT Algorithm Confusion Attack Explained](https://security.unboundcompute.com/jwt-algorithm-confusion-attack/): focus on JWT algorithm confusion attack.
 - [Kubernetes service account token abuse: from one pod to cluster admin](https://security.unboundcompute.com/kubernetes-service-account-token-abuse/): focus on Kubernetes service account token.
+- [Lateral Movement: How One Foothold Becomes the Whole Cluster](https://security.unboundcompute.com/lateral-movement-credentials/): focus on lateral movement.
 - [OAuth redirect_uri Manipulation: How a Loose Callback Check Leaks Your Code](https://security.unboundcompute.com/oauth-redirect-uri-manipulation/): focus on OAuth redirect_uri manipulation.
 - [Poisoned Pipeline Execution: When Your CI Runs Attacker Code With Your Secrets](https://security.unboundcompute.com/poisoned-pipeline-execution/): focus on poisoned pipeline execution.
 - [postMessage Vulnerabilities: When Cross Origin Messages Turn Into XSS](https://security.unboundcompute.com/postmessage-vulnerabilities/): focus on postMessage vulnerabilities.
+- [Quishing Explained: How QR Code Phishing Works and How to Spot It](https://security.unboundcompute.com/quishing-qr-code-phishing/): focus on quishing.
 - [SAML Signature Wrapping Explained: When a Valid Signature Lies](https://security.unboundcompute.com/saml-signature-wrapping/): focus on SAML signature wrapping.
+- [SIM Swapping: How Attackers Hijack Your Phone Number](https://security.unboundcompute.com/sim-swapping-explained/): focus on sim swapping.
+- [SMTP Smuggling: The Email Spoof That Rides Past SPF, DKIM, and DMARC](https://security.unboundcompute.com/smtp-smuggling/): focus on SMTP smuggling.
+- [Stalkerware: How to Detect Hidden Phone Spying and Remove It](https://security.unboundcompute.com/stalkerware-explained/): focus on stalkerware.
 - [The GraphQL Attack Surface: Introspection, Query DoS, Broken Authorization, and Injection](https://security.unboundcompute.com/graphql-api-attack-surface/): focus on graphql attack surface.
+- [The SAML Authentication Bypass Behind SAP NetWeaver](https://security.unboundcompute.com/saml-authentication-bypass/): focus on SAML authentication bypass.
 - [What Actually Happens In A Kernel Use After Free](https://security.unboundcompute.com/how-a-kernel-use-after-free-works/): focus on kernel use after free.
 - [What Is a Hash Flooding Attack and Why It Stalls a Server With Bytes](https://security.unboundcompute.com/what-is-a-hash-flooding-attack/): focus on hash flooding attack.
 - [What Is a Padding Oracle Attack and How It Decrypts CBC Without the Key](https://security.unboundcompute.com/what-is-a-padding-oracle-attack/): focus on padding oracle attack.
@@ -100,6 +177,11 @@ Client side only, nothing you paste leaves the page.
 
 ## Blog: Injection and input handling
 
+- [Code Execution in Data Pipelines: When Loading a File Runs Someone Else's Code](https://security.unboundcompute.com/code-execution-in-data-pipelines/): focus on code execution in data pipelines.
+- [CSS Injection: Stealing Data With Style Rules and No JavaScript](https://security.unboundcompute.com/css-injection-data-exfiltration/): focus on CSS injection.
+- [DOM Clobbering: Manipulating a Page's JavaScript With Markup Alone](https://security.unboundcompute.com/dom-clobbering/): focus on DOM clobbering.
+- [HTTP Parameter Pollution: When One Request Says the Same Thing Twice](https://security.unboundcompute.com/http-parameter-pollution/): focus on HTTP parameter pollution.
+- [Second Order SQL Injection: The Payload That Waits](https://security.unboundcompute.com/second-order-sql-injection/): focus on second order sql injection.
 - [What is command injection? Examples explained](https://security.unboundcompute.com/what-is-command-injection/): focus on command injection.
 - [What is CSV injection (formula injection)?](https://security.unboundcompute.com/what-is-csv-injection/): focus on csv injection.
 - [What is DOM based XSS?](https://security.unboundcompute.com/what-is-dom-based-xss/): focus on dom based xss.
@@ -117,7 +199,17 @@ Client side only, nothing you paste leaves the page.
 ## Blog: Access control and authorization
 
 - [Authentication vs authorization, explained with examples](https://security.unboundcompute.com/authentication-vs-authorization/): focus on authentication vs authorization.
+- [Broken Function Level Authorization (BFLA) Explained](https://security.unboundcompute.com/broken-function-level-authorization/): focus on broken function level authorization.
 - [Broken object level authorization and IDOR, with examples](https://security.unboundcompute.com/broken-object-level-authorization-idor/): focus on broken object level authorization.
+- [Broken Object Property Level Authorization (BOPLA) Explained](https://security.unboundcompute.com/broken-object-property-level-authorization/): focus on broken object property level authorization.
+- [Firebase Security Rules Misconfiguration: When Any Client Reads Everyone's Data](https://security.unboundcompute.com/firebase-security-rules-misconfiguration/): focus on Firebase security rules misconfiguration.
+- [Hardcoded API Keys in Frontend Code: Which Keys Leak and How to Fix It](https://security.unboundcompute.com/hardcoded-api-keys-in-frontend/): focus on hardcoded API keys in frontend.
+- [JWT Algorithm Confusion Attacks Explained](https://security.unboundcompute.com/jwt-algorithm-confusion/): focus on jwt algorithm confusion.
+- [Next.js Server Actions Security: Every Action Is a Public Endpoint](https://security.unboundcompute.com/nextjs-server-actions-security/): focus on Next.js Server Actions security.
+- [OIDC Authentication Bypass: Trusting a Token You Never Verified](https://security.unboundcompute.com/oidc-authentication-bypass/): focus on OIDC authentication bypass.
+- [Passkeys vs Passwords: What Actually Changes for Your Security](https://security.unboundcompute.com/passkeys-vs-passwords/): focus on passkeys vs passwords.
+- [Password reset poisoning: how a genuine email hands over your account](https://security.unboundcompute.com/password-reset-poisoning/): focus on password reset poisoning.
+- [Supabase RLS Misconfiguration: When Your Anon Key Reads Every Row](https://security.unboundcompute.com/supabase-rls-misconfiguration/): focus on Supabase RLS misconfiguration.
 - [What is a CORS Misconfiguration? How It Leaks Data](https://security.unboundcompute.com/what-is-cors-misconfiguration/): focus on CORS misconfiguration.
 - [What is a Mass Assignment Vulnerability? How Extra Fields Break Access Control](https://security.unboundcompute.com/what-is-mass-assignment/): focus on mass assignment vulnerability.
 - [What is an access control vulnerability? Broken access control explained](https://security.unboundcompute.com/what-is-an-access-control-vulnerability/): focus on broken access control.
@@ -135,8 +227,11 @@ Client side only, nothing you paste leaves the page.
 
 ## Blog: Attack teardowns
 
+- [Client Side Paywall Bypass: When Only the Browser Guards Paid Content](https://security.unboundcompute.com/client-side-paywall-bypass/): focus on client side paywall bypass.
+- [Limit Overrun Race Conditions Explained](https://security.unboundcompute.com/race-condition-limit-overrun/): focus on limit overrun race condition.
 - [Teardown: chaining small bugs into a real breach](https://security.unboundcompute.com/teardown-chaining-bugs-into-a-breach/): focus on exploit chaining.
 - [Teardown: how an IDOR quietly exposes another user's data](https://security.unboundcompute.com/teardown-idor-exposes-user-data/): focus on idor example.
+- [The Single Packet Attack: Making Web Race Conditions Reliable](https://security.unboundcompute.com/single-packet-attack/): focus on single packet attack.
 
 ## Blog: Scanners vs real research
 

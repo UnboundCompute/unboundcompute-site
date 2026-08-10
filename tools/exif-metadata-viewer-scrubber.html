@@ -11,7 +11,9 @@
 <meta name="author" content="UnboundCompute" />
 <meta name="theme-color" content="#0a0a0b" />
 <link rel="canonical" href="https://unboundcompute.com/tools/exif-metadata-viewer-scrubber.html" />
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a0a0b'/%3E%3Cline x1='16' y1='4' x2='16' y2='28' stroke='%23fb5b46' stroke-width='2' stroke-dasharray='3 3'/%3E%3Ccircle cx='16' cy='16' r='3.4' fill='%23fb5b46'/%3E%3C/svg%3E" />
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="UnboundCompute" />
@@ -31,15 +33,15 @@
   "@context": "https://schema.org",
   "@graph": [
     {
-      "@type": "WebApplication",
+      "@type": "WebPage",
       "name": "EXIF Metadata Viewer and Scrubber",
-      "applicationCategory": "SecurityApplication",
-      "operatingSystem": "Web",
-      "browserRequirements": "Requires JavaScript. Runs entirely client side.",
       "url": "https://unboundcompute.com/tools/exif-metadata-viewer-scrubber.html",
       "description": "A free tool that reads the hidden EXIF metadata in a photo, including the GPS coordinates that reveal where it was taken, the camera make and model, and the original date and time. It then re encodes the image to strip the metadata and offers a cleaned copy to download. Everything happens in the browser and the photo is never uploaded.",
-      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
-      "publisher": { "@type": "Organization", "name": "UnboundCompute", "url": "https://unboundcompute.com/" }
+      "publisher": {
+        "@type": "Organization",
+        "name": "UnboundCompute",
+        "url": "https://unboundcompute.com/"
+      }
     },
     {
       "@type": "FAQPage",
@@ -47,27 +49,42 @@
         {
           "@type": "Question",
           "name": "What is EXIF metadata and why does it matter for privacy?",
-          "acceptedAnswer": { "@type": "Answer", "text": "EXIF is a block of hidden data that many cameras and phones embed inside a photo file. It can include the GPS coordinates where the photo was taken, the exact date and time, and the camera or phone make and model. The GPS part is the privacy risk: a photo you share publicly can quietly reveal your home, your workplace, or your child's school to anyone who opens the file." }
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "EXIF is a block of hidden data that many cameras and phones embed inside a photo file. It can include the GPS coordinates where the photo was taken, the exact date and time, and the camera or phone make and model. The GPS part is the privacy risk: a photo you share publicly can quietly reveal your home, your workplace, or your child's school to anyone who opens the file."
+          }
         },
         {
           "@type": "Question",
           "name": "Is my photo uploaded anywhere when I use this tool?",
-          "acceptedAnswer": { "@type": "Answer", "text": "No. Your photo is read and processed entirely in your browser with JavaScript. It is never uploaded, logged, or sent to any server. That is the whole point: you can inspect and clean a personal photo without it ever leaving your device." }
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. Your photo is read and processed entirely in your browser with JavaScript. It is never uploaded, logged, or sent to any server. That is the whole point: you can inspect and clean a personal photo without it ever leaving your device."
+          }
         },
         {
           "@type": "Question",
           "name": "How does the tool remove the metadata?",
-          "acceptedAnswer": { "@type": "Answer", "text": "It draws your image onto an HTML canvas and then exports that canvas to a new image file. The canvas holds only the pixels, so the EXIF block, the GPS coordinates, and other embedded metadata are not carried into the new file. The cleaned copy you download has the visible picture but not the hidden data." }
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "It draws your image onto an HTML canvas and then exports that canvas to a new image file. The canvas holds only the pixels, so the EXIF block, the GPS coordinates, and other embedded metadata are not carried into the new file. The cleaned copy you download has the visible picture but not the hidden data."
+          }
         },
         {
           "@type": "Question",
           "name": "Does cleaning the photo change its quality?",
-          "acceptedAnswer": { "@type": "Answer", "text": "A little, and we want to be honest about it. Re encoding through a canvas compresses the pixels again, so a cleaned JPEG can be very slightly softer than the original. It also drops the ICC color profile, which can shift colors a touch on wide gamut displays. For sharing a photo online the difference is usually invisible, but if you need a pixel perfect master, keep the original safely and share only the cleaned copy." }
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A little, and we want to be honest about it. Re encoding through a canvas compresses the pixels again, so a cleaned JPEG can be very slightly softer than the original. It also drops the ICC color profile, which can shift colors a touch on wide gamut displays. For sharing a photo online the difference is usually invisible, but if you need a pixel perfect master, keep the original safely and share only the cleaned copy."
+          }
         },
         {
           "@type": "Question",
           "name": "Does removing EXIF guarantee my photo is anonymous?",
-          "acceptedAnswer": { "@type": "Answer", "text": "It removes the embedded location and camera data, which is the most common leak. It does not change what is visible in the picture itself. A street sign, a house number, a reflection, or a recognizable background can still reveal a place, so treat metadata removal as one helpful step rather than a complete cloak." }
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "It removes the embedded location and camera data, which is the most common leak. It does not change what is visible in the picture itself. A street sign, a house number, a reflection, or a recognizable background can still reveal a place, so treat metadata removal as one helpful step rather than a complete cloak."
+          }
         }
       ]
     }
@@ -181,6 +198,9 @@
     .hint{margin-left:0;width:100%}
   }
 </style>
+<link href="../brand-core.css" rel="stylesheet">
+<link href="../brand-core.css" rel="stylesheet">
+<link href="../lp-footer-fix.css" rel="stylesheet">
 </head>
 <body>
 
@@ -244,11 +264,23 @@
     <a href="https://unboundcompute.com/tools/"><span>All tools</span>The full free tools hub</a>
   </div>
 </div>
-
-<footer><div class="wrap">
-  <div>Built by <a href="https://unboundcompute.com/">UnboundCompute</a>, autonomous security research for web apps and APIs.</div>
-  <div><a href="https://unboundcompute.com/#cta">Request access</a></div>
-</div></footer>
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="site-footer" style="position:relative;overflow:hidden">
+    <div class="footer-links" style="position:relative;z-index:1;max-width:var(--maxw);margin:0 auto;padding:56px 32px 34px;display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px">
+      <div>
+        <a href="../index.html#top" style="display:flex;align-items:center;gap:11px;font-family:var(--mono);font-weight:600;font-size:15px;margin-bottom:14px">
+          <span style="width:27px;height:27px;border-radius:7px;border:1px solid var(--accent-line);display:grid;place-items:center"><svg viewBox="0 0 24 24" fill="none" style="width:15px;height:15px"><line x1="12" y1="3" x2="12" y2="21" stroke="var(--accent)" stroke-width="1.8" stroke-dasharray="2.6 2.6"/><circle cx="12" cy="12" r="3" fill="var(--accent)"/></svg></span>UnboundCompute</a>
+        <p style="font-size:13px;color:var(--ink-faint);line-height:1.6;max-width:30ch">An autonomous security researcher that finds the line, crosses it, and proves it.</p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:11px;font-size:13.5px;color:var(--ink-soft)"><span style="font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-faint);margin-bottom:5px">Product</span><a href="../index.html#proof" style-hover="color:var(--ink)">Proof</a><a href="../index.html#capabilities" style-hover="color:var(--ink)">Capabilities</a><a href="../design-partners.html" style-hover="color:var(--ink)">Design partners</a><a href="../tools/" style-hover="color:var(--ink)">Tools</a><a href="../index.html#cta" style-hover="color:var(--ink)">Become a design partner</a></div>
+      <div style="display:flex;flex-direction:column;gap:11px;font-size:13.5px;color:var(--ink-soft)"><span style="font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-faint);margin-bottom:5px">Company</span><a href="../about.html" style-hover="color:var(--ink)">About</a><a href="../research.html" style-hover="color:var(--ink)">Research</a><a href="../careers.html" style-hover="color:var(--ink)">Careers</a><a href="https://linkedin.com/company/unboundcomputes" style-hover="color:var(--ink)">LinkedIn</a></div>
+      <div style="display:flex;flex-direction:column;gap:11px;font-size:13.5px;color:var(--ink-soft)"><span style="font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-faint);margin-bottom:5px">Legal</span><a href="../trust.html" style-hover="color:var(--ink)">Trust center</a><a href="../privacy.html" style-hover="color:var(--ink)">Privacy</a><a href="../terms.html" style-hover="color:var(--ink)">Terms</a></div>
+    </div>
+    <div class="footer-meta" style="position:relative;z-index:1;max-width:var(--maxw);margin:0 auto;padding:22px 32px 28px;display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--ink-faint);flex-wrap:wrap;gap:10px">
+      <span>&copy; 2026 UnboundCompute</span><span>the boundary held, until it didn't</span>
+    </div>
+    <div class="uc-word-wrap footer-word" aria-hidden="true"><span class="uc-word"><span class="b">Unbound</span>Compute<span class="d">.</span></span></div>
+  </footer>
 
 <script>
 (function(){

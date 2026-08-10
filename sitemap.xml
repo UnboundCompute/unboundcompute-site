@@ -2,211 +2,211 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://unboundcompute.com/</loc>
-    <lastmod>2026-06-20</lastmod>
+    <lastmod>2026-07-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://unboundcompute.com/design-partners.html</loc>
-    <lastmod>2026-06-23</lastmod>
+    <lastmod>2026-07-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://unboundcompute.com/about.html</loc>
-    <lastmod>2026-06-20</lastmod>
+    <lastmod>2026-07-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://unboundcompute.com/research.html</loc>
-    <lastmod>2026-06-20</lastmod>
+    <lastmod>2026-07-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://unboundcompute.com/careers.html</loc>
-    <lastmod>2026-06-20</lastmod>
+    <lastmod>2026-07-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://unboundcompute.com/trust.html</loc>
-    <lastmod>2026-06-20</lastmod>
+    <lastmod>2026-07-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://unboundcompute.com/privacy.html</loc>
-    <lastmod>2026-06-20</lastmod>
+    <lastmod>2026-07-06</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
     <loc>https://unboundcompute.com/terms.html</loc>
-    <lastmod>2026-06-20</lastmod>
+    <lastmod>2026-07-06</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
     <loc>https://unboundcompute.com/tools/</loc>
-    <lastmod>2026-06-22</lastmod>
+    <lastmod>2026-07-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://unboundcompute.com/tools/security-headers-analyzer.html</loc>
-    <lastmod>2026-06-22</lastmod>
+    <lastmod>2026-07-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://unboundcompute.com/tools/jwt-security-inspector.html</loc>
-    <lastmod>2026-06-22</lastmod>
+    <lastmod>2026-07-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://unboundcompute.com/tools/cookie-security-auditor.html</loc>
-    <lastmod>2026-06-22</lastmod>
+    <lastmod>2026-07-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://unboundcompute.com/tools/cors-misconfiguration-checker.html</loc>
-    <lastmod>2026-06-22</lastmod>
+    <lastmod>2026-07-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://unboundcompute.com/tools/csp-generator.html</loc>
-    <lastmod>2026-06-22</lastmod>
+    <lastmod>2026-07-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://unboundcompute.com/tools/sri-hash-generator.html</loc>
-    <lastmod>2026-06-22</lastmod>
+    <lastmod>2026-07-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://unboundcompute.com/tools/subdomain-takeover-checker.html</loc>
-    <lastmod>2026-06-22</lastmod>
+    <lastmod>2026-07-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://unboundcompute.com/tools/password-strength-analyzer.html</loc>
-    <lastmod>2026-06-22</lastmod>
+    <lastmod>2026-07-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://unboundcompute.com/tools/csp-evaluator.html</loc>
-    <lastmod>2026-06-22</lastmod>
+    <lastmod>2026-07-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://unboundcompute.com/tools/permissions-policy-builder.html</loc>
-    <lastmod>2026-06-22</lastmod>
+    <lastmod>2026-07-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://unboundcompute.com/tools/ssrf-ip-url-normalizer.html</loc>
-    <lastmod>2026-06-22</lastmod>
+    <lastmod>2026-07-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://unboundcompute.com/tools/url-parser-confusion-analyzer.html</loc>
-    <lastmod>2026-06-22</lastmod>
+    <lastmod>2026-07-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://unboundcompute.com/tools/mime-sniffing-checker.html</loc>
-    <lastmod>2026-06-22</lastmod>
+    <lastmod>2026-07-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://unboundcompute.com/tools/redos-regex-analyzer.html</loc>
-    <lastmod>2026-06-22</lastmod>
+    <lastmod>2026-07-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://unboundcompute.com/tools/security-txt-generator-validator.html</loc>
-    <lastmod>2026-06-22</lastmod>
+    <lastmod>2026-07-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://unboundcompute.com/tools/prompt-template-injection-linter.html</loc>
-    <lastmod>2026-06-22</lastmod>
+    <lastmod>2026-07-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://unboundcompute.com/tools/mcp-server-security-auditor.html</loc>
-    <lastmod>2026-06-22</lastmod>
+    <lastmod>2026-07-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://unboundcompute.com/tools/owasp-llm-top10-scorecard.html</loc>
-    <lastmod>2026-06-22</lastmod>
+    <lastmod>2026-07-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://unboundcompute.com/tools/ioc-defanger-extractor.html</loc>
-    <lastmod>2026-06-22</lastmod>
+    <lastmod>2026-07-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://unboundcompute.com/tools/encoded-payload-deobfuscator.html</loc>
-    <lastmod>2026-06-22</lastmod>
+    <lastmod>2026-07-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://unboundcompute.com/tools/file-entropy-magic-analyzer.html</loc>
-    <lastmod>2026-06-22</lastmod>
+    <lastmod>2026-07-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://unboundcompute.com/tools/forensic-timestamp-converter.html</loc>
-    <lastmod>2026-06-22</lastmod>
+    <lastmod>2026-07-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://unboundcompute.com/tools/x509-certificate-decoder.html</loc>
-    <lastmod>2026-06-22</lastmod>
+    <lastmod>2026-07-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://unboundcompute.com/tools/classical-cipher-solver.html</loc>
-    <lastmod>2026-06-22</lastmod>
+    <lastmod>2026-07-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://unboundcompute.com/tools/exif-metadata-viewer-scrubber.html</loc>
-    <lastmod>2026-06-22</lastmod>
+    <lastmod>2026-07-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://unboundcompute.com/tools/secret-scanner.html</loc>
-    <lastmod>2026-06-22</lastmod>
+    <lastmod>2026-07-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>

@@ -11,7 +11,9 @@
 <meta name="author" content="UnboundCompute" />
 <meta name="theme-color" content="#0a0a0b" />
 <link rel="canonical" href="https://unboundcompute.com/tools/owasp-llm-top10-scorecard.html" />
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a0a0b'/%3E%3Cline x1='16' y1='4' x2='16' y2='28' stroke='%23fb5b46' stroke-width='2' stroke-dasharray='3 3'/%3E%3Ccircle cx='16' cy='16' r='3.4' fill='%23fb5b46'/%3E%3C/svg%3E" />
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="UnboundCompute" />
@@ -31,15 +33,15 @@
   "@context": "https://schema.org",
   "@graph": [
     {
-      "@type": "WebApplication",
+      "@type": "WebPage",
       "name": "OWASP LLM Top 10 Self Assessment Scorecard",
-      "applicationCategory": "SecurityApplication",
-      "operatingSystem": "Web",
-      "browserRequirements": "Requires JavaScript. Runs entirely client side.",
       "url": "https://unboundcompute.com/tools/owasp-llm-top10-scorecard.html",
       "description": "A free, interactive self assessment that scores an LLM application against the OWASP Top 10 for LLM Applications 2025. You answer yes, partial, or no to control questions across all ten categories, including prompt injection, sensitive information disclosure, supply chain, data and model poisoning, improper output handling, excessive agency, system prompt leakage, vector and embedding weaknesses, misinformation, and unbounded consumption. The tool produces a per category status, an overall readiness percentage and letter grade, highlights the weakest areas, and exports the completed assessment as Markdown. All scoring happens in the browser.",
-      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
-      "publisher": { "@type": "Organization", "name": "UnboundCompute", "url": "https://unboundcompute.com/" }
+      "publisher": {
+        "@type": "Organization",
+        "name": "UnboundCompute",
+        "url": "https://unboundcompute.com/"
+      }
     },
     {
       "@type": "FAQPage",
@@ -47,27 +49,42 @@
         {
           "@type": "Question",
           "name": "What is the OWASP Top 10 for LLM Applications?",
-          "acceptedAnswer": { "@type": "Answer", "text": "It is a community list, published by the OWASP GenAI Security Project, of the most critical security risks that affect applications built on large language models. The 2025 edition names ten categories: prompt injection, sensitive information disclosure, supply chain, data and model poisoning, improper output handling, excessive agency, system prompt leakage, vector and embedding weaknesses, misinformation, and unbounded consumption. This scorecard turns each category into honest control questions you answer about your own system." }
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "It is a community list, published by the OWASP GenAI Security Project, of the most critical security risks that affect applications built on large language models. The 2025 edition names ten categories: prompt injection, sensitive information disclosure, supply chain, data and model poisoning, improper output handling, excessive agency, system prompt leakage, vector and embedding weaknesses, misinformation, and unbounded consumption. This scorecard turns each category into honest control questions you answer about your own system."
+          }
         },
         {
           "@type": "Question",
           "name": "Does this scorecard send my answers anywhere?",
-          "acceptedAnswer": { "@type": "Answer", "text": "No. Every question, score, and export is computed in your browser with JavaScript. Your answers are never uploaded, logged, or stored on any server. You can assess a real internal system honestly without the responses leaving your machine. Nothing is even saved between page reloads unless you export it yourself." }
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. Every question, score, and export is computed in your browser with JavaScript. Your answers are never uploaded, logged, or stored on any server. You can assess a real internal system honestly without the responses leaving your machine. Nothing is even saved between page reloads unless you export it yourself."
+          }
         },
         {
           "@type": "Question",
           "name": "Is a passing grade a certification that my LLM app is secure?",
-          "acceptedAnswer": { "@type": "Answer", "text": "No. This is a self assessment, not a certification, an audit, or a guarantee. The grade only reflects the honesty and completeness of the answers you give. It is meant to surface gaps and start conversations, not to prove a system is safe. A high score on self reported controls is not the same as a tested, verified system. Real assurance comes from hands on testing and review." }
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. This is a self assessment, not a certification, an audit, or a guarantee. The grade only reflects the honesty and completeness of the answers you give. It is meant to surface gaps and start conversations, not to prove a system is safe. A high score on self reported controls is not the same as a tested, verified system. Real assurance comes from hands on testing and review."
+          }
         },
         {
           "@type": "Question",
           "name": "How is the readiness score calculated?",
-          "acceptedAnswer": { "@type": "Answer", "text": "Each category holds a few control questions. A yes earns the full points for that question, a partial earns half, and a no earns none. The category status is the share of its points you earned, and the overall score is the share across every answered question, shown as a percentage out of one hundred. The letter grade uses A for ninety and above, B for eighty, C for seventy, D for sixty, and F below that." }
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Each category holds a few control questions. A yes earns the full points for that question, a partial earns half, and a no earns none. The category status is the share of its points you earned, and the overall score is the share across every answered question, shown as a percentage out of one hundred. The letter grade uses A for ninety and above, B for eighty, C for seventy, D for sixty, and F below that."
+          }
         },
         {
           "@type": "Question",
           "name": "How does this relate to the OWASP AI Testing Guide?",
-          "acceptedAnswer": { "@type": "Answer", "text": "Where it helps, each category notes the matching OWASP AI Testing Guide identifiers, which use the AITG-APP form. Those identifiers point to concrete test procedures for the same risks. This scorecard is the quick self check that helps you decide which of those tests to run next. It is a starting map, not a replacement for running the tests." }
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Where it helps, each category notes the matching OWASP AI Testing Guide identifiers, which use the AITG-APP form. Those identifiers point to concrete test procedures for the same risks. This scorecard is the quick self check that helps you decide which of those tests to run next. It is a starting map, not a replacement for running the tests."
+          }
         }
       ]
     }
@@ -185,6 +202,8 @@
     .catstat{margin-left:0}
   }
 </style>
+<link href="../brand-core.css" rel="stylesheet">
+<link href="../lp-footer-fix.css" rel="stylesheet">
 </head>
 <body>
 
@@ -278,11 +297,23 @@
     <a href="https://unboundcompute.com/tools/"><span>Hub</span>All free security tools</a>
   </div>
 </div>
-
-<footer><div class="wrap">
-  <div>Built by <a href="https://unboundcompute.com/">UnboundCompute</a>, autonomous security research for web apps and APIs.</div>
-  <div><a href="https://unboundcompute.com/#cta">Request access</a></div>
-</div></footer>
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="site-footer" style="position:relative;overflow:hidden">
+    <div class="footer-links" style="position:relative;z-index:1;max-width:var(--maxw);margin:0 auto;padding:56px 32px 34px;display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px">
+      <div>
+        <a href="../index.html#top" style="display:flex;align-items:center;gap:11px;font-family:var(--mono);font-weight:600;font-size:15px;margin-bottom:14px">
+          <span style="width:27px;height:27px;border-radius:7px;border:1px solid var(--accent-line);display:grid;place-items:center"><svg viewBox="0 0 24 24" fill="none" style="width:15px;height:15px"><line x1="12" y1="3" x2="12" y2="21" stroke="var(--accent)" stroke-width="1.8" stroke-dasharray="2.6 2.6"/><circle cx="12" cy="12" r="3" fill="var(--accent)"/></svg></span>UnboundCompute</a>
+        <p style="font-size:13px;color:var(--ink-faint);line-height:1.6;max-width:30ch">An autonomous security researcher that finds the line, crosses it, and proves it.</p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:11px;font-size:13.5px;color:var(--ink-soft)"><span style="font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-faint);margin-bottom:5px">Product</span><a href="../index.html#proof" style-hover="color:var(--ink)">Proof</a><a href="../index.html#capabilities" style-hover="color:var(--ink)">Capabilities</a><a href="../design-partners.html" style-hover="color:var(--ink)">Design partners</a><a href="../tools/" style-hover="color:var(--ink)">Tools</a><a href="../index.html#cta" style-hover="color:var(--ink)">Become a design partner</a></div>
+      <div style="display:flex;flex-direction:column;gap:11px;font-size:13.5px;color:var(--ink-soft)"><span style="font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-faint);margin-bottom:5px">Company</span><a href="../about.html" style-hover="color:var(--ink)">About</a><a href="../research.html" style-hover="color:var(--ink)">Research</a><a href="../careers.html" style-hover="color:var(--ink)">Careers</a><a href="https://linkedin.com/company/unboundcomputes" style-hover="color:var(--ink)">LinkedIn</a></div>
+      <div style="display:flex;flex-direction:column;gap:11px;font-size:13.5px;color:var(--ink-soft)"><span style="font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-faint);margin-bottom:5px">Legal</span><a href="../trust.html" style-hover="color:var(--ink)">Trust center</a><a href="../privacy.html" style-hover="color:var(--ink)">Privacy</a><a href="../terms.html" style-hover="color:var(--ink)">Terms</a></div>
+    </div>
+    <div class="footer-meta" style="position:relative;z-index:1;max-width:var(--maxw);margin:0 auto;padding:22px 32px 28px;display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--ink-faint);flex-wrap:wrap;gap:10px">
+      <span>&copy; 2026 UnboundCompute</span><span>the boundary held, until it didn't</span>
+    </div>
+    <div class="uc-word-wrap footer-word" aria-hidden="true"><span class="uc-word"><span class="b">Unbound</span>Compute<span class="d">.</span></span></div>
+  </footer>
 
 <script>
 (function(){

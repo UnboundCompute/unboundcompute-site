@@ -1,0 +1,33 @@
+# UnboundCompute apex site (unboundcompute.com) — Hostinger (Apache / LiteSpeed)
+#
+# Security response headers. Added 2026-07-19 to resolve the Semrush audit notice
+# "3 subdomains don't support HSTS".
+#
+# NOTE ON includeSubDomains: this policy applies to EVERY subdomain of
+# unboundcompute.com. As of 2026-07-19 the live subdomains are www, security, and
+# console, and all three serve valid HTTPS, so this is safe. Before adding any NEW
+# subdomain, make sure it has a valid certificate and serves HTTPS, otherwise
+# browsers that cached this policy will refuse to load it.
+#
+# NOTE ON preload: deliberately NOT enabled. Submitting to the browser preload list
+# is hard to reverse (removal takes months and ships with browser releases). Enable
+# it only as a deliberate decision, not as a default.
+
+<IfModule mod_headers.c>
+  # Tell browsers to only ever use HTTPS for this domain and its subdomains.
+  # max-age is one year, expressed in seconds.
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains" "expr=%{HTTPS} == 'on'"
+
+  # Do not let the browser guess a response's content type.
+  Header always set X-Content-Type-Options "nosniff"
+
+  # Send the full referrer to our own origin, only the origin cross site.
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
+  # Allow our own pages to frame each other, block everyone else.
+  Header always set X-Frame-Options "SAMEORIGIN"
+
+  # Deliberately NOT setting Content-Security-Policy here. The free tools under
+  # /tools/ run entirely in the browser and rely on inline script, so a strict CSP
+  # would break them. The existing upgrade-insecure-requests policy stays as is.
+</IfModule>

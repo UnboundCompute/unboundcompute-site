@@ -1,0 +1,38 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600&family=JetBrains+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,300;1,6..72,400&display=swap');
+:root{
+  --bg:#0a0a0b!important;
+  --bg-deep:#070708!important;
+  --bg-2:#070708!important;
+  --panel:#0e0e10!important;
+  --panel-2:#131315!important;
+  --paper:#0e0e10!important;
+  --ink:#f4f2ec!important;
+  --ink-hi:#fbf9f3!important;
+  --ink-soft:#9b988f!important;
+  --ink-faint:#5e5b54!important;
+  --muted:#9b988f!important;
+  --quiet:#5e5b54!important;
+  --line:rgba(244,242,236,.13)!important;
+  --line-2:rgba(244,242,236,.07)!important;
+  --rule:rgba(244,242,236,.13)!important;
+  --rule2:rgba(244,242,236,.13)!important;
+  --accent:#fb5b46!important;
+  --accent-2:#ff7d6b!important;
+  --accent-wash:rgba(251,91,70,.12)!important;
+  --accent-line:rgba(251,91,70,.42)!important;
+  --signal:#fb5b46!important;
+  --verified:#74d99a!important;
+  --ok:#74d99a!important;
+  --lime:#74d99a!important;
+  --blocked:#c9a86a!important;
+  --amber:#c9a86a!important;
+  --observed:#8c9498!important;
+  --cyan:#8c9498!important;
+  --hold:#8c9498!important;
+  --on-accent:#1a0c09!important;
+  --serif:'Newsreader',Georgia,serif!important;
+  --sans:'Inter',system-ui,sans-serif!important;
+  --mono:'JetBrains Mono',ui-monospace,monospace!important;
+}
+::selection{background:var(--accent);color:var(--on-accent)}
+:focus-visible{outline:2px solid rgba(251,91,70,.32);outline-offset:2px}

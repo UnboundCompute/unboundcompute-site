@@ -11,7 +11,9 @@
 <meta name="author" content="UnboundCompute" />
 <meta name="theme-color" content="#0a0a0b" />
 <link rel="canonical" href="https://unboundcompute.com/tools/forensic-timestamp-converter.html" />
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a0a0b'/%3E%3Cline x1='16' y1='4' x2='16' y2='28' stroke='%23fb5b46' stroke-width='2' stroke-dasharray='3 3'/%3E%3Ccircle cx='16' cy='16' r='3.4' fill='%23fb5b46'/%3E%3C/svg%3E" />
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="UnboundCompute" />
@@ -31,15 +33,15 @@
   "@context": "https://schema.org",
   "@graph": [
     {
-      "@type": "WebApplication",
+      "@type": "WebPage",
       "name": "Forensic Timestamp Converter",
-      "applicationCategory": "SecurityApplication",
-      "operatingSystem": "Web",
-      "browserRequirements": "Requires JavaScript. Runs entirely client side.",
       "url": "https://unboundcompute.com/tools/forensic-timestamp-converter.html",
       "description": "A free tool for digital forensics and incident response that decodes an artifact timestamp into a human readable date. It auto detects the likely source format from the magnitude of the value and shows every plausible interpretation side by side, including Windows FILETIME, Active Directory and LDAP timestamps, Chrome and WebKit time, Apple Cocoa Core Data absolute time, Mac HFS plus time, OLE Automation date, packed DOS date and time, and Unix epoch in seconds, milliseconds, microseconds, and nanoseconds. An ISO 8601 input is re encoded into each of those formats. All conversion happens in the browser as pure math on the input.",
-      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
-      "publisher": { "@type": "Organization", "name": "UnboundCompute", "url": "https://unboundcompute.com/" }
+      "publisher": {
+        "@type": "Organization",
+        "name": "UnboundCompute",
+        "url": "https://unboundcompute.com/"
+      }
     },
     {
       "@type": "FAQPage",
@@ -47,27 +49,42 @@
         {
           "@type": "Question",
           "name": "What is a Windows FILETIME and how is it converted?",
-          "acceptedAnswer": { "@type": "Answer", "text": "A Windows FILETIME is a 64 bit count of 100 nanosecond intervals that have elapsed since midnight on the first of January 1601 in UTC. To convert it to a Unix style date you divide by ten million to get seconds, then subtract the 11644473600 seconds that separate the 1601 epoch from the 1970 epoch. Because the raw value can exceed what a double can hold exactly, this tool does that arithmetic with BigInt so the result stays precise." }
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A Windows FILETIME is a 64 bit count of 100 nanosecond intervals that have elapsed since midnight on the first of January 1601 in UTC. To convert it to a Unix style date you divide by ten million to get seconds, then subtract the 11644473600 seconds that separate the 1601 epoch from the 1970 epoch. Because the raw value can exceed what a double can hold exactly, this tool does that arithmetic with BigInt so the result stays precise."
+          }
         },
         {
           "@type": "Question",
           "name": "How does the tool know which format my number is?",
-          "acceptedAnswer": { "@type": "Answer", "text": "It does not assume one answer. It looks at the magnitude and the shape of the value, then decodes it under every format that could plausibly produce a number that size and lands on a sane date. The most likely interpretation is highlighted, but every plausible reading is shown side by side so you, the analyst, make the final call from the surrounding context of the artifact." }
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "It does not assume one answer. It looks at the magnitude and the shape of the value, then decodes it under every format that could plausibly produce a number that size and lands on a sane date. The most likely interpretation is highlighted, but every plausible reading is shown side by side so you, the analyst, make the final call from the surrounding context of the artifact."
+          }
         },
         {
           "@type": "Question",
           "name": "Does this timestamp converter send my data anywhere?",
-          "acceptedAnswer": { "@type": "Answer", "text": "No. Every conversion is pure arithmetic that runs in your browser with JavaScript. The value you paste is never uploaded, logged, or sent to any server. That matters in forensics because a timestamp can come from a sealed image or a live investigation, and the input never leaves your machine." }
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. Every conversion is pure arithmetic that runs in your browser with JavaScript. The value you paste is never uploaded, logged, or sent to any server. That matters in forensics because a timestamp can come from a sealed image or a live investigation, and the input never leaves your machine."
+          }
         },
         {
           "@type": "Question",
           "name": "Why do some formats not have a time zone?",
-          "acceptedAnswer": { "@type": "Answer", "text": "Most of the epoch based formats here are defined in UTC, so the tool shows UTC as the source of truth and adds your local rendering for convenience. A few artifacts, notably classic Mac HFS plus timestamps, were historically stored in local time on the machine that wrote them. The tool decodes the raw value against the documented epoch and labels it so you remember to reason about the original time zone yourself." }
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Most of the epoch based formats here are defined in UTC, so the tool shows UTC as the source of truth and adds your local rendering for convenience. A few artifacts, notably classic Mac HFS plus timestamps, were historically stored in local time on the machine that wrote them. The tool decodes the raw value against the documented epoch and labels it so you remember to reason about the original time zone yourself."
+          }
         },
         {
           "@type": "Question",
           "name": "Can I go the other way, from a date to these encodings?",
-          "acceptedAnswer": { "@type": "Answer", "text": "Yes. Paste an ISO 8601 date and time such as 2021-01-01T00:00:00Z and the tool re encodes that instant into each supported format, so you can search a disk image or a database for the matching raw value." }
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Paste an ISO 8601 date and time such as 2021-01-01T00:00:00Z and the tool re encodes that instant into each supported format, so you can search a disk image or a database for the matching raw value."
+          }
         }
       ]
     }
@@ -188,6 +205,8 @@
     td.dt .local,td.dt{white-space:normal}
   }
 </style>
+<link href="../brand-core.css" rel="stylesheet">
+<link href="../lp-footer-fix.css" rel="stylesheet">
 </head>
 <body>
 
@@ -266,11 +285,23 @@
     <a href="https://unboundcompute.com/tools/"><span>Hub</span>All free security tools</a>
   </div>
 </div>
-
-<footer><div class="wrap">
-  <div>Built by <a href="https://unboundcompute.com/">UnboundCompute</a>, autonomous security research for web apps and APIs.</div>
-  <div><a href="https://unboundcompute.com/#cta">Request access</a></div>
-</div></footer>
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="site-footer" style="position:relative;overflow:hidden">
+    <div class="footer-links" style="position:relative;z-index:1;max-width:var(--maxw);margin:0 auto;padding:56px 32px 34px;display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px">
+      <div>
+        <a href="../index.html#top" style="display:flex;align-items:center;gap:11px;font-family:var(--mono);font-weight:600;font-size:15px;margin-bottom:14px">
+          <span style="width:27px;height:27px;border-radius:7px;border:1px solid var(--accent-line);display:grid;place-items:center"><svg viewBox="0 0 24 24" fill="none" style="width:15px;height:15px"><line x1="12" y1="3" x2="12" y2="21" stroke="var(--accent)" stroke-width="1.8" stroke-dasharray="2.6 2.6"/><circle cx="12" cy="12" r="3" fill="var(--accent)"/></svg></span>UnboundCompute</a>
+        <p style="font-size:13px;color:var(--ink-faint);line-height:1.6;max-width:30ch">An autonomous security researcher that finds the line, crosses it, and proves it.</p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:11px;font-size:13.5px;color:var(--ink-soft)"><span style="font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-faint);margin-bottom:5px">Product</span><a href="../index.html#proof" style-hover="color:var(--ink)">Proof</a><a href="../index.html#capabilities" style-hover="color:var(--ink)">Capabilities</a><a href="../design-partners.html" style-hover="color:var(--ink)">Design partners</a><a href="../tools/" style-hover="color:var(--ink)">Tools</a><a href="../index.html#cta" style-hover="color:var(--ink)">Become a design partner</a></div>
+      <div style="display:flex;flex-direction:column;gap:11px;font-size:13.5px;color:var(--ink-soft)"><span style="font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-faint);margin-bottom:5px">Company</span><a href="../about.html" style-hover="color:var(--ink)">About</a><a href="../research.html" style-hover="color:var(--ink)">Research</a><a href="../careers.html" style-hover="color:var(--ink)">Careers</a><a href="https://linkedin.com/company/unboundcomputes" style-hover="color:var(--ink)">LinkedIn</a></div>
+      <div style="display:flex;flex-direction:column;gap:11px;font-size:13.5px;color:var(--ink-soft)"><span style="font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-faint);margin-bottom:5px">Legal</span><a href="../trust.html" style-hover="color:var(--ink)">Trust center</a><a href="../privacy.html" style-hover="color:var(--ink)">Privacy</a><a href="../terms.html" style-hover="color:var(--ink)">Terms</a></div>
+    </div>
+    <div class="footer-meta" style="position:relative;z-index:1;max-width:var(--maxw);margin:0 auto;padding:22px 32px 28px;display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--ink-faint);flex-wrap:wrap;gap:10px">
+      <span>&copy; 2026 UnboundCompute</span><span>the boundary held, until it didn't</span>
+    </div>
+    <div class="uc-word-wrap footer-word" aria-hidden="true"><span class="uc-word"><span class="b">Unbound</span>Compute<span class="d">.</span></span></div>
+  </footer>
 
 <script>
 (function(){

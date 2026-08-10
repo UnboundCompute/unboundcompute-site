@@ -11,7 +11,9 @@
 <meta name="author" content="UnboundCompute" />
 <meta name="theme-color" content="#0a0a0b" />
 <link rel="canonical" href="https://unboundcompute.com/tools/file-entropy-magic-analyzer.html" />
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a0a0b'/%3E%3Cline x1='16' y1='4' x2='16' y2='28' stroke='%23fb5b46' stroke-width='2' stroke-dasharray='3 3'/%3E%3Ccircle cx='16' cy='16' r='3.4' fill='%23fb5b46'/%3E%3C/svg%3E" />
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="UnboundCompute" />
@@ -31,15 +33,15 @@
   "@context": "https://schema.org",
   "@graph": [
     {
-      "@type": "WebApplication",
+      "@type": "WebPage",
       "name": "File Entropy and Magic Byte Analyzer",
-      "applicationCategory": "SecurityApplication",
-      "operatingSystem": "Web",
-      "browserRequirements": "Requires JavaScript. Runs entirely client side.",
       "url": "https://unboundcompute.com/tools/file-entropy-magic-analyzer.html",
       "description": "A free static triage tool that reads a file locally and reports its overall Shannon entropy, a sliding window entropy graph that reveals packed or encrypted regions, the real file type detected from magic bytes versus the extension, a classic hex viewer of the first bytes, and any appended or embedded file signatures that suggest a polyglot or hidden payload. The file is read in the browser and never uploaded.",
-      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
-      "publisher": { "@type": "Organization", "name": "UnboundCompute", "url": "https://unboundcompute.com/" }
+      "publisher": {
+        "@type": "Organization",
+        "name": "UnboundCompute",
+        "url": "https://unboundcompute.com/"
+      }
     },
     {
       "@type": "FAQPage",
@@ -47,27 +49,42 @@
         {
           "@type": "Question",
           "name": "What does file entropy tell me?",
-          "acceptedAnswer": { "@type": "Answer", "text": "Shannon entropy measures how unpredictable the bytes in a file are, on a scale from 0 to 8 bits per byte. Plain text and structured formats sit low, often between 4 and 6. Compressed, encrypted, or packed data pushes close to 8 because every byte value appears about equally often. High entropy is not proof of anything malicious, since a normal zip or a JPEG is also high entropy, but a region of near maximum entropy where you would not expect it is a strong reason to look closer." }
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Shannon entropy measures how unpredictable the bytes in a file are, on a scale from 0 to 8 bits per byte. Plain text and structured formats sit low, often between 4 and 6. Compressed, encrypted, or packed data pushes close to 8 because every byte value appears about equally often. High entropy is not proof of anything malicious, since a normal zip or a JPEG is also high entropy, but a region of near maximum entropy where you would not expect it is a strong reason to look closer."
+          }
         },
         {
           "@type": "Question",
           "name": "Is my file uploaded anywhere?",
-          "acceptedAnswer": { "@type": "Answer", "text": "No. The file is read in your browser with the FileReader API as an ArrayBuffer, and every calculation runs in local JavaScript. Nothing is uploaded, logged, or sent to any server. That is the point of a client side triage tool: you can inspect a suspicious sample or an internal artifact without it leaving your machine." }
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. The file is read in your browser with the FileReader API as an ArrayBuffer, and every calculation runs in local JavaScript. Nothing is uploaded, logged, or sent to any server. That is the point of a client side triage tool: you can inspect a suspicious sample or an internal artifact without it leaving your machine."
+          }
         },
         {
           "@type": "Question",
           "name": "What are magic bytes and why check them against the extension?",
-          "acceptedAnswer": { "@type": "Answer", "text": "Magic bytes are a short, fixed signature at the start of a file that names its real format, like the bytes 50 4B for a zip or 7F 45 4C 46 for an ELF binary. The file extension is just a label that anyone can rename. When the magic bytes disagree with the extension, for example an executable carrying an image extension, that mismatch is a classic triage signal worth investigating." }
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Magic bytes are a short, fixed signature at the start of a file that names its real format, like the bytes 50 4B for a zip or 7F 45 4C 46 for an ELF binary. The file extension is just a label that anyone can rename. When the magic bytes disagree with the extension, for example an executable carrying an image extension, that mismatch is a classic triage signal worth investigating."
+          }
         },
         {
           "@type": "Question",
           "name": "How does it find appended or embedded payloads?",
-          "acceptedAnswer": { "@type": "Answer", "text": "The tool scans the file for known format signatures that appear after the start rather than at offset zero. A zip header sitting deep inside an image, for instance, can mean a polyglot file or a payload appended to a benign carrier. The scan reports the offset where each extra signature was found so you can carve it out and examine it. A match is a lead to verify, not a verdict." }
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The tool scans the file for known format signatures that appear after the start rather than at offset zero. A zip header sitting deep inside an image, for instance, can mean a polyglot file or a payload appended to a benign carrier. The scan reports the offset where each extra signature was found so you can carve it out and examine it. A match is a lead to verify, not a verdict."
+          }
         },
         {
           "@type": "Question",
           "name": "Does high entropy mean a file is packed or malicious?",
-          "acceptedAnswer": { "@type": "Answer", "text": "Not on its own. Many ordinary files are high entropy by design, including archives, encrypted containers, and most modern media. What matters is context: a normally low entropy format that contains a high entropy region, an executable section that is far more random than the rest of the binary, or appended high entropy data after a clean file. The entropy graph exists so you can see where the surprise is, then decide if it deserves a closer look." }
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Not on its own. Many ordinary files are high entropy by design, including archives, encrypted containers, and most modern media. What matters is context: a normally low entropy format that contains a high entropy region, an executable section that is far more random than the rest of the binary, or appended high entropy data after a clean file. The entropy graph exists so you can see where the surprise is, then decide if it deserves a closer look."
+          }
         }
       ]
     }
@@ -199,6 +216,8 @@
     .hint{margin-left:0;width:100%}
   }
 </style>
+<link href="../brand-core.css" rel="stylesheet">
+<link href="../lp-footer-fix.css" rel="stylesheet">
 </head>
 <body>
 
@@ -274,11 +293,23 @@
     <a href="https://unboundcompute.com/tools/"><span>Free tools</span>All security tools</a>
   </div>
 </div>
-
-<footer><div class="wrap">
-  <div>Built by <a href="https://unboundcompute.com/">UnboundCompute</a>, autonomous security research for web apps and APIs.</div>
-  <div><a href="https://unboundcompute.com/#cta">Request access</a></div>
-</div></footer>
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="site-footer" style="position:relative;overflow:hidden">
+    <div class="footer-links" style="position:relative;z-index:1;max-width:var(--maxw);margin:0 auto;padding:56px 32px 34px;display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px">
+      <div>
+        <a href="../index.html#top" style="display:flex;align-items:center;gap:11px;font-family:var(--mono);font-weight:600;font-size:15px;margin-bottom:14px">
+          <span style="width:27px;height:27px;border-radius:7px;border:1px solid var(--accent-line);display:grid;place-items:center"><svg viewBox="0 0 24 24" fill="none" style="width:15px;height:15px"><line x1="12" y1="3" x2="12" y2="21" stroke="var(--accent)" stroke-width="1.8" stroke-dasharray="2.6 2.6"/><circle cx="12" cy="12" r="3" fill="var(--accent)"/></svg></span>UnboundCompute</a>
+        <p style="font-size:13px;color:var(--ink-faint);line-height:1.6;max-width:30ch">An autonomous security researcher that finds the line, crosses it, and proves it.</p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:11px;font-size:13.5px;color:var(--ink-soft)"><span style="font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-faint);margin-bottom:5px">Product</span><a href="../index.html#proof" style-hover="color:var(--ink)">Proof</a><a href="../index.html#capabilities" style-hover="color:var(--ink)">Capabilities</a><a href="../design-partners.html" style-hover="color:var(--ink)">Design partners</a><a href="../tools/" style-hover="color:var(--ink)">Tools</a><a href="../index.html#cta" style-hover="color:var(--ink)">Become a design partner</a></div>
+      <div style="display:flex;flex-direction:column;gap:11px;font-size:13.5px;color:var(--ink-soft)"><span style="font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-faint);margin-bottom:5px">Company</span><a href="../about.html" style-hover="color:var(--ink)">About</a><a href="../research.html" style-hover="color:var(--ink)">Research</a><a href="../careers.html" style-hover="color:var(--ink)">Careers</a><a href="https://linkedin.com/company/unboundcomputes" style-hover="color:var(--ink)">LinkedIn</a></div>
+      <div style="display:flex;flex-direction:column;gap:11px;font-size:13.5px;color:var(--ink-soft)"><span style="font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-faint);margin-bottom:5px">Legal</span><a href="../trust.html" style-hover="color:var(--ink)">Trust center</a><a href="../privacy.html" style-hover="color:var(--ink)">Privacy</a><a href="../terms.html" style-hover="color:var(--ink)">Terms</a></div>
+    </div>
+    <div class="footer-meta" style="position:relative;z-index:1;max-width:var(--maxw);margin:0 auto;padding:22px 32px 28px;display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--ink-faint);flex-wrap:wrap;gap:10px">
+      <span>&copy; 2026 UnboundCompute</span><span>the boundary held, until it didn't</span>
+    </div>
+    <div class="uc-word-wrap footer-word" aria-hidden="true"><span class="uc-word"><span class="b">Unbound</span>Compute<span class="d">.</span></span></div>
+  </footer>
 
 <script>
 (function(){

@@ -11,7 +11,9 @@
 <meta name="author" content="UnboundCompute" />
 <meta name="theme-color" content="#0a0a0b" />
 <link rel="canonical" href="https://unboundcompute.com/tools/prompt-template-injection-linter.html" />
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a0a0b'/%3E%3Cline x1='16' y1='4' x2='16' y2='28' stroke='%23fb5b46' stroke-width='2' stroke-dasharray='3 3'/%3E%3Ccircle cx='16' cy='16' r='3.4' fill='%23fb5b46'/%3E%3C/svg%3E" />
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="UnboundCompute" />
@@ -31,15 +33,15 @@
   "@context": "https://schema.org",
   "@graph": [
     {
-      "@type": "WebApplication",
+      "@type": "WebPage",
       "name": "Prompt Template Injection Linter",
-      "applicationCategory": "SecurityApplication",
-      "operatingSystem": "Web",
-      "browserRequirements": "Requires JavaScript. Runs entirely client side.",
       "url": "https://unboundcompute.com/tools/prompt-template-injection-linter.html",
       "description": "A free, defensive tool that lints a prompt template for prompt injection risk. It finds variable interpolation points across Jinja2, f-string, .format, and Handlebars shapes, then flags where untrusted input could override instructions: interpolation into the system area, missing instruction and data separation, secrets in the same string as user input, and missing output constraints. It maps findings to OWASP Top 10 for LLM Applications LLM01 and the OWASP AI Testing Guide identifier AITG-APP-01. All analysis happens in the browser.",
-      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
-      "publisher": { "@type": "Organization", "name": "UnboundCompute", "url": "https://unboundcompute.com/" }
+      "publisher": {
+        "@type": "Organization",
+        "name": "UnboundCompute",
+        "url": "https://unboundcompute.com/"
+      }
     },
     {
       "@type": "FAQPage",
@@ -47,27 +49,42 @@
         {
           "@type": "Question",
           "name": "What is prompt injection?",
-          "acceptedAnswer": { "@type": "Answer", "text": "Prompt injection is when untrusted text that you put into a prompt is read by the language model as new instructions instead of as data. Because a prompt is one flat string, the model has no built in way to tell your trusted instructions apart from a user supplied value, so content that says something like ignore the above can override the behavior you intended. It is tracked as LLM01 in the OWASP Top 10 for LLM Applications." }
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Prompt injection is when untrusted text that you put into a prompt is read by the language model as new instructions instead of as data. Because a prompt is one flat string, the model has no built in way to tell your trusted instructions apart from a user supplied value, so content that says something like ignore the above can override the behavior you intended. It is tracked as LLM01 in the OWASP Top 10 for LLM Applications."
+          }
         },
         {
           "@type": "Question",
           "name": "Does this linter send my prompt template anywhere?",
-          "acceptedAnswer": { "@type": "Answer", "text": "No. The linting runs entirely in your browser with JavaScript. The template you paste is never uploaded, logged, or sent to any server, and the tool never calls a language model. It only does static pattern analysis on the text you provide, so you can paste an internal prompt template without it leaving your machine." }
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. The linting runs entirely in your browser with JavaScript. The template you paste is never uploaded, logged, or sent to any server, and the tool never calls a language model. It only does static pattern analysis on the text you provide, so you can paste an internal prompt template without it leaving your machine."
+          }
         },
         {
           "@type": "Question",
           "name": "Does this tool run a model or generate attack strings?",
-          "acceptedAnswer": { "@type": "Answer", "text": "No. This is a static, defensive tool. It never runs or calls a language model, it never generates injection payloads, and it never connects to a network. It reads the structure of your template, points out where untrusted input could become instructions, and suggests defensive fixes such as wrapping untrusted input in explicit delimiters and labeling it as data." }
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. This is a static, defensive tool. It never runs or calls a language model, it never generates injection payloads, and it never connects to a network. It reads the structure of your template, points out where untrusted input could become instructions, and suggests defensive fixes such as wrapping untrusted input in explicit delimiters and labeling it as data."
+          }
         },
         {
           "@type": "Question",
           "name": "How does this map to OWASP?",
-          "acceptedAnswer": { "@type": "Answer", "text": "The findings map to LLM01 Prompt Injection in the OWASP Top 10 for LLM Applications, which is the catalog entry for untrusted input being read as instructions. The corresponding test in the OWASP AI Testing Guide is identified as AITG-APP-01. The linter checks template structure, which is one input to that testing, not a full substitute for it." }
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The findings map to LLM01 Prompt Injection in the OWASP Top 10 for LLM Applications, which is the catalog entry for untrusted input being read as instructions. The corresponding test in the OWASP AI Testing Guide is identified as AITG-APP-01. The linter checks template structure, which is one input to that testing, not a full substitute for it."
+          }
         },
         {
           "@type": "Question",
           "name": "Can a clean result guarantee my prompt is safe?",
-          "acceptedAnswer": { "@type": "Answer", "text": "No. A low risk result means the common structural traps were not found in the text you pasted. It cannot prove safety, because prompt injection also depends on how the model is used, what tools it can call, and what the surrounding application does with its output. Treat a clean result as one signal among many, alongside real testing and human review." }
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. A low risk result means the common structural traps were not found in the text you pasted. It cannot prove safety, because prompt injection also depends on how the model is used, what tools it can call, and what the surrounding application does with its output. Treat a clean result as one signal among many, alongside real testing and human review."
+          }
         }
       ]
     }
@@ -176,6 +193,8 @@
     .hint{margin-left:0;width:100%}
   }
 </style>
+<link href="../brand-core.css" rel="stylesheet">
+<link href="../lp-footer-fix.css" rel="stylesheet">
 </head>
 <body>
 
@@ -257,11 +276,23 @@
     <a href="https://unboundcompute.com/tools/"><span>All tools</span>Free security tools hub</a>
   </div>
 </div>
-
-<footer><div class="wrap">
-  <div>Built by <a href="https://unboundcompute.com/">UnboundCompute</a>, autonomous security research for web apps and APIs.</div>
-  <div><a href="https://unboundcompute.com/#cta">Request access</a></div>
-</div></footer>
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="site-footer" style="position:relative;overflow:hidden">
+    <div class="footer-links" style="position:relative;z-index:1;max-width:var(--maxw);margin:0 auto;padding:56px 32px 34px;display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px">
+      <div>
+        <a href="../index.html#top" style="display:flex;align-items:center;gap:11px;font-family:var(--mono);font-weight:600;font-size:15px;margin-bottom:14px">
+          <span style="width:27px;height:27px;border-radius:7px;border:1px solid var(--accent-line);display:grid;place-items:center"><svg viewBox="0 0 24 24" fill="none" style="width:15px;height:15px"><line x1="12" y1="3" x2="12" y2="21" stroke="var(--accent)" stroke-width="1.8" stroke-dasharray="2.6 2.6"/><circle cx="12" cy="12" r="3" fill="var(--accent)"/></svg></span>UnboundCompute</a>
+        <p style="font-size:13px;color:var(--ink-faint);line-height:1.6;max-width:30ch">An autonomous security researcher that finds the line, crosses it, and proves it.</p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:11px;font-size:13.5px;color:var(--ink-soft)"><span style="font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-faint);margin-bottom:5px">Product</span><a href="../index.html#proof" style-hover="color:var(--ink)">Proof</a><a href="../index.html#capabilities" style-hover="color:var(--ink)">Capabilities</a><a href="../design-partners.html" style-hover="color:var(--ink)">Design partners</a><a href="../tools/" style-hover="color:var(--ink)">Tools</a><a href="../index.html#cta" style-hover="color:var(--ink)">Become a design partner</a></div>
+      <div style="display:flex;flex-direction:column;gap:11px;font-size:13.5px;color:var(--ink-soft)"><span style="font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-faint);margin-bottom:5px">Company</span><a href="../about.html" style-hover="color:var(--ink)">About</a><a href="../research.html" style-hover="color:var(--ink)">Research</a><a href="../careers.html" style-hover="color:var(--ink)">Careers</a><a href="https://linkedin.com/company/unboundcomputes" style-hover="color:var(--ink)">LinkedIn</a></div>
+      <div style="display:flex;flex-direction:column;gap:11px;font-size:13.5px;color:var(--ink-soft)"><span style="font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-faint);margin-bottom:5px">Legal</span><a href="../trust.html" style-hover="color:var(--ink)">Trust center</a><a href="../privacy.html" style-hover="color:var(--ink)">Privacy</a><a href="../terms.html" style-hover="color:var(--ink)">Terms</a></div>
+    </div>
+    <div class="footer-meta" style="position:relative;z-index:1;max-width:var(--maxw);margin:0 auto;padding:22px 32px 28px;display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--ink-faint);flex-wrap:wrap;gap:10px">
+      <span>&copy; 2026 UnboundCompute</span><span>the boundary held, until it didn't</span>
+    </div>
+    <div class="uc-word-wrap footer-word" aria-hidden="true"><span class="uc-word"><span class="b">Unbound</span>Compute<span class="d">.</span></span></div>
+  </footer>
 
 <script>
 (function(){

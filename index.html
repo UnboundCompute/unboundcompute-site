@@ -12,7 +12,9 @@
 <meta name="author" content="UnboundCompute" />
 <meta name="theme-color" content="#0a0a0b" />
 <link rel="canonical" href="https://unboundcompute.com/" />
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a0a0b'/%3E%3Cline x1='16' y1='4' x2='16' y2='28' stroke='%23fb5b46' stroke-width='2' stroke-dasharray='3 3'/%3E%3Ccircle cx='16' cy='16' r='3.4' fill='%23fb5b46'/%3E%3C/svg%3E" />
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
 <!-- Open Graph -->
 <meta property="og:type" content="website" />
@@ -42,10 +44,8 @@
       "description": "Autonomous security research for web apps and APIs."
     },
     {
-      "@type": "SoftwareApplication",
+      "@type": "WebPage",
       "name": "UnboundCompute",
-      "applicationCategory": "SecurityApplication",
-      "operatingSystem": "Web",
       "url": "https://unboundcompute.com/",
       "description": "An autonomous security researcher for the software you ship. It learns the boundaries your product trusts, crosses the ones that should not hold, and proves every finding with hard evidence."
     }
@@ -56,6 +56,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600&family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,300;1,6..72,400&display=swap" rel="stylesheet">
+<link href="brand-core.css" rel="stylesheet">
+<link href="lp-product-experience.css" rel="stylesheet">
+<link href="lp-brand-alignment.css" rel="stylesheet">
+<link href="lp-footer-fix.css" rel="stylesheet">
 <style>
   :root{
     --bg:#0a0a0b; --bg-2:#070708; --panel:#0e0e10; --panel-2:#131315;
@@ -128,7 +132,8 @@
         <a href="#proof" style="transition:color .15s" style-hover="color:var(--ink)">Proof</a>
         <a href="demo/" style="transition:color .15s" style-hover="color:var(--ink)">Demo</a>
         <a href="tools/" style="transition:color .15s" style-hover="color:var(--ink)">Tools</a>
-        <a href="#cta" style="font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;background:var(--accent);color:var(--on-accent);padding:10px 17px;border-radius:8px;transition:filter .15s" style-hover="filter:brightness(1.08)">Request access</a>
+        <a href="about.html" style="transition:color .15s" style-hover="color:var(--ink)">About</a>
+        <a href="design-partners.html" style="font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;background:var(--accent);color:var(--on-accent);padding:10px 17px;border-radius:8px;transition:filter .15s" style-hover="filter:brightness(1.08)">Become a design partner</a>
       </div>
     </div>
   </nav>
@@ -143,15 +148,15 @@
           <span style="color:var(--ink-faint)">[</span> Autonomous offensive security <span style="color:var(--ink-faint)">]</span>
         </p>
         <h1 style="font-family:var(--serif);font-weight:400;font-size:clamp(46px,5.8vw,78px);line-height:.98;letter-spacing:-.03em;color:var(--ink-hi);margin-bottom:26px">Thinks like an<br><em style="font-style:italic;color:var(--accent)">attacker.</em><br>Proves like an <em style="font-style:italic;color:var(--ink-hi)">auditor.</em></h1>
-        <p style="font-size:18px;color:var(--ink-soft);max-width:45ch;line-height:1.58;margin-bottom:32px">An autonomous security researcher for the software you ship. It learns the boundaries your product trusts, crosses the ones that should not hold, and proves every finding with hard evidence.</p>
+        <p style="font-size:18px;color:var(--ink-soft);max-width:47ch;line-height:1.58;margin-bottom:32px">An autonomous security researcher for the software you ship. It learns the boundaries your product trusts, crosses the ones that should not hold, and proves every finding with hard evidence.</p>
         <div style="display:flex;gap:13px;margin-bottom:34px;flex-wrap:wrap">
-          <a href="#cta" style="font-family:var(--mono);font-size:12.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:14px 22px;border-radius:9px;background:var(--accent);color:var(--on-accent);transition:filter .15s" style-hover="filter:brightness(1.08)">Request access</a>
+          <a href="design-partners.html" style="font-family:var(--mono);font-size:12.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:14px 22px;border-radius:9px;background:var(--accent);color:var(--on-accent);transition:filter .15s" style-hover="filter:brightness(1.08)">Become a design partner</a>
           <a href="#proof" style="font-family:var(--mono);font-size:12.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:14px 22px;border-radius:9px;border:1px solid var(--line);color:var(--ink);transition:border-color .15s,background .15s" style-hover="border-color:var(--ink-soft);background:var(--panel)">See the proof</a>
           <a href="demo/" style="font-family:var(--mono);font-size:12.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:14px 22px;border-radius:9px;border:1px solid var(--line);color:var(--ink);transition:border-color .15s,background .15s" style-hover="border-color:var(--ink-soft);background:var(--panel)">Explore the console</a>
         </div>
         <div style="display:flex;gap:26px;font-family:var(--mono);font-size:11.5px;color:var(--ink-faint);letter-spacing:.04em;border-top:1px solid var(--line-2);padding-top:18px;flex-wrap:wrap">
           <span><span style="color:var(--ink-soft)">scope</span> &nbsp;your software</span>
-          <span><span style="color:var(--ink-soft)">mode</span> &nbsp;continuous</span>
+          <span><span style="color:var(--ink-soft)">mode</span> &nbsp;scoped &amp; ongoing</span>
           <span><span style="color:var(--ink-soft)">output</span> &nbsp;proven findings</span>
         </div>
       </div>
@@ -186,6 +191,119 @@
     </div>
   </section>
 
+  <!-- ===================== WHO IT'S FOR ===================== -->
+  <section style="border-top:1px solid var(--line-2)">
+    <div style="max-width:var(--maxw);margin:0 auto;padding:96px 32px">
+      <p style="font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:14px">Who it's for</p>
+      <h2 style="font-family:var(--serif);font-weight:300;font-size:clamp(34px,4.4vw,52px);line-height:1.03;letter-spacing:-.025em;color:var(--ink-hi);max-width:22ch;margin-bottom:22px">Built for teams shipping faster than security can keep up.</h2>
+      <p style="font-size:16px;color:var(--ink-soft);max-width:60ch;line-height:1.6;border-left:2px solid var(--accent-line);padding-left:18px;margin-bottom:44px">If a broken permission check would cost you a customer, a contract, or a headline, this is built for you.</p>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px">
+        <div style="border:1px solid var(--line);border-radius:13px;background:var(--panel);padding:22px 20px">
+          <h3 style="font-size:16.5px;color:var(--ink-hi);margin-bottom:8px;font-weight:500">Multiple tenants or roles</h3>
+          <p style="font-size:14px;color:var(--ink-soft);line-height:1.5">One user's data must never cross into another user's access.</p>
+        </div>
+        <div style="border:1px solid var(--line);border-radius:13px;background:var(--panel);padding:22px 20px">
+          <h3 style="font-size:16.5px;color:var(--ink-hi);margin-bottom:8px;font-weight:500">Complex authorization</h3>
+          <p style="font-size:14px;color:var(--ink-soft);line-height:1.5">Roles, permissions, and approval flows where the rules carry real consequences.</p>
+        </div>
+        <div style="border:1px solid var(--line);border-radius:13px;background:var(--panel);padding:22px 20px">
+          <h3 style="font-size:16.5px;color:var(--ink-hi);margin-bottom:8px;font-weight:500">Money and state changes</h3>
+          <p style="font-size:14px;color:var(--ink-soft);line-height:1.5">Refunds, discounts, quotas, and workflow states worth bending past the rules.</p>
+        </div>
+        <div style="border:1px solid var(--line);border-radius:13px;background:var(--panel);padding:22px 20px">
+          <h3 style="font-size:16.5px;color:var(--ink-hi);margin-bottom:8px;font-weight:500">Heavy on APIs, shipping fast</h3>
+          <p style="font-size:14px;color:var(--ink-soft);line-height:1.5">New endpoints every week, faster than a manual review cycle can keep up with.</p>
+        </div>
+        <div style="border:1px solid var(--line);border-radius:13px;background:var(--panel);padding:22px 20px">
+          <h3 style="font-size:16.5px;color:var(--ink-hi);margin-bottom:8px;font-weight:500">No offensive team of your own</h3>
+          <p style="font-size:14px;color:var(--ink-soft);line-height:1.5">You want this coverage without standing up a full offensive security function.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PROOF ===================== -->
+  <!-- ===================== PRODUCT EXPERIENCE ===================== -->
+  <section id="product" class="product-experience">
+    <div class="px-wrap">
+      <div class="px-heading">
+        <div>
+          <p class="px-eyebrow">Inside the product</p>
+          <h2>Complex research.<br><em>Radical clarity.</em></h2>
+        </div>
+        <p>UnboundCompute does the offensive-security work underneath, then gives whoever owns the problem a clear account of what happened, how it knows, and what to do next.</p>
+      </div>
+
+      <div class="px-console" data-px-console>
+        <div class="px-topbar">
+          <div class="px-brand"><span class="px-mark"><i></i></span>UnboundCompute <small>/ console</small></div>
+          <div class="px-location">NORTHSTAR / <b data-px-location>BRIEFING</b></div>
+          <div class="px-actions"><span>Menu</span><span>Ask</span><strong>New research</strong></div>
+        </div>
+
+        <div class="px-body">
+          <div class="px-index" role="tablist" aria-label="Product experience">
+            <button class="on" data-px-tab="briefing"><span>01</span><b>Briefing</b><small>What needs your attention</small></button>
+            <button data-px-tab="research"><span>02</span><b>Investigation</b><small>Watch understanding form</small></button>
+            <button data-px-tab="proof"><span>03</span><b>Proof</b><small>See exactly how it knows</small></button>
+            <button data-px-tab="verify"><span>04</span><b>Verification</b><small>Replay the path after a fix</small></button>
+          </div>
+
+          <div class="px-stage">
+            <div class="px-view on" data-px-view="briefing">
+              <p class="px-state coral">Needs your attention</p>
+              <h3>A normal member downloaded another company&rsquo;s invoice.</h3>
+              <p class="px-copy">Customer billing data crossed between two companies. The behavior was reproduced with two separate member accounts.</p>
+              <div class="px-meta"><span><b>01</b> proven path</span><span><b>02</b> reproductions</span><span><b>18</b> evidence objects</span></div>
+              <div class="px-row"><span>What should happen</span><b>Members see only their company&rsquo;s invoices.</b></div>
+              <div class="px-row"><span>What happened</span><b class="coral">Another company&rsquo;s invoice was returned.</b></div>
+            </div>
+
+            <div class="px-view" data-px-view="research">
+              <div class="px-research-head"><div><p class="px-state neutral">Independent reproduction</p><h3>Invitation and team-role workflows</h3></div><span class="px-live">researching now</span></div>
+              <div class="px-map">
+                <div class="px-node n1"><small>Identity</small><b>Normal member</b></div>
+                <div class="px-node n2"><small>Workflow</small><b>Team invitations</b></div>
+                <div class="px-node n3"><small>Hypothesis</small><b>Reuse invitation</b></div>
+                <div class="px-node n4"><small>Observed</small><b>Second account accepted</b></div>
+                <i class="px-line l1"></i><i class="px-line l2"></i><i class="px-line l3"></i>
+                <span class="px-signal">research attention</span>
+              </div>
+              <div class="px-timeline"><span class="done">Understand</span><span class="done">Baseline</span><span class="done">Observe</span><span class="now">Reproduce</span><span>Prove</span></div>
+            </div>
+
+            <div class="px-view" data-px-view="proof">
+              <p class="px-state coral">Proven / reproduced &times;2</p>
+              <h3>One claim, every layer of proof attached.</h3>
+              <div class="px-proof-grid"><div><small>Baseline</small><b>Own invoice</b><strong>200</strong></div><div><small>Changed condition</small><b>Another company&rsquo;s invoice</b><strong class="coral">200</strong></div><div><small>Negative control</small><b>Signed out</b><strong>401</strong></div></div>
+              <pre><span>GET</span> /api/v2/invoices/inv_209/export
+Authorization: Bearer [member_identity]
+X-Workspace-ID: ws_acme
+
+HTTP/2 <em>200 OK</em>
+organization: <mark>Northstar Labs</mark></pre>
+            </div>
+
+            <div class="px-view" data-px-view="verify">
+              <p class="px-state safe">Verified closed</p>
+              <h3>The repaired boundary held.</h3>
+              <p class="px-copy">UnboundCompute replayed the same identity, action, and foreign invoice reference used in the original proof.</p>
+              <div class="px-verify"><span>Normal member</span><i></i><span>Download invoice</span><i></i><strong>Access refused</strong></div>
+              <div class="px-result"><span>Original result</span><b class="coral">200 / data returned</b><span>After fix</span><b class="safe">404 / boundary held</b></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="px-assurance">
+        <div><span>Tested and held</span><b>Project ownership</b></div>
+        <div><span>Proven harmful</span><b>Invoice ownership</b></div>
+        <div><span>Still unknown</span><b>Administrator role changes</b></div>
+        <p>It shows what it proved, what held, and what it could not test.</p>
+      </div>
+    </div>
+  </section>
+
   <!-- ===================== PROOF ===================== -->
   <section id="proof" style="border-top:1px solid var(--line)">
     <div style="max-width:var(--maxw);margin:0 auto;padding:96px 32px;display:grid;grid-template-columns:.92fr 1.08fr;gap:60px;align-items:center">
@@ -193,7 +311,7 @@
         <svg viewBox="0 0 12 12" style="position:absolute;left:-2px;top:-34px;width:11px;height:11px;color:var(--ink-faint)"><path d="M6 0V12M0 6H12" stroke="currentColor" stroke-width="1"/></svg>
         <p style="font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:24px">02 / Evidence</p>
         <h2 style="font-family:var(--serif);font-weight:300;font-size:clamp(38px,5vw,60px);line-height:1.0;letter-spacing:-.025em;color:var(--ink-hi);margin-bottom:22px">Every finding,<br><em style="font-style:italic;color:var(--accent)">proven.</em></h2>
-        <p style="font-size:17px;color:var(--ink-soft);line-height:1.6;max-width:42ch;margin-bottom:26px">No guessing at severity, no "likely exploitable." Each report is a recorded request, the response that should never have come back, and a replay your engineers can run themselves.</p>
+        <p style="font-size:17px;color:var(--ink-soft);line-height:1.6;max-width:42ch;margin-bottom:26px">No guessing at severity, no "likely exploitable." Suspicious behavior stays an observation until it is reproduced against a control. Each proven report includes the recorded request, the response that should never have come back, and a replay your engineers can run themselves.</p>
         <div style="display:flex;flex-direction:column;gap:14px;font-family:var(--mono);font-size:13px;color:var(--ink)">
           <div style="display:flex;gap:12px;align-items:baseline"><span style="color:var(--accent)">&rarr;</span> Recorded request and response, verbatim</div>
           <div style="display:flex;gap:12px;align-items:baseline"><span style="color:var(--accent)">&rarr;</span> Replayed against an authorized baseline</div>
@@ -206,7 +324,7 @@
         <div style="padding:18px 16px;font-family:var(--mono);font-size:12.5px;line-height:1.85;color:var(--ink)">
           <div style="color:var(--ink-faint)"># as another user, should be denied</div>
           <div><span style="color:var(--accent)">POST</span> /api/orders/4471/refund</div>
-          <div style="color:var(--ink-soft)">authorization: Bearer &lt;user-b&gt;</div>
+          <div style="color:var(--ink-soft)">authorization: Bearer &lt;user_b&gt;</div>
           <div style="height:10px"></div>
           <div style="color:var(--ink-faint)"># response</div>
           <div><span style="background:var(--accent);color:var(--on-accent);padding:1px 7px;border-radius:4px;font-weight:600">200 OK</span> &nbsp;refund issued &middot; $1,200.00</div>
@@ -224,7 +342,7 @@
         <svg viewBox="0 0 12 12" style="width:11px;height:11px;color:var(--ink-faint);margin-bottom:20px"><path d="M6 0V12M0 6H12" stroke="currentColor" stroke-width="1"/></svg>
         <p style="font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:20px">Proof in plain sight</p>
         <h2 style="font-family:var(--serif);font-weight:300;font-size:clamp(34px,4.4vw,52px);line-height:1.03;letter-spacing:-.025em;color:var(--ink-hi);margin-bottom:22px">Proof your whole<br>team can act on.</h2>
-        <p style="font-size:17px;color:var(--ink-soft);max-width:44ch;line-height:1.6;margin-bottom:24px">Every finding ships a plain-English read — what it is, what an attacker could do, and how to fix it — right next to the hard evidence. Your engineers get the exact request; everyone else gets the point.</p>
+        <p style="font-size:17px;color:var(--ink-soft);max-width:44ch;line-height:1.6;margin-bottom:24px">Every finding ships a plain English read, what it is, what an attacker could do, and how to fix it, right next to the hard evidence. Your engineers get the exact request, everyone else gets the point.</p>
         <div style="display:flex;gap:26px;font-family:var(--mono);font-size:11.5px;color:var(--ink-faint);letter-spacing:.04em;border-top:1px solid var(--line-2);padding-top:18px;flex-wrap:wrap">
           <span><span style="color:var(--ink-soft)">read by</span> &nbsp;engineers &amp; PMs</span>
           <span><span style="color:var(--ink-soft)">export</span> &nbsp;PoC &middot; ticket &middot; report</span>
@@ -233,7 +351,7 @@
       <!-- plain-english card -->
       <div style="border:1px solid rgba(251,91,70,.28);background:rgba(251,91,70,.07);border-radius:16px;padding:26px 28px;box-shadow:0 40px 100px -50px rgba(0,0,0,.9)">
         <p style="font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-2);margin-bottom:14px">In plain English</p>
-        <p style="font-family:var(--serif);font-size:21px;line-height:1.36;color:var(--ink-hi);margin-bottom:22px">A logged-in user can open another customer&rsquo;s project just by changing an ID in the address.</p>
+        <p style="font-family:var(--serif);font-size:21px;line-height:1.36;color:var(--ink-hi);margin-bottom:22px">A logged in user could open another customer&rsquo;s project that should have been off limits to them.</p>
         <div style="display:grid;gap:15px">
           <div style="display:flex;gap:12px"><span style="color:var(--accent);font-family:var(--mono)">&rarr;</span><div><div style="font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-faint);margin-bottom:3px">What could happen</div><div style="font-size:14px;color:var(--ink)">An attacker could read other tenants&rsquo; private projects and data.</div></div></div>
           <div style="display:flex;gap:12px"><span style="color:#76c79b;font-family:var(--mono)">&rarr;</span><div><div style="font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-faint);margin-bottom:3px">How to fix it</div><div style="font-size:14px;color:var(--ink)">Check on every request that the user owns the record they ask for.</div></div></div>
@@ -250,38 +368,68 @@
           <p style="font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:14px">03 / What it crosses</p>
           <h2 style="font-family:var(--serif);font-weight:300;font-size:clamp(34px,4.4vw,52px);line-height:1.03;letter-spacing:-.025em;color:var(--ink-hi);max-width:20ch">The boundaries a checklist walks past.</h2>
         </div>
-        <p style="font-family:var(--mono);font-size:12px;color:var(--ink-faint);max-width:26ch;line-height:1.6;text-align:right">Six classes it reasons through, not a signature it matches.</p>
+        <p style="font-family:var(--mono);font-size:12px;color:var(--ink-faint);max-width:31ch;line-height:1.6;text-align:right">It models identities, objects, workflows and trust relationships. These are boundaries, not a closed vulnerability checklist.</p>
       </div>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px">
         <div style="border:1px solid var(--line);border-radius:13px;background:var(--panel);padding:22px 20px;transition:border-color .18s,transform .18s" style-hover="border-color:var(--accent-line);transform:translateY(-3px)">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px"><span style="font-family:var(--mono);font-size:11.5px;color:var(--accent);letter-spacing:.06em">A01</span><span style="position:relative;display:inline-block;width:40px;height:22px"><span style="position:absolute;left:50%;top:0;bottom:0;width:1.5px;transform:translateX(-50%);background-image:repeating-linear-gradient(var(--accent) 0 4px,transparent 4px 8px);opacity:.8"></span><span style="position:absolute;top:50%;left:74%;width:8px;height:8px;border-radius:50%;transform:translate(-50%,-50%);background:var(--accent);box-shadow:0 0 0 3px var(--accent-wash)"></span></span></div>
-          <h3 style="font-size:17.5px;color:var(--ink-hi);margin-bottom:8px;font-weight:500">Broken access control</h3>
-          <p style="font-size:14px;color:var(--ink-soft);line-height:1.5">Acting as another tenant, owner, or role, and getting a 200 that proves it.</p>
+          <h3 style="font-size:17.5px;color:var(--ink-hi);margin-bottom:8px;font-weight:500">Identity and tenant boundaries</h3>
+          <p style="font-size:14px;color:var(--ink-soft);line-height:1.5">Testing what changes when the same action is performed as another tenant, member, owner, or role.</p>
         </div>
         <div style="border:1px solid var(--line);border-radius:13px;background:var(--panel);padding:22px 20px;transition:border-color .18s,transform .18s" style-hover="border-color:var(--accent-line);transform:translateY(-3px)">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px"><span style="font-family:var(--mono);font-size:11.5px;color:var(--accent);letter-spacing:.06em">A02</span><span style="position:relative;display:inline-block;width:40px;height:22px"><span style="position:absolute;left:50%;top:0;bottom:0;width:1.5px;transform:translateX(-50%);background-image:repeating-linear-gradient(var(--accent) 0 4px,transparent 4px 8px);opacity:.8"></span><span style="position:absolute;top:50%;left:74%;width:8px;height:8px;border-radius:50%;transform:translate(-50%,-50%);background:var(--accent);box-shadow:0 0 0 3px var(--accent-wash)"></span></span></div>
-          <h3 style="font-size:17.5px;color:var(--ink-hi);margin-bottom:8px;font-weight:500">Insecure object references</h3>
-          <p style="font-size:14px;color:var(--ink-soft);line-height:1.5">Walking identifiers to read or mutate records that belong to someone else.</p>
+          <h3 style="font-size:17.5px;color:var(--ink-hi);margin-bottom:8px;font-weight:500">Object ownership</h3>
+          <p style="font-size:14px;color:var(--ink-soft);line-height:1.5">Following identifiers and relationships to learn whether records remain bound to the people and companies that own them.</p>
         </div>
         <div style="border:1px solid var(--line);border-radius:13px;background:var(--panel);padding:22px 20px;transition:border-color .18s,transform .18s" style-hover="border-color:var(--accent-line);transform:translateY(-3px)">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px"><span style="font-family:var(--mono);font-size:11.5px;color:var(--accent);letter-spacing:.06em">A03</span><span style="position:relative;display:inline-block;width:40px;height:22px"><span style="position:absolute;left:50%;top:0;bottom:0;width:1.5px;transform:translateX(-50%);background-image:repeating-linear-gradient(var(--accent) 0 4px,transparent 4px 8px);opacity:.8"></span><span style="position:absolute;top:50%;left:74%;width:8px;height:8px;border-radius:50%;transform:translate(-50%,-50%);background:var(--accent);box-shadow:0 0 0 3px var(--accent-wash)"></span></span></div>
-          <h3 style="font-size:17.5px;color:var(--ink-hi);margin-bottom:8px;font-weight:500">Business logic abuse</h3>
-          <p style="font-size:14px;color:var(--ink-soft);line-height:1.5">Refunds, discounts, quotas and workflows bent past what the rules intend.</p>
+          <h3 style="font-size:17.5px;color:var(--ink-hi);margin-bottom:8px;font-weight:500">Workflow and state boundaries</h3>
+          <p style="font-size:14px;color:var(--ink-soft);line-height:1.5">Refunds, approvals, discounts, quotas and state transitions bent past what the product rules intend.</p>
         </div>
         <div style="border:1px solid var(--line);border-radius:13px;background:var(--panel);padding:22px 20px;transition:border-color .18s,transform .18s" style-hover="border-color:var(--accent-line);transform:translateY(-3px)">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px"><span style="font-family:var(--mono);font-size:11.5px;color:var(--accent);letter-spacing:.06em">A04</span><span style="position:relative;display:inline-block;width:40px;height:22px"><span style="position:absolute;left:50%;top:0;bottom:0;width:1.5px;transform:translateX(-50%);background-image:repeating-linear-gradient(var(--accent) 0 4px,transparent 4px 8px);opacity:.8"></span><span style="position:absolute;top:50%;left:74%;width:8px;height:8px;border-radius:50%;transform:translate(-50%,-50%);background:var(--accent);box-shadow:0 0 0 3px var(--accent-wash)"></span></span></div>
-          <h3 style="font-size:17.5px;color:var(--ink-hi);margin-bottom:8px;font-weight:500">Auth and session bypass</h3>
-          <p style="font-size:14px;color:var(--ink-soft);line-height:1.5">Privilege escalation, token confusion, and flows that forget to check again.</p>
+          <h3 style="font-size:17.5px;color:var(--ink-hi);margin-bottom:8px;font-weight:500">Role and permission transitions</h3>
+          <p style="font-size:14px;color:var(--ink-soft);line-height:1.5">Sessions, tokens and role changes that let a low-trust caller reach actions reserved for someone else.</p>
         </div>
         <div style="border:1px solid var(--line);border-radius:13px;background:var(--panel);padding:22px 20px;transition:border-color .18s,transform .18s" style-hover="border-color:var(--accent-line);transform:translateY(-3px)">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px"><span style="font-family:var(--mono);font-size:11.5px;color:var(--accent);letter-spacing:.06em">A05</span><span style="position:relative;display:inline-block;width:40px;height:22px"><span style="position:absolute;left:50%;top:0;bottom:0;width:1.5px;transform:translateX(-50%);background-image:repeating-linear-gradient(var(--accent) 0 4px,transparent 4px 8px);opacity:.8"></span><span style="position:absolute;top:50%;left:74%;width:8px;height:8px;border-radius:50%;transform:translate(-50%,-50%);background:var(--accent);box-shadow:0 0 0 3px var(--accent-wash)"></span></span></div>
-          <h3 style="font-size:17.5px;color:var(--ink-hi);margin-bottom:8px;font-weight:500">Server side request forgery</h3>
-          <p style="font-size:14px;color:var(--ink-soft);line-height:1.5">Coaxing the backend into reaching places the boundary assumed it could not.</p>
+          <h3 style="font-size:17.5px;color:var(--ink-hi);margin-bottom:8px;font-weight:500">Service and network trust</h3>
+          <p style="font-size:14px;color:var(--ink-soft);line-height:1.5">Following backend calls, integrations and trusted services into places the application assumed a user could not reach.</p>
         </div>
         <div style="border:1px solid var(--line);border-radius:13px;background:var(--panel);padding:22px 20px;transition:border-color .18s,transform .18s" style-hover="border-color:var(--accent-line);transform:translateY(-3px)">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px"><span style="font-family:var(--mono);font-size:11.5px;color:var(--accent);letter-spacing:.06em">A06</span><span style="position:relative;display:inline-block;width:40px;height:22px"><span style="position:absolute;left:50%;top:0;bottom:0;width:1.5px;transform:translateX(-50%);background-image:repeating-linear-gradient(var(--accent) 0 4px,transparent 4px 8px);opacity:.8"></span><span style="position:absolute;top:50%;left:74%;width:8px;height:8px;border-radius:50%;transform:translate(-50%,-50%);background:var(--accent);box-shadow:0 0 0 3px var(--accent-wash)"></span></span></div>
-          <h3 style="font-size:17.5px;color:var(--ink-hi);margin-bottom:8px;font-weight:500">Privilege escalation</h3>
-          <p style="font-size:14px;color:var(--ink-soft);line-height:1.5">Climbing from a low-trust caller to actions only an admin should reach.</p>
+          <h3 style="font-size:17.5px;color:var(--ink-hi);margin-bottom:8px;font-weight:500">Chained impact</h3>
+          <p style="font-size:14px;color:var(--ink-soft);line-height:1.5">Using one proven foothold to reach the next boundary, then preserving the complete path from entry to impact.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== OPERATION ===================== -->
+  <section style="border-top:1px solid var(--line-2)">
+    <div style="max-width:var(--maxw);margin:0 auto;padding:96px 32px">
+      <div style="display:grid;grid-template-columns:.92fr 1.08fr;gap:64px;align-items:end;margin-bottom:44px">
+        <div>
+          <p style="font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:14px">How it operates</p>
+          <h2 style="font-family:var(--serif);font-weight:300;font-size:clamp(34px,4.4vw,52px);line-height:1.03;letter-spacing:-.025em;color:var(--ink-hi);max-width:19ch">Deep research, inside boundaries you control.</h2>
+        </div>
+        <p style="font-size:17px;color:var(--ink-soft);line-height:1.6;max-width:48ch">You define the environment, scope and test identities. UnboundCompute keeps the difference between observed, proven, blocked and untested visible throughout the research.</p>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px">
+        <div style="border-top:1px solid var(--accent-line);padding:22px 4px 0">
+          <p style="font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);margin-bottom:12px">01 / Scope</p>
+          <h3 style="font-size:17px;color:var(--ink-hi);margin-bottom:8px;font-weight:500">Start with an environment and identities</h3>
+          <p style="font-size:14px;color:var(--ink-soft);line-height:1.55">Connect a staging application, choose what is in scope, and provide the roles needed to exercise real workflows.</p>
+        </div>
+        <div style="border-top:1px solid var(--accent-line);padding:22px 4px 0">
+          <p style="font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);margin-bottom:12px">02 / Control</p>
+          <h3 style="font-size:17px;color:var(--ink-hi);margin-bottom:8px;font-weight:500">Research stays attributable</h3>
+          <p style="font-size:14px;color:var(--ink-soft);line-height:1.55">Requests, identities, baselines and controls remain attached to the investigation, including paths it could not exercise.</p>
+        </div>
+        <div style="border-top:1px solid var(--accent-line);padding:22px 4px 0">
+          <p style="font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);margin-bottom:12px">03 / Handoff</p>
+          <h3 style="font-size:17px;color:var(--ink-hi);margin-bottom:8px;font-weight:500">Proof remains useful after the run</h3>
+          <p style="font-size:14px;color:var(--ink-soft);line-height:1.55">Export the evidence and replay the same identity, action and boundary after the fix to verify that it now holds.</p>
         </div>
       </div>
     </div>
@@ -291,7 +439,7 @@
   <section style="border-top:1px solid var(--line)">
     <div style="max-width:var(--maxw);margin:0 auto;padding:100px 32px">
       <p style="font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:14px">04 / Why it's different</p>
-      <h2 style="font-family:var(--serif);font-weight:300;font-size:clamp(40px,6vw,76px);line-height:.98;letter-spacing:-.03em;color:var(--ink-hi);margin-bottom:54px">Differentiation</h2>
+      <h2 style="font-family:var(--serif);font-weight:300;font-size:clamp(40px,6vw,76px);line-height:.98;letter-spacing:-.03em;color:var(--ink-hi);margin-bottom:54px">A different kind of result.</h2>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:1px solid var(--line)">
         <div style="padding:30px 26px 30px 0;border-right:1px solid var(--line)">
           <p style="font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-faint);margin-bottom:18px">Scanners</p>
@@ -303,7 +451,7 @@
         </div>
         <div style="padding:30px 0 30px 26px;background:linear-gradient(180deg,var(--accent-wash),transparent 64%)">
           <p style="font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);margin-bottom:18px">UnboundCompute</p>
-          <p style="font-size:16px;color:var(--ink-hi);line-height:1.55">Reasons about your app continuously, crosses only the boundaries that should hold, and proves each one with replayable evidence.</p>
+          <p style="font-size:16px;color:var(--ink-hi);line-height:1.55">Builds an application-specific model of identities, objects, workflows and trust. It explores unexpected transitions, reproduces what succeeds against controls, and preserves the path for replay.</p>
         </div>
       </div>
     </div>
@@ -314,12 +462,13 @@
     <div style="max-width:var(--maxw);margin:0 auto;padding:110px 32px;text-align:center;position:relative">
       <div style="position:absolute;left:50%;top:0;bottom:0;width:2px;transform:translateX(-50%);background-image:repeating-linear-gradient(var(--accent) 0 6px,transparent 6px 13px);opacity:.5"></div>
       <div style="position:relative">
-        <p style="font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:26px">Request access</p>
+        <p style="font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:26px">Design partner program</p>
         <h2 style="font-family:var(--serif);font-weight:300;font-size:clamp(40px,6vw,74px);line-height:.98;letter-spacing:-.03em;color:var(--ink-hi);margin-bottom:24px">Find the line.<br>Then watch it <em style="font-style:italic;color:var(--accent)">cross.</em></h2>
-        <p style="font-size:18px;color:var(--ink-soft);max-width:46ch;margin:0 auto 34px;line-height:1.55">UnboundCompute is in private access. Point it at a staging environment and see what it proves before your next release does.</p>
+        <p style="font-size:18px;color:var(--ink-soft);max-width:48ch;margin:0 auto 22px;line-height:1.55">UnboundCompute is in private access. Point it at a staging environment and see what it proves before your next release does.</p>
+        <p style="font-family:var(--mono);font-size:11.5px;color:var(--ink-faint);letter-spacing:.03em;margin:0 auto 34px">you control the scope &middot; blocked coverage stays visible &middot; evidence is replayable</p>
         <form id="waitlist-form" novalidate>
           <input id="wl-email" type="email" name="email" required placeholder="you@company.com" aria-label="Your work email" autocomplete="email">
-          <button id="wl-submit" type="submit">Request access</button>
+          <button id="wl-submit" type="submit">Become a design partner</button>
         </form>
         <p id="wl-msg" role="status" aria-live="polite"></p>
         <p style="margin-top:24px;font-family:var(--mono);font-size:12px;letter-spacing:.04em;color:var(--ink-faint)">or <a href="demo/" style="color:var(--ink-soft);border-bottom:1px solid var(--line)" style-hover="color:var(--ink)">explore the console demo</a> with sample data</p>
@@ -328,25 +477,26 @@
   </section>
 
   <!-- ===================== FOOTER ===================== -->
-  <footer style="border-top:1px solid var(--line);position:relative;overflow:hidden">
-    <div class="uc-word-wrap" aria-hidden="true"><span class="uc-word"><span class="b">Unbound</span>Compute<span class="d">.</span></span></div>
-    <div style="position:relative;z-index:1;max-width:var(--maxw);margin:0 auto;padding:56px 32px 34px;display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px;border-bottom:1px solid var(--line-2)">
+  <footer class="site-footer" style="position:relative;overflow:hidden">
+    <div class="footer-links" style="position:relative;z-index:1;max-width:var(--maxw);margin:0 auto;padding:56px 32px 34px;display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px">
       <div>
         <a href="#top" style="display:flex;align-items:center;gap:11px;font-family:var(--mono);font-weight:600;font-size:15px;margin-bottom:14px">
           <span style="width:27px;height:27px;border-radius:7px;border:1px solid var(--accent-line);display:grid;place-items:center"><svg viewBox="0 0 24 24" fill="none" style="width:15px;height:15px"><line x1="12" y1="3" x2="12" y2="21" stroke="var(--accent)" stroke-width="1.8" stroke-dasharray="2.6 2.6"/><circle cx="12" cy="12" r="3" fill="var(--accent)"/></svg></span>UnboundCompute</a>
         <p style="font-size:13px;color:var(--ink-faint);line-height:1.6;max-width:30ch">An autonomous security researcher that finds the line, crosses it, and proves it.</p>
       </div>
-      <div style="display:flex;flex-direction:column;gap:11px;font-size:13.5px;color:var(--ink-soft)"><span style="font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-faint);margin-bottom:5px">Product</span><a href="#proof" style-hover="color:var(--ink)">Proof</a><a href="#capabilities" style-hover="color:var(--ink)">Capabilities</a><a href="design-partners.html" style-hover="color:var(--ink)">Design partners</a><a href="tools/" style-hover="color:var(--ink)">Tools</a><a href="#cta" style-hover="color:var(--ink)">Request access</a></div>
-      <div style="display:flex;flex-direction:column;gap:11px;font-size:13.5px;color:var(--ink-soft)"><span style="font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-faint);margin-bottom:5px">Company</span><a href="about.html" style-hover="color:var(--ink)">About</a><a href="research.html" style-hover="color:var(--ink)">Research</a><a href="careers.html" style-hover="color:var(--ink)">Careers</a></div>
+      <div style="display:flex;flex-direction:column;gap:11px;font-size:13.5px;color:var(--ink-soft)"><span style="font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-faint);margin-bottom:5px">Product</span><a href="#proof" style-hover="color:var(--ink)">Proof</a><a href="#capabilities" style-hover="color:var(--ink)">Capabilities</a><a href="design-partners.html" style-hover="color:var(--ink)">Design partners</a><a href="tools/" style-hover="color:var(--ink)">Tools</a><a href="#cta" style-hover="color:var(--ink)">Become a design partner</a></div>
+      <div style="display:flex;flex-direction:column;gap:11px;font-size:13.5px;color:var(--ink-soft)"><span style="font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-faint);margin-bottom:5px">Company</span><a href="about.html" style-hover="color:var(--ink)">About</a><a href="research.html" style-hover="color:var(--ink)">Research</a><a href="careers.html" style-hover="color:var(--ink)">Careers</a><a href="https://linkedin.com/company/unboundcomputes" style-hover="color:var(--ink)">LinkedIn</a></div>
       <div style="display:flex;flex-direction:column;gap:11px;font-size:13.5px;color:var(--ink-soft)"><span style="font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-faint);margin-bottom:5px">Legal</span><a href="trust.html" style-hover="color:var(--ink)">Trust center</a><a href="privacy.html" style-hover="color:var(--ink)">Privacy</a><a href="terms.html" style-hover="color:var(--ink)">Terms</a></div>
     </div>
-    <div style="position:relative;z-index:1;max-width:var(--maxw);margin:0 auto;padding:22px 32px 104px;display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--ink-faint);flex-wrap:wrap;gap:10px">
+    <div class="footer-meta" style="position:relative;z-index:1;max-width:var(--maxw);margin:0 auto;padding:22px 32px 28px;display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--ink-faint);flex-wrap:wrap;gap:10px">
       <span>&copy; 2026 UnboundCompute</span><span>the boundary held, until it didn't</span>
     </div>
+    <div class="uc-word-wrap footer-word" aria-hidden="true"><span class="uc-word"><span class="b">Unbound</span>Compute<span class="d">.</span></span></div>
   </footer>
   </div>
 </div>
 
+<script src="lp-product-experience.js" defer></script>
 <!-- hover handler (replaces the design framework's style-hover) -->
 <script>
   (function(){
