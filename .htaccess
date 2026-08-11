@@ -31,3 +31,13 @@
   # /tools/ run entirely in the browser and rely on inline script, so a strict CSP
   # would break them. The existing upgrade-insecure-requests policy stays as is.
 </IfModule>
+
+# Canonical host. www.unboundcompute.com serves the same content as the apex,
+# which splits ranking signals across two URLs for every page. Redirect www to
+# the apex with a permanent 301 so crawlers consolidate on one canonical host.
+# Added 2026-08-11 (visibility audit item 9).
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{HTTP_HOST} ^www\.unboundcompute\.com$ [NC]
+  RewriteRule ^(.*)$ https://unboundcompute.com/$1 [R=301,L]
+</IfModule>
