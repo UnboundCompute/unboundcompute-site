@@ -60,5 +60,5 @@ The tools are free to use, but this repository is published for transparency rat
 The site content, copy, brand assets, and logos are all rights reserved. If you want to reuse
 something here, open an issue and ask.
 
-Our open source work lives in [Arachne](https://github.com/UnboundCompute/arachne), released
+Our open source work lives in [Lachesis](https://github.com/UnboundCompute/lachesis), released
 under AGPL 3.0.
