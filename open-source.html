@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Open source | UnboundCompute</title>
-<meta name="description" content="The open source projects behind UnboundCompute: Lachesis, Atropos, and Countermand. The code property graph, taint model, and agent firewall we build our autonomous security researcher on, out in the open on GitHub.">
+<meta name="description" content="Lachesis and Atropos: the open code property graph and taint model anyone can build on, and the open foundation under UnboundCompute's autonomous security researcher. Plus Countermand, our open action firewall for AI agents, and security-agent-skills, our security-testing method as portable agent skills. All on GitHub.">
 <meta name="theme-color" content="#0a0a0b">
 <link rel="canonical" href="https://unboundcompute.com/open-source.html">
 <link rel="icon" href="/favicon.ico" sizes="any">
@@ -12,7 +12,7 @@
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Open source | UnboundCompute">
-<meta property="og:description" content="Lachesis, Atropos, and Countermand. The code property graph, taint model, and agent firewall we build in the open.">
+<meta property="og:description" content="Lachesis and Atropos: the open code graph and taint model we build on and give away. Plus Countermand, our open agent firewall. Built in the open on GitHub.">
 <meta property="og:url" content="https://unboundcompute.com/open-source.html">
 <meta property="og:image" content="https://unboundcompute.com/og.png">
 <meta name="twitter:card" content="summary_large_image">
@@ -75,6 +75,10 @@
   .step p{margin:0;font-size:15.5px;color:var(--ink-soft)}
 
   .rule{height:1px;background:var(--line);margin:56px 0 44px}
+  .also-open{font-family:var(--mono);font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-faint);margin:20px 2px 2px}
+  .quickstart{margin:34px 0 4px}
+  .qs-pre{font-family:var(--mono);font-size:12.5px;line-height:1.8;color:var(--ink);background:var(--bg-2);border:1px solid var(--line);border-radius:13px;padding:22px 24px;overflow-x:auto;margin:0;white-space:pre}
+  .qs-c{color:var(--ink-faint)}
   .soon{margin-top:44px;border:1px dashed var(--line);border-radius:13px;background:var(--panel);padding:30px 28px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap}
   .soon p{margin:0;max-width:44ch}
   .cta-link{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:13px 22px;border-radius:9px;background:var(--accent);color:var(--on-accent);white-space:nowrap}
@@ -143,12 +147,12 @@
   <header class="head"><div class="wrap">
     <p class="eyebrow">Company / Open source</p>
     <h1>Built in the <em>open.</em></h1>
-    <p class="lede">Our whole approach rests on proof you can check for yourself. A system that reasons about your code should be one you can read, so we build its core pieces in the open. The graph, the knowledge model, and the firewall that governs our agents all live on <a href="https://github.com/UnboundCompute" rel="me">GitHub</a>.</p>
+    <p class="lede">The foundation our researcher reads code with is open, and you can use it too. Lachesis, the code graph, and Atropos, the taint model, are free to build on, the same reader that powers our hosted product. What we offer commercially is the layer on top: the orchestration, judgment, and scale that turn the graph into proven findings. It all lives on <a href="https://github.com/UnboundCompute" rel="me">GitHub</a>.</p>
   </div></header>
 
   <main class="body"><div class="wrap">
     <h2>The projects</h2>
-    <p class="section-note">The loop the researcher runs, understand the code, know what is dangerous, act without doing harm, is split into three projects. Each one stands on its own, and each one is public.</p>
+    <p class="section-note">Two projects make up the open foundation: <b>Lachesis</b> reads the code, <b>Atropos</b> says what is dangerous. Each stands on its own, and each is public. A third project, Countermand, is separate, also open, but a different tool for a different job.</p>
 
     <div class="repos">
 
@@ -157,7 +161,7 @@
           <span class="name"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>lachesis</span>
           <span class="arrow">View on GitHub &rarr;</span>
         </div>
-        <p class="desc">A compiler-precise code property graph for reasoning about source the way an attacker reads it. It is how the researcher understands a codebase without losing a caller to a rename or an import indirection, and it powers the <code>lachesis</code> MCP server we reach for every day.</p>
+        <p class="desc">A compiler-precise code property graph you can ask questions of: who calls this, what flows into this buffer, does this input reach that sink, which of two near-identical functions checks its input and which does not. It parses with real compilers, so it never loses a caller to a rename or an import indirection, and it serves the whole graph to an agent over the <code>lachesis</code> MCP server.</p>
         <div class="meta">
           <span class="lang"><span class="dot"></span>Python</span>
           <span class="lic">AGPL-3.0</span>
@@ -180,6 +184,8 @@
         <div class="tags"><span class="tag">taint-model</span><span class="tag">sources-sinks</span><span class="tag">sanitizers</span><span class="tag">static-analysis</span></div>
       </a>
 
+      <p class="also-open">Also open, separate projects</p>
+
       <a class="repo" href="https://github.com/UnboundCompute/countermand" target="_blank" rel="noopener">
         <div class="top">
           <span class="name"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>countermand</span>
@@ -194,6 +200,28 @@
         <div class="tags"><span class="tag">ai-security</span><span class="tag">agent-safety</span><span class="tag">policy-engine</span><span class="tag">mcp</span><span class="tag">claude-code</span></div>
       </a>
 
+      <a class="repo" href="https://github.com/UnboundCompute/security-agent-skills" target="_blank" rel="noopener">
+        <div class="top">
+          <span class="name"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>security-agent-skills</span>
+          <span class="arrow">View on GitHub &rarr;</span>
+        </div>
+        <p class="desc">Our security-testing method, written as portable agent skills: playbooks for white-box bug hunting, AI-agent and LLM red-teaming, cloud and CI/CD trust, supply-chain risk, and appsec depth. Each one encodes the judgment behind a real test, not a script, so it transfers to any agent runtime. Install the whole set as a Claude Code plugin, or read one <code>SKILL.md</code> and run the loop by hand.</p>
+        <div class="meta">
+          <span class="lang"><span class="dot"></span>Method</span>
+          <span class="lic">MIT</span>
+          <span>Agent skills &middot; Claude Code plugin</span>
+        </div>
+        <div class="tags"><span class="tag">agent-skills</span><span class="tag">red-team</span><span class="tag">llm-security</span><span class="tag">vulnerability-research</span><span class="tag">appsec</span><span class="tag">claude-code</span></div>
+      </a>
+
+    </div>
+
+    <div class="quickstart">
+      <p class="section-note" style="margin-bottom:14px">No install to wait on. Lachesis builds from a clone, then parses a tree into a graph and serves it to your agent over MCP. Full docs in the repo.</p>
+      <pre class="qs-pre">git clone https://github.com/UnboundCompute/lachesis &amp;&amp; cd lachesis
+pip install -e ".[dev]" &amp;&amp; npm install       <span class="qs-c"># build from source</span>
+lachesis-analyze ./my-project graph.kuzu     <span class="qs-c"># parse a tree into a graph</span>
+lachesis-mcp graph.kuzu                       <span class="qs-c"># hand it to your agent over MCP</span></pre>
     </div>
 
     <div class="rule"></div>

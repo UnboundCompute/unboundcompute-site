@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Research | UnboundCompute</title>
-<meta name="description" content="How UnboundCompute reasons about applications, designs crossings, and proves findings. Research notes and writing from the team.">
+<meta name="description" content="Research notes from UnboundCompute: how we build an autonomous security researcher that reads code and probes running apps, what worked, what failed, and how we hold every finding to proof.">
 <meta name="theme-color" content="#0a0a0b">
 <link rel="canonical" href="https://unboundcompute.com/research.html">
 <link rel="icon" href="/favicon.ico" sizes="any">
@@ -105,23 +105,29 @@
   <header class="head"><div class="wrap">
     <p class="eyebrow">Company / Research</p>
     <h1>Notes from the <em>boundary.</em></h1>
-    <p class="lede">How we get a machine to reason about an application instead of matching payloads, and how we hold it to proof. Deeper writing is on the way.</p>
+    <p class="lede">We are building an autonomous security researcher, and this is where we write down how it is going. The method it runs, the experiments behind it, what worked, what did not, and what each result changed. Honest notes from inside the build, not a launch feed.</p>
   </div></header>
 
   <main class="body"><div class="wrap">
     <h2>The method we automate</h2>
-    <p>UnboundCompute runs the loop a strong human tester uses, continuously and without supervision. Each step exists to turn an assumption about the application into a <em>provable</em> contradiction.</p>
+    <p>UnboundCompute runs the loop a strong human tester uses, continuously and without supervision. It reads your source and probes your running app, and each step exists to turn an assumption about the system into a <em>provable</em> contradiction.</p>
 
     <div class="steps">
-      <div class="step"><div class="k"><span class="num">01</span><span class="name">Understand</span></div><p>Explore the live application the way a person would: features, roles, objects, workflows, state, and the trust boundaries between them.</p></div>
+      <div class="step"><div class="k"><span class="num">01</span><span class="name">Understand</span></div><p>Read the source and explore the running app the way a person would: features, roles, objects, workflows, state, and the trust boundaries between them.</p></div>
       <div class="step"><div class="k"><span class="num">02</span><span class="name">Assume</span></div><p>For each feature, work out the rule the app is meant to enforce. Only the owner can refund. An invite works once. Each rule is a boundary to test.</p></div>
       <div class="step"><div class="k"><span class="num">03</span><span class="name">Experiment</span></div><p>Turn each assumption into the exact request that should be blocked, always measured against a normal, authorized baseline.</p></div>
       <div class="step"><div class="k"><span class="num">04</span><span class="name">Verify</span></div><p>Confirm a crossing with hard evidence, a real and repeatable difference between what should happen and what did. Otherwise, drop it.</p></div>
       <div class="step"><div class="k"><span class="num">05</span><span class="name">Chain</span></div><p>Feed every confirmed result into the next idea, following the thread the way an attacker would instead of stopping at the first crossing.</p></div>
     </div>
 
-    <h2>Writing, soon</h2>
-    <p>We are putting together longer pieces on reasoning about trust boundaries, designing crossings against a baseline, and turning findings into regression tests. We would rather publish something worth reading than something on a schedule.</p>
+    <h2>Research notes</h2>
+    <p>What we are actually learning while we build the researcher, including the parts that did not work. We would rather write down a result that surprised us than post on a schedule.</p>
+
+    <div class="steps">
+      <div class="step"><div class="k"><span class="num">01</span><span class="name">One analysis never covers it</span></div><p>We expected our dataflow and taint layer to carry most of memory-safety analysis. It does not. A whole class of bug, an integer that wraps and then narrows into a smaller signed type, is a <em>local</em> property: the dangerous value is computed and used inside one function, with nothing flowing in from outside. Taint, reachability, and points-to add nothing there. The lesson we keep relearning is that no single technique covers memory safety, and the honest move is to add a model for the class you are missing, not to stretch the one you have.</p></div>
+      <div class="step"><div class="k"><span class="num">02</span><span class="name">Proving code safe is a result</span></div><p>We optimize for precision, not coverage. A finding only ships with repeatable evidence, and anything ambiguous is suppressed with a written reason instead of surfaced as a maybe. Most of the engine's work is proving code <em>safe</em>, ruling out the cases that cannot matter so a person only ever looks at the few that can. Five findings you can ground beat a hundred you have to triage. A tool that cries wolf gets turned off in a week.</p></div>
+      <div class="step"><div class="k"><span class="num">03</span><span class="name">Measuring a finder is hard</span></div><p>How do you know the finder is any good? Re-finding a known bug proves little if you told it where to look. Name the function in the prompt and you have measured recall of a hint, not discovery. So we separate the two: rediscovery on public, already-fixed bugs to check the mechanism, and blind runs with no hints to measure real discovery. When a result is not clean, we say so. Most of what we learn comes from the runs that fail.</p></div>
+    </div>
 
     <div class="soon">
       <p>Want the first posts when they land? The fastest way in is the access list.</p>
