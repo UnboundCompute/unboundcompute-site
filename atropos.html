@@ -3,13 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>About | UnboundCompute</title>
-<meta name="description" content="UnboundCompute builds an autonomous security researcher that reasons about your application, crosses the boundaries that should hold, and proves every finding.">
+<title>Atropos &middot; taint-model knowledge base | UnboundCompute</title>
+<meta name="description" content="Atropos is a taint-model knowledge base: where untrusted data enters, where it must not land, and what makes it safe again. Pure validated JSON, over 1,000 verified facts across C, Python, JavaScript and TypeScript. Models CC BY 4.0, tooling MIT.">
 <meta name="theme-color" content="#0a0a0b">
-<link rel="canonical" href="https://unboundcompute.com/about.html">
+<link rel="canonical" href="https://unboundcompute.com/atropos.html">
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Atropos &middot; taint-model knowledge base | UnboundCompute">
+<meta property="og:description" content="A taint-model knowledge base: sources, sinks, sanitizers and flow summaries as pure validated JSON. Over 1,000 verified facts across four languages.">
+<meta property="og:url" content="https://unboundcompute.com/atropos.html">
+<meta property="og:image" content="https://unboundcompute.com/og.png">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600&family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,300;1,6..72,400&display=swap" rel="stylesheet">
@@ -31,40 +37,51 @@
   .eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:24px}
   h1{font-family:var(--serif);font-weight:300;font-size:clamp(40px,6vw,66px);line-height:1.0;letter-spacing:-.03em;color:var(--ink-hi)}
   h1 em{font-style:italic;color:var(--accent)}
-  .lede{font-size:19px;color:var(--ink-soft);max-width:54ch;margin-top:26px;line-height:1.55}
+  .lede{font-size:19px;color:var(--ink-soft);max-width:60ch;margin-top:26px;line-height:1.55}
+  .lede a{color:var(--ink);border-bottom:1px solid var(--accent-line);transition:border-color .15s}
+  .lede a:hover{border-color:var(--accent)}
   .body{padding:64px 0 96px}
-  .body h2{font-family:var(--serif);font-weight:400;font-size:28px;letter-spacing:-.015em;color:var(--ink-hi);margin:48px 0 16px}
-  .body h2:first-child{margin-top:0}
+  .body h2{font-family:var(--serif);font-weight:400;font-size:28px;letter-spacing:-.015em;color:var(--ink-hi);margin:0 0 8px}
   .body p{font-size:17px;color:var(--ink-soft);max-width:64ch;margin-bottom:18px}
-  .body p b,.body p strong{color:var(--ink);font-weight:600}
+  .body p b{color:var(--ink);font-weight:600}
   .body em{font-style:normal;color:var(--accent)}
-  .grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin:30px 0}
+  .body code{font-family:var(--mono);font-size:.86em;color:var(--ink);background:var(--accent-wash);border-radius:5px;padding:1px 6px}
+  .section-note{font-size:16px;color:var(--ink-soft);max-width:60ch;margin:0 0 24px}
+
+  /* hero fact badges + CTAs */
+  .facts{display:flex;flex-wrap:wrap;gap:9px;margin:28px 0 0}
+  .badge{font-family:var(--mono);font-size:11px;letter-spacing:.03em;color:var(--ink-soft);border:1px solid var(--line);border-radius:20px;padding:5px 12px;display:inline-flex;align-items:center;gap:6px}
+  .badge b{color:var(--ink);font-weight:600}
+  .cta-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:30px}
+  .btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:13px 22px;border-radius:9px;transition:filter .15s,border-color .15s,background .15s,color .15s}
+  .btn.primary{background:var(--accent);color:var(--on-accent)}
+  .btn.primary:hover{filter:brightness(1.08)}
+  .btn.ghost{border:1px solid var(--line);color:var(--ink-soft)}
+  .btn.ghost:hover{border-color:var(--accent-line);color:var(--ink)}
+
+  /* capability grid */
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:6px 0 0}
   @media(max-width:640px){.grid{grid-template-columns:1fr}}
-  .pr{border-top:1px solid var(--line);padding-top:22px}
-  .pr .n{font-family:var(--mono);font-size:11px;color:var(--accent);letter-spacing:.1em;display:block;margin-bottom:12px}
-  .pr h3{font-family:var(--serif);font-weight:500;font-size:20px;color:var(--ink-hi);margin-bottom:8px}
-  .pr p{font-size:15px;line-height:1.55;margin:0}
-  .contact{margin-top:44px;border:1px solid var(--line);border-radius:13px;background:var(--panel);padding:30px 28px}
-  .contact p{margin:0 0 14px}
-  .cta-link{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:13px 22px;border-radius:9px;background:var(--accent);color:var(--on-accent)}
-  .founder{display:flex;gap:22px;align-items:flex-start;border:1px solid var(--line);border-radius:13px;background:var(--panel);padding:26px}
-  .founder .ava{flex:none;width:64px;height:64px;border-radius:50%;border:1px solid var(--accent-line);background:var(--accent-wash);display:grid;place-items:center;font-family:var(--mono);font-weight:600;font-size:19px;color:var(--accent);overflow:hidden}
-  .founder .ava img{width:100%;height:100%;object-fit:cover}
-  .founder .who{flex:1}
-  .founder .nm{font-family:var(--serif);font-size:22px;color:var(--ink-hi);margin-bottom:3px}
-  .founder .rl{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);margin-bottom:14px}
-  .founder .no{font-size:15.5px;color:var(--ink-soft);line-height:1.6;margin:0 0 16px;max-width:58ch}
-  .founder .ln{display:inline-flex;gap:8px;align-items:center;font-family:var(--mono);font-size:12.5px;color:var(--ink);border-bottom:1px solid var(--line);transition:color .15s,border-color .15s}
-  .founder .ln:hover{color:var(--accent);border-color:var(--accent-line)}
-  @media(max-width:560px){.founder{flex-direction:column;gap:16px}}
+  .feature{border:1px solid var(--line);border-radius:13px;background:var(--panel);padding:22px 24px}
+  .feature h3{font-family:var(--mono);font-size:12.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-hi);margin:0 0 9px}
+  .feature p{font-size:14.5px;color:var(--ink-soft);margin:0;line-height:1.55;max-width:none}
+
+  /* code + output */
+  .qs-pre{font-family:var(--mono);font-size:12.5px;line-height:1.8;color:var(--ink);background:var(--bg-2);border:1px solid var(--line);border-radius:13px;padding:22px 24px;overflow-x:auto;margin:0;white-space:pre}
+  .qs-c{color:var(--ink-faint)}
+  .out-pre{font-family:var(--mono);font-size:12.5px;line-height:1.75;color:var(--ink-soft);background:var(--panel);border:1px solid var(--line-2);border-radius:13px;padding:18px 22px;overflow-x:auto;margin:12px 0 0;white-space:pre}
+  .example-note{font-size:16px;color:var(--ink-soft);max-width:64ch;margin:0 0 8px}
+
+  .rule{height:1px;background:var(--line);margin:52px 0 40px}
+  .soon{margin-top:48px;border:1px dashed var(--line);border-radius:13px;background:var(--panel);padding:30px 28px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap}
+  .soon p{margin:0;max-width:52ch;font-size:16px;color:var(--ink-soft)}
+  .cta-link{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:13px 22px;border-radius:9px;background:var(--accent);color:var(--on-accent);white-space:nowrap}
+
   .uc-word-wrap{position:absolute;left:0;right:0;bottom:0;z-index:0;overflow:hidden;pointer-events:none}
   .uc-word{display:block;max-width:1180px;margin:0 auto -.16em;padding:0 32px;font-family:var(--serif);font-weight:400;font-size:clamp(42px,11.05vw,130px);line-height:1;letter-spacing:-.015em;color:var(--ink-faint);opacity:.28;white-space:nowrap;user-select:none}
   .uc-word .b{color:var(--ink-soft)}
   .uc-word .d{color:var(--accent);font-style:italic;opacity:.82}
   footer{border-top:1px solid var(--line);position:relative;overflow:hidden}
-  .foot{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:30px 32px 100px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px;font-family:var(--mono);font-size:11px;color:var(--ink-faint)}
-  .foot a{color:var(--ink-faint);transition:color .15s}.foot a:hover{color:var(--ink-soft)}
-  .foot .links{display:flex;gap:22px;flex-wrap:wrap}
 </style>
 <link href="brand-core.css" rel="stylesheet">
 <link href="lp-footer-fix.css" rel="stylesheet">
@@ -73,35 +90,30 @@
   "@context": "https://schema.org",
   "@graph": [
     {
-      "@type": "AboutPage",
-      "name": "About",
-      "url": "https://unboundcompute.com/about.html",
-      "description": "UnboundCompute builds an autonomous security researcher that reasons about your application, crosses the boundaries that should hold, and proves every finding.",
-      "isPartOf": {
-        "@id": "https://unboundcompute.com/#website"
-      },
-      "publisher": {
+      "@type": "WebPage",
+      "name": "Atropos",
+      "url": "https://unboundcompute.com/atropos.html",
+      "description": "A taint-model knowledge base: sources, sinks, sanitizers and flow summaries as pure, validated JSON data.",
+      "isPartOf": { "@id": "https://unboundcompute.com/#website" }
+    },
+    {
+      "@type": "SoftwareSourceCode",
+      "name": "Atropos",
+      "description": "A taint-model knowledge base for static analysis: sources, sinks, sanitizers, and flow summaries as pure, validated JSON data. Over 1,000 verified facts across C, Python, JavaScript and TypeScript.",
+      "codeRepository": "https://github.com/UnboundCompute/atropos",
+      "programmingLanguage": ["JSON", "Python"],
+      "license": "https://creativecommons.org/licenses/by/4.0/",
+      "author": {
         "@type": "Organization",
         "@id": "https://unboundcompute.com/#organization",
         "name": "UnboundCompute",
         "url": "https://unboundcompute.com/",
-        "description": "An autonomous security researcher for web apps and APIs.",
         "sameAs": [
           "https://www.linkedin.com/company/unboundcompute",
           "https://github.com/UnboundCompute",
           "https://www.crunchbase.com/organization/unboundcompute",
           "https://x.com/unboundcompute"
-        ],
-        "logo": {
-          "@type": "ImageObject",
-          "url": "https://unboundcompute.com/logo.png",
-          "width": 2048,
-          "height": 2048
-        },
-        "email": "riyan@unboundcompute.com"
-      },
-      "mainEntity": {
-        "@id": "https://unboundcompute.com/#organization"
+        ]
       }
     }
   ]
@@ -134,49 +146,69 @@
   </div></nav>
 
   <header class="head"><div class="wrap">
-    <p class="eyebrow">Company / About</p>
-    <h1>We build the researcher,<br>not the <em>checklist.</em></h1>
-    <p class="lede">UnboundCompute is an autonomous security researcher for the software teams ship. It learns how an application is meant to behave, then puts the boundaries it trusts under real pressure.</p>
+    <p class="eyebrow">Open source / Atropos</p>
+    <h1>Atropos</h1>
+    <p class="lede">A taint-model knowledge base: where untrusted data enters, where it must not land, and what makes it safe again. Pure, validated JSON, sources, sinks, sanitizers and flow summaries keyed by symbol and access path, with no analysis engine of its own.</p>
+    <div class="facts">
+      <span class="badge">Models <b>CC BY 4.0</b></span>
+      <span class="badge">Tooling <b>MIT</b></span>
+      <span class="badge"><b>v1.7</b></span>
+      <span class="badge"><b>1,000+</b> verified facts</span>
+      <span class="badge"><b>C &middot; Python &middot; JS &middot; TS</b></span>
+      <span class="badge">Zero dependencies</span>
+    </div>
+    <div class="cta-row">
+      <a class="btn primary" href="https://github.com/UnboundCompute/atropos" target="_blank" rel="noopener">View on GitHub &rarr;</a>
+      <a class="btn ghost" href="#quickstart">Quickstart &darr;</a>
+    </div>
   </div></header>
 
   <main class="body"><div class="wrap">
-    <h2>Why we exist</h2>
-    <p>Most security tooling looks for patterns it already knows. Scanners fire a fixed list of payloads, and a yearly pentest is a snapshot that ages the moment it ends. Meanwhile the bugs that actually hurt are rarely a missing input filter. They are a <em>line the application assumes will hold</em>, and you have to understand the application to know where that line is.</p>
-    <p>We started UnboundCompute to close that gap with a system that reasons about <b>your</b> product the way a strong human researcher would, continuously, and proves what it finds instead of guessing.</p>
+    <h2>A model, not an engine</h2>
+    <p>Knowledge and reasoning change at different speeds. The fact that <code>memcpy</code>'s size argument is dangerous does not change when a graph engine gets rewritten, and it is useful to anything that can resolve a symbol, not just one tool. So the models live on their own, as data.</p>
+    <p>Atropos figures out none of it by itself. The engine (<a href="lachesis.html">Lachesis</a>) owns propagation, reachability and guard reasoning. Atropos is the lookup table that says <em>this specific argument is dangerous, and here is why</em>. Keeping it in its own permissively licensed repo means the taxonomy can be versioned, reviewed and grown on its own schedule.</p>
 
-    <h2>What we believe</h2>
+    <div class="rule"></div>
+
+    <h2>What you get</h2>
+    <p class="section-note">A catalog you read, not a library you import.</p>
     <div class="grid">
-      <div class="pr"><span class="n">01</span><h3>Understanding beats signatures</h3><p>A finding worth your time comes from understanding features, roles, and trust boundaries, not from matching a template.</p></div>
-      <div class="pr"><span class="n">02</span><h3>Proof, or it does not ship</h3><p>Every reported crossing rests on a recorded request and a repeatable contradiction. If it cannot be proven, it is not a finding.</p></div>
-      <div class="pr"><span class="n">03</span><h3>Permission is the first rule</h3><p>Offensive work is only legitimate inside an authorized scope. That principle is built into how the product runs.</p></div>
-      <div class="pr"><span class="n">04</span><h3>Findings should outlive the report</h3><p>A confirmed crossing becomes a repeatable test, so a fix stays fixed instead of quietly regressing.</p></div>
+      <div class="feature"><h3>Just data</h3><p>One row per fact: a resolvable symbol, an access path, and a role. No engine, no import, no dependency. Consuming it is reading JSON.</p></div>
+      <div class="feature"><h3>It says "watch this", not "this is a bug"</h3><p>Models mark sources, sinks and sanitizers. The verdict is left to the engine and the human, so there is no false confidence baked in.</p></div>
+      <div class="feature"><h3>Precise attachment</h3><p>Each fact names exactly what to watch: <code>Argument[n]</code>, <code>ReturnValue</code>, <code>Receiver</code>, or <code>in&rarr;out</code> for a flow summary.</p></div>
+      <div class="feature"><h3>Four languages, 27 kinds</h3><p>C, Python, JavaScript and TypeScript across buffer overflow, command, SQL and template injection, path traversal, SSRF, deserialization, prototype pollution, weak crypto, and more.</p></div>
+      <div class="feature"><h3>Validated on every change</h3><p>Schema shape, unique ids and grammatical access paths are gated in CI, so the catalog stays consistent as it grows past a thousand facts.</p></div>
+      <div class="feature"><h3>Versioned and reviewable</h3><p>Kept in its own repo so the taxonomy can be reviewed and grown on its own schedule, decoupled from any single engine.</p></div>
     </div>
 
-    <h2>Who is building this</h2>
-    <div class="founder">
-      <!-- To add a photo: replace the RD monogram below with <img src="riyan.jpg" alt="Riyan Dhiman"> -->
-      <div class="ava" aria-hidden="true">RD</div>
-      <div class="who">
-        <div class="nm">Riyan Dhiman</div>
-        <div class="rl">Founder</div>
-        <p class="no">The security work that mattered most in every app I touched was never a payload a scanner could match. It was the boundary the code quietly trusted, and finding it meant understanding the application, not scanning it. I am building the researcher I wanted, and working directly with the first teams who point it at their own software.</p>
-        <div style="display:flex;flex-wrap:wrap;gap:18px">
-          <a class="ln" href="mailto:riyan@unboundcompute.com">riyan@unboundcompute.com &rarr;</a>
-          <a class="ln" href="https://calendar.app.google/mQzKwpJPKPqtbtfF9">Book a call &rarr;</a>
-          <a class="ln" href="https://www.linkedin.com/in/riyan-dhiman/">LinkedIn &rarr;</a>
-          <a class="ln" href="https://x.com/riyandhiman14">X &rarr;</a>
-        </div>
-      </div>
-    </div>
+    <div class="rule"></div>
 
-    <h2>Where we are</h2>
-    <p>UnboundCompute is in private access while we work with a small number of early teams. We are taking a handful of founding design partners who help shape what the researcher looks for and how the evidence reads. If that sounds like you, come see the fit, or just email me directly above.</p>
+    <h2 id="quickstart">Quickstart</h2>
+    <p class="section-note">The tooling is standard-library Python, zero dependencies. Validate the catalog, see coverage, and bind models to real graph nodes.</p>
+    <pre class="qs-pre">git clone https://github.com/UnboundCompute/atropos &amp;&amp; cd atropos
+python3 tools/validate.py                     <span class="qs-c"># schema, unique ids, access paths</span>
+python3 tools/stats.py                         <span class="qs-c"># coverage by language / role / kind</span>
+python3 tools/bind.py fixtures/c_buffer.index.json   <span class="qs-c"># resolve models to graph nodes</span></pre>
 
-    <div class="contact">
-      <p>See the founding design partner program.</p>
-      <a class="cta-link" href="design-partners.html">Design partners &rarr;</a>
+    <div class="rule"></div>
+
+    <h2>What a fact looks like</h2>
+    <p class="example-note">One entry is one row of data: a resolvable symbol, an access path, and a role.</p>
+    <pre class="qs-pre">{
+  "id": "c.mem.memcpy.n",
+  "language": "c", "method": "memcpy",
+  "signature": "void *memcpy(void *dest, const void *src, size_t n)",
+  "access_path": "Argument[2]", "role": "sink", "kind": "buffer-size",
+  "cwe": ["CWE-787", "CWE-120", "CWE-190"], "confidence": "high"
+}</pre>
+    <p class="example-note" style="margin-top:26px"><code>memcpy</code>'s third argument, the size, is a buffer-size sink. Atropos only says <em>watch this</em>. Whether a given call is a real bug is up to the engine, does tainted data reach it, and the human, is the length actually bounded upstream.</p>
+
+    <div class="soon">
+      <p>Atropos is the taint knowledge base our hosted autonomous security researcher reasons over. On its own it is just data; paired with Lachesis, each fact resolves against a real graph.</p>
+      <a class="cta-link" href="lachesis.html">Pairs with Lachesis &rarr;</a>
     </div>
   </div></main>
+
   <!-- ===================== FOOTER ===================== -->
   <footer class="site-footer" style="position:relative;overflow:hidden">
     <div class="footer-links" style="position:relative;z-index:1;max-width:var(--maxw);margin:0 auto;padding:56px 32px 34px;display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px">

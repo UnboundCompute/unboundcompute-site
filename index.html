@@ -138,7 +138,25 @@
   @media (max-width:560px){
     section [style*="grid-template-columns:repeat(3,1fr)"]{grid-template-columns:1fr!important}
     nav [style*="display:flex;gap:30px"] a:not([style*="background:var(--accent)"]){display:none}
+    nav .nav-dd{display:none}
   }
+</style>
+<style>
+  /* Open Source nav dropdown */
+  .nav-dd{position:relative;display:inline-flex;align-items:center}
+  .nav-dd-t{font-family:var(--sans);font-size:14px;color:var(--ink-soft);background:none;border:0;cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:0;line-height:1;transition:color .15s}
+  .nav-dd:hover .nav-dd-t,.nav-dd:focus-within .nav-dd-t{color:var(--ink)}
+  .nav-dd-c{font-size:9px;line-height:1;transition:transform .2s}
+  .nav-dd:hover .nav-dd-c,.nav-dd:focus-within .nav-dd-c{transform:rotate(180deg)}
+  .nav-dd-menu{position:absolute;top:100%;right:0;padding-top:16px;min-width:290px;opacity:0;visibility:hidden;transform:translateY(-6px);transition:opacity .16s ease,transform .16s ease,visibility .16s;pointer-events:none}
+  .nav-dd:hover .nav-dd-menu,.nav-dd:focus-within .nav-dd-menu{opacity:1;visibility:visible;transform:translateY(0);pointer-events:auto}
+  .nav-dd-inner{background:rgba(12,12,14,.98);backdrop-filter:blur(16px);border:1px solid var(--line);border-radius:14px;padding:10px;box-shadow:0 24px 60px rgba(0,0,0,.55)}
+  .nav-dd-group{font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-faint);padding:9px 12px 5px;margin:0}
+  .nav-dd-menu a{display:flex;flex-direction:column;gap:1px;padding:9px 12px;border-radius:9px;transition:background .14s}
+  .nav-dd-menu a:hover{background:rgba(244,242,236,.055)}
+  .nav-dd-menu a b{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--ink-hi)}
+  .nav-dd-menu a span{font-size:12px;color:var(--ink-faint);line-height:1.3}
+  .nav-dd-all{flex-direction:row !important;align-items:center;margin-top:6px;padding-top:13px !important;border-top:1px solid var(--line-2);font-family:var(--mono);font-size:12px;color:var(--accent)}
 </style>
 </head>
 <body>
@@ -160,7 +178,18 @@
         <a href="#proof" style="transition:color .15s" style-hover="color:var(--ink)">Proof</a>
         <a href="demo/" style="transition:color .15s" style-hover="color:var(--ink)">Demo</a>
         <a href="tools/" style="transition:color .15s" style-hover="color:var(--ink)">Tools</a>
-        <a href="open-source.html" style="transition:color .15s" style-hover="color:var(--ink)">Open source</a>
+        <div class="nav-dd">
+          <button class="nav-dd-t" type="button" aria-haspopup="true" aria-expanded="false">Open source <span class="nav-dd-c">&#9662;</span></button>
+          <div class="nav-dd-menu"><div class="nav-dd-inner">
+            <p class="nav-dd-group">Engine</p>
+            <a href="lachesis.html"><b>Lachesis</b><span>Code property graph</span></a>
+            <a href="atropos.html"><b>Atropos</b><span>Taint-model knowledge base</span></a>
+            <p class="nav-dd-group">Agent security</p>
+            <a href="security-agent-skills.html"><b>Security Agent Skills</b><span>Testing method as agent skills</span></a>
+            <a href="open-source.html#countermand"><b>Countermand</b><span>Action firewall for AI agents</span></a>
+            <a class="nav-dd-all" href="open-source.html">All open source &rarr;</a>
+          </div></div>
+        </div>
         <a href="about.html" style="transition:color .15s" style-hover="color:var(--ink)">About</a>
         <a href="design-partners.html" style="font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;background:var(--accent);color:var(--on-accent);padding:10px 17px;border-radius:8px;transition:filter .15s" style-hover="filter:brightness(1.08)">Become a design partner</a>
       </div>

@@ -139,9 +139,28 @@
 </script>
 </head>
 <body>
-  <nav><div class="nav-in">
-    <a class="brand" href="index.html"><span><svg viewBox="0 0 24 24" fill="none" style="width:15px;height:15px"><line x1="12" y1="3" x2="12" y2="21" stroke="var(--accent)" stroke-width="1.8" stroke-dasharray="2.6 2.6"/><circle cx="12" cy="12" r="3" fill="var(--accent)"/></svg></span>UnboundCompute</a>
-    <a class="back" href="index.html">&larr; Back to home</a>
+  <nav class="site-nav"><div class="site-nav-in">
+    <a class="site-nav-brand" href="index.html"><span><svg viewBox="0 0 24 24" fill="none" style="width:15px;height:15px"><line x1="12" y1="3" x2="12" y2="21" stroke="var(--accent)" stroke-width="1.8" stroke-dasharray="2.6 2.6"/><circle cx="12" cy="12" r="3" fill="var(--accent)"/></svg></span>UnboundCompute</a>
+    <div class="site-nav-links">
+      <a href="index.html#capabilities">Capabilities</a>
+      <a href="index.html#proof">Proof</a>
+      <a href="demo/">Demo</a>
+      <a href="tools/">Tools</a>
+      <div class="nav-dd">
+        <button class="nav-dd-t" type="button" aria-haspopup="true" aria-expanded="false">Open source <span class="nav-dd-c">&#9662;</span></button>
+        <div class="nav-dd-menu"><div class="nav-dd-inner">
+          <p class="nav-dd-group">Engine</p>
+          <a href="lachesis.html"><b>Lachesis</b><span>Code property graph</span></a>
+          <a href="atropos.html"><b>Atropos</b><span>Taint-model knowledge base</span></a>
+          <p class="nav-dd-group">Agent security</p>
+          <a href="security-agent-skills.html"><b>Security Agent Skills</b><span>Testing method as agent skills</span></a>
+          <a href="open-source.html#countermand"><b>Countermand</b><span>Action firewall for AI agents</span></a>
+          <a class="nav-dd-all" href="open-source.html">All open source &rarr;</a>
+        </div></div>
+      </div>
+      <a href="about.html">About</a>
+      <a class="site-nav-cta" href="design-partners.html">Become a design partner</a>
+    </div>
   </div></nav>
 
   <header class="head"><div class="wrap">
@@ -156,10 +175,10 @@
 
     <div class="repos">
 
-      <a class="repo" href="https://github.com/UnboundCompute/lachesis" target="_blank" rel="noopener">
+      <a class="repo" id="lachesis" href="lachesis.html">
         <div class="top">
           <span class="name"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>lachesis</span>
-          <span class="arrow">View on GitHub &rarr;</span>
+          <span class="arrow">Learn more &rarr;</span>
         </div>
         <p class="desc">A compiler-precise code property graph you can ask questions of: who calls this, what flows into this buffer, does this input reach that sink, which of two near-identical functions checks its input and which does not. It parses with real compilers, so it never loses a caller to a rename or an import indirection, and it serves the whole graph to an agent over the <code>lachesis</code> MCP server.</p>
         <div class="meta">
@@ -170,10 +189,10 @@
         <div class="tags"><span class="tag">static-analysis</span><span class="tag">code-graph</span><span class="tag">taint-analysis</span><span class="tag">program-analysis</span><span class="tag">mcp</span><span class="tag">appsec</span></div>
       </a>
 
-      <a class="repo" href="https://github.com/UnboundCompute/atropos" target="_blank" rel="noopener">
+      <a class="repo" id="atropos" href="atropos.html">
         <div class="top">
           <span class="name"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>atropos</span>
-          <span class="arrow">View on GitHub &rarr;</span>
+          <span class="arrow">Learn more &rarr;</span>
         </div>
         <p class="desc">The knowledge of what is a source, what is a sink, and what actually sanitizes, kept as plain validated JSON instead of buried in engine code. It is the model layer Lachesis reasons over, so anyone can review or extend it without touching the compiler.</p>
         <div class="meta">
@@ -186,7 +205,7 @@
 
       <p class="also-open">Also open, separate projects</p>
 
-      <a class="repo" href="https://github.com/UnboundCompute/countermand" target="_blank" rel="noopener">
+      <a class="repo" id="countermand" href="https://github.com/UnboundCompute/countermand" target="_blank" rel="noopener">
         <div class="top">
           <span class="name"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>countermand</span>
           <span class="arrow">View on GitHub &rarr;</span>
@@ -200,10 +219,10 @@
         <div class="tags"><span class="tag">ai-security</span><span class="tag">agent-safety</span><span class="tag">policy-engine</span><span class="tag">mcp</span><span class="tag">claude-code</span></div>
       </a>
 
-      <a class="repo" href="https://github.com/UnboundCompute/security-agent-skills" target="_blank" rel="noopener">
+      <a class="repo" id="security-agent-skills" href="security-agent-skills.html">
         <div class="top">
           <span class="name"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>security-agent-skills</span>
-          <span class="arrow">View on GitHub &rarr;</span>
+          <span class="arrow">Learn more &rarr;</span>
         </div>
         <p class="desc">Our security-testing method, written as portable agent skills: playbooks for white-box bug hunting, AI-agent and LLM red-teaming, cloud and CI/CD trust, supply-chain risk, and appsec depth. Each one encodes the judgment behind a real test, not a script, so it transfers to any agent runtime. Install the whole set as a Claude Code plugin, or read one <code>SKILL.md</code> and run the loop by hand.</p>
         <div class="meta">

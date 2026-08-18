@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Security Agent Skills &middot; security-testing method for AI agents | UnboundCompute</title>
+<meta name="description" content="Security Agent Skills: 33 tool-agnostic security-testing skills for AI coding agents. White-box bug hunting, AI-agent and LLM red-teaming, cloud identity, supply-chain, and appsec depth, written as portable Claude Code skills. Open source, MIT.">
+<meta name="theme-color" content="#0a0a0b">
+<link rel="canonical" href="https://unboundcompute.com/security-agent-skills.html">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Security Agent Skills &middot; security-testing method for AI agents | UnboundCompute">
+<meta property="og:description" content="33 tool-agnostic security-testing skills for AI coding agents: white-box bug hunting, agent and LLM red-teaming, cloud, supply-chain and appsec depth. Portable Claude Code skills, MIT.">
+<meta property="og:url" content="https://unboundcompute.com/security-agent-skills.html">
+<meta property="og:image" content="https://unboundcompute.com/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600&family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,300;1,6..72,400&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0a0b;--bg-2:#070708;--panel:#0e0e10;--ink:#f4f2ec;--ink-hi:#fbf9f3;--ink-soft:#9b988f;--ink-faint:#5e5b54;--line:rgba(244,242,236,.13);--line-2:rgba(244,242,236,.07);--accent:#fb5b46;--accent-line:rgba(251,91,70,.42);--accent-wash:rgba(251,91,70,.12);--on-accent:#1a0c09;--serif:'Newsreader',Georgia,serif;--mono:'JetBrains Mono',ui-monospace,monospace;--sans:'Inter',system-ui,sans-serif;--maxw:880px}
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;line-height:1.62}
+  ::selection{background:var(--accent);color:var(--on-accent)}
+  a{color:inherit;text-decoration:none}
+  nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);background:rgba(10,10,11,.72);border-bottom:1px solid var(--line-2)}
+  .nav-in{max-width:1180px;margin:0 auto;height:66px;padding:0 32px;display:flex;align-items:center;justify-content:space-between}
+  .brand{display:flex;align-items:center;gap:11px;font-family:var(--mono);font-weight:600;font-size:15px}
+  .brand span{width:27px;height:27px;border-radius:7px;border:1px solid var(--accent-line);display:grid;place-items:center}
+  .back{font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);transition:color .15s}
+  .back:hover{color:var(--ink)}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 32px}
+  .head{padding:84px 0 56px;border-bottom:1px solid var(--line)}
+  .eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:24px}
+  h1{font-family:var(--serif);font-weight:300;font-size:clamp(40px,6vw,66px);line-height:1.0;letter-spacing:-.03em;color:var(--ink-hi)}
+  h1 em{font-style:italic;color:var(--accent)}
+  .lede{font-size:19px;color:var(--ink-soft);max-width:60ch;margin-top:26px;line-height:1.55}
+  .lede a{color:var(--ink);border-bottom:1px solid var(--accent-line);transition:border-color .15s}
+  .lede a:hover{border-color:var(--accent)}
+  .body{padding:64px 0 96px}
+  .body h2{font-family:var(--serif);font-weight:400;font-size:28px;letter-spacing:-.015em;color:var(--ink-hi);margin:0 0 8px}
+  .body p{font-size:17px;color:var(--ink-soft);max-width:64ch;margin-bottom:18px}
+  .body p b{color:var(--ink);font-weight:600}
+  .body em{font-style:normal;color:var(--accent)}
+  .body code{font-family:var(--mono);font-size:.86em;color:var(--ink);background:var(--accent-wash);border-radius:5px;padding:1px 6px}
+  .section-note{font-size:16px;color:var(--ink-soft);max-width:60ch;margin:0 0 24px}
+
+  /* hero fact badges + CTAs */
+  .facts{display:flex;flex-wrap:wrap;gap:9px;margin:28px 0 0}
+  .badge{font-family:var(--mono);font-size:11px;letter-spacing:.03em;color:var(--ink-soft);border:1px solid var(--line);border-radius:20px;padding:5px 12px;display:inline-flex;align-items:center;gap:6px}
+  .badge b{color:var(--ink);font-weight:600}
+  .cta-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:30px}
+  .btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:13px 22px;border-radius:9px;transition:filter .15s,border-color .15s,background .15s,color .15s}
+  .btn.primary{background:var(--accent);color:var(--on-accent)}
+  .btn.primary:hover{filter:brightness(1.08)}
+  .btn.ghost{border:1px solid var(--line);color:var(--ink-soft)}
+  .btn.ghost:hover{border-color:var(--accent-line);color:var(--ink)}
+
+  /* capability grid */
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:6px 0 0}
+  @media(max-width:640px){.grid{grid-template-columns:1fr}}
+  .feature{border:1px solid var(--line);border-radius:13px;background:var(--panel);padding:22px 24px}
+  .feature h3{font-family:var(--mono);font-size:12.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-hi);margin:0 0 9px}
+  .feature p{font-size:14.5px;color:var(--ink-soft);margin:0;line-height:1.55;max-width:none}
+
+  /* code + output */
+  .qs-pre{font-family:var(--mono);font-size:12.5px;line-height:1.8;color:var(--ink);background:var(--bg-2);border:1px solid var(--line);border-radius:13px;padding:22px 24px;overflow-x:auto;margin:0;white-space:pre}
+  .qs-c{color:var(--ink-faint)}
+  .out-pre{font-family:var(--mono);font-size:12.5px;line-height:1.85;color:var(--ink-soft);background:var(--panel);border:1px solid var(--line-2);border-radius:13px;padding:20px 22px;overflow-x:auto;margin:12px 0 0;white-space:pre}
+  .out-pre b{color:var(--ink-hi);font-weight:600}
+  .example-note{font-size:16px;color:var(--ink-soft);max-width:64ch;margin:0 0 8px}
+
+  .rule{height:1px;background:var(--line);margin:52px 0 40px}
+  .soon{margin-top:48px;border:1px dashed var(--line);border-radius:13px;background:var(--panel);padding:30px 28px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap}
+  .soon p{margin:0;max-width:52ch;font-size:16px;color:var(--ink-soft)}
+  .cta-link{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:13px 22px;border-radius:9px;background:var(--accent);color:var(--on-accent);white-space:nowrap}
+
+  .uc-word-wrap{position:absolute;left:0;right:0;bottom:0;z-index:0;overflow:hidden;pointer-events:none}
+  .uc-word{display:block;max-width:1180px;margin:0 auto -.16em;padding:0 32px;font-family:var(--serif);font-weight:400;font-size:clamp(42px,11.05vw,130px);line-height:1;letter-spacing:-.015em;color:var(--ink-faint);opacity:.28;white-space:nowrap;user-select:none}
+  .uc-word .b{color:var(--ink-soft)}
+  .uc-word .d{color:var(--accent);font-style:italic;opacity:.82}
+  footer{border-top:1px solid var(--line);position:relative;overflow:hidden}
+</style>
+<link href="brand-core.css" rel="stylesheet">
+<link href="lp-footer-fix.css" rel="stylesheet">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "name": "Security Agent Skills",
+      "url": "https://unboundcompute.com/security-agent-skills.html",
+      "description": "33 tool-agnostic security-testing skills for AI coding agents, written as portable Claude Code skills.",
+      "isPartOf": { "@id": "https://unboundcompute.com/#website" }
+    },
+    {
+      "@type": "SoftwareSourceCode",
+      "name": "Security Agent Skills",
+      "description": "33 tool-agnostic security-testing skills for AI coding agents: white-box bug hunting, AI-agent and LLM red-teaming, cloud identity and CI/CD trust, supply-chain risk, and appsec depth. Portable Claude Code skills that encode security-testing methodology.",
+      "codeRepository": "https://github.com/UnboundCompute/security-agent-skills",
+      "license": "https://opensource.org/license/mit",
+      "author": {
+        "@type": "Organization",
+        "@id": "https://unboundcompute.com/#organization",
+        "name": "UnboundCompute",
+        "url": "https://unboundcompute.com/",
+        "sameAs": [
+          "https://www.linkedin.com/company/unboundcompute",
+          "https://github.com/UnboundCompute",
+          "https://www.crunchbase.com/organization/unboundcompute",
+          "https://x.com/unboundcompute"
+        ]
+      }
+    }
+  ]
+}
+</script>
+</head>
+<body>
+  <nav class="site-nav"><div class="site-nav-in">
+    <a class="site-nav-brand" href="index.html"><span><svg viewBox="0 0 24 24" fill="none" style="width:15px;height:15px"><line x1="12" y1="3" x2="12" y2="21" stroke="var(--accent)" stroke-width="1.8" stroke-dasharray="2.6 2.6"/><circle cx="12" cy="12" r="3" fill="var(--accent)"/></svg></span>UnboundCompute</a>
+    <div class="site-nav-links">
+      <a href="index.html#capabilities">Capabilities</a>
+      <a href="index.html#proof">Proof</a>
+      <a href="demo/">Demo</a>
+      <a href="tools/">Tools</a>
+      <div class="nav-dd">
+        <button class="nav-dd-t" type="button" aria-haspopup="true" aria-expanded="false">Open source <span class="nav-dd-c">&#9662;</span></button>
+        <div class="nav-dd-menu"><div class="nav-dd-inner">
+          <p class="nav-dd-group">Engine</p>
+          <a href="lachesis.html"><b>Lachesis</b><span>Code property graph</span></a>
+          <a href="atropos.html"><b>Atropos</b><span>Taint-model knowledge base</span></a>
+          <p class="nav-dd-group">Agent security</p>
+          <a href="security-agent-skills.html"><b>Security Agent Skills</b><span>Testing method as agent skills</span></a>
+          <a href="open-source.html#countermand"><b>Countermand</b><span>Action firewall for AI agents</span></a>
+          <a class="nav-dd-all" href="open-source.html">All open source &rarr;</a>
+        </div></div>
+      </div>
+      <a href="about.html">About</a>
+      <a class="site-nav-cta" href="design-partners.html">Become a design partner</a>
+    </div>
+  </div></nav>
+
+  <header class="head"><div class="wrap">
+    <p class="eyebrow">Open source / Security Agent Skills</p>
+    <h1>Security Agent Skills</h1>
+    <p class="lede">Thirty-three security-testing skills for AI coding agents, each one the <em>method</em> behind real testing: the reasoning, ordering, and adjudication discipline, not a script. White-box bug hunting, AI-agent and LLM red-teaming, cloud identity, supply chain, and appsec depth, written as portable skills your agent loads and follows.</p>
+    <div class="facts">
+      <span class="badge"><b>MIT</b></span>
+      <span class="badge"><b>33</b> skills</span>
+      <span class="badge"><b>Claude Code</b> plugin</span>
+      <span class="badge">Tool-agnostic method</span>
+      <span class="badge"><b>6</b> testing lanes</span>
+      <span class="badge">Shared finding schema</span>
+    </div>
+    <div class="cta-row">
+      <a class="btn primary" href="https://github.com/UnboundCompute/security-agent-skills" target="_blank" rel="noopener">View on GitHub &rarr;</a>
+      <a class="btn ghost" href="#quickstart">Install &darr;</a>
+    </div>
+  </div></header>
+
+  <main class="body"><div class="wrap">
+    <h2>Why it exists</h2>
+    <p>A security skill's value is judgment, not a script. Point an agent at a target and the hard part is not running a tool, it is knowing what to look at first, in what order, and when a lead is real. These skills write that discipline down: enumerate the whole taxonomy before you fixate on one family, treat rank as triage and never a filter, and hold that a lead is a fact to adjudicate, never a verdict.</p>
+    <p>Because that reasoning is the value, every skill here is <b>tool-agnostic</b>. Each one names the <em>capability</em> a step needs, for example "something that answers who calls this from a real parse", without prescribing a product. Bring your own tools. The method transfers to anyone, whatever they run.</p>
+
+    <div class="rule"></div>
+
+    <h2>What you get</h2>
+    <p class="section-note">Method you can load, not a scanner you configure.</p>
+    <div class="grid">
+      <div class="feature"><h3>Method, not a script</h3><p>Each skill encodes the reasoning, ordering, and adjudication of real black-box and white-box testing, the part a scanner cannot give you.</p></div>
+      <div class="feature"><h3>Tool-agnostic by design</h3><p>A skill names the capability a step needs, not a product. Bring a code graph, a static analyzer, or careful manual tracing. The loop is the same.</p></div>
+      <div class="feature"><h3>Thirty-three skills, six lanes</h3><p>White-box, research, AI-agent, black-box, cloud, and reporting, from guard-gap audits to prompt-injection tests to IAM privilege-escalation paths.</p></div>
+      <div class="feature"><h3>Discipline baked in</h3><p>Enumerate the whole taxonomy, rank is triage not a filter, a lead is a fact not a verdict. The habits that separate a real hunt from a demo.</p></div>
+      <div class="feature"><h3>One shared finding schema</h3><p>Every skill emits findings in the same schema, so results from any lane are consistent, deduplicable, and ready to write up without reformatting.</p></div>
+      <div class="feature"><h3>Authorized use only</h3><p>Every skill opens with a scope check or gate. Nothing here targets systems you do not have permission to test. Your own code, OSS, CTFs, and in-scope work.</p></div>
+    </div>
+
+    <div class="rule"></div>
+
+    <h2 id="quickstart">Install</h2>
+    <p class="section-note">Add the marketplace and install once, and every skill becomes available to your agent, matched by name and description. Or copy a single skill by hand.</p>
+    <pre class="qs-pre">/plugin marketplace add UnboundCompute/security-agent-skills
+/plugin install security-agent-skills@unboundcompute   <span class="qs-c"># all skills, updatable</span>
+
+cp -r skills/detecting-race-conditions .claude/skills/   <span class="qs-c"># or one skill, by hand</span></pre>
+    <p class="example-note" style="margin-top:22px">Not on Claude Code? Each <code>SKILL.md</code> is a standalone playbook. Point any agent runtime that follows the <a href="https://agentskills.io" target="_blank" rel="noopener" style="color:var(--ink);border-bottom:1px solid var(--accent-line)">Agent Skills</a> format at the <code>skills/</code> directory, or read one and follow the loop by hand.</p>
+
+    <div class="rule"></div>
+
+    <h2>The six lanes</h2>
+    <p class="example-note">Coverage runs from source-level bug hunting to agent and cloud attack surface, with reporting to close the loop.</p>
+    <pre class="out-pre"><b>white-box </b> guard gaps, taint adjudication, memory safety, races, business logic, crypto, authz
+<b>research  </b> bug variants, n-day from a patch, dependency-CVE reachability, supply chain
+<b>agent     </b> lethal trifecta, prompt injection, MCP tool abuse, multi-agent, RAG poisoning, guardrails
+<b>black-box </b> attack-surface recon, cache attacks, SAML and OIDC, request smuggling, DOM, SSRF
+<b>cloud     </b> IAM privilege escalation, CI/CD OIDC trust, non-human identity reachability
+<b>reporting </b> a confirmed finding to a reproducible writeup</pre>
+    <p class="example-note" style="margin-top:26px">The white-box lane assumes you have <em>some</em> way to answer structural questions from a real parse, a code property graph, a static analyzer, or careful tracing on a small target. That is exactly what <a href="lachesis.html" style="color:var(--ink);border-bottom:1px solid var(--accent-line)">Lachesis</a> provides, though the method does not depend on which tool you bring.</p>
+
+    <div class="soon">
+      <p>These skills encode the same testing discipline our hosted autonomous security researcher runs at scale. Read them, run them yourself, or let the researcher do it for you.</p>
+      <a class="cta-link" href="index.html">See the researcher &rarr;</a>
+    </div>
+  </div></main>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="site-footer" style="position:relative;overflow:hidden">
+    <div class="footer-links" style="position:relative;z-index:1;max-width:var(--maxw);margin:0 auto;padding:56px 32px 34px;display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px">
+      <div>
+        <a href="index.html#top" style="display:flex;align-items:center;gap:11px;font-family:var(--mono);font-weight:600;font-size:15px;margin-bottom:14px">
+          <span style="width:27px;height:27px;border-radius:7px;border:1px solid var(--accent-line);display:grid;place-items:center"><svg viewBox="0 0 24 24" fill="none" style="width:15px;height:15px"><line x1="12" y1="3" x2="12" y2="21" stroke="var(--accent)" stroke-width="1.8" stroke-dasharray="2.6 2.6"/><circle cx="12" cy="12" r="3" fill="var(--accent)"/></svg></span>UnboundCompute</a>
+        <p style="font-size:13px;color:var(--ink-faint);line-height:1.6;max-width:30ch">An autonomous security researcher that finds the line, crosses it, and proves it.</p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:11px;font-size:13.5px;color:var(--ink-soft)"><span style="font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-faint);margin-bottom:5px">Product</span><a href="index.html#proof" style-hover="color:var(--ink)">Proof</a><a href="index.html#capabilities" style-hover="color:var(--ink)">Capabilities</a><a href="design-partners.html" style-hover="color:var(--ink)">Design partners</a><a href="tools/" style-hover="color:var(--ink)">Tools</a><a href="index.html#cta" style-hover="color:var(--ink)">Become a design partner</a></div>
+      <div style="display:flex;flex-direction:column;gap:11px;font-size:13.5px;color:var(--ink-soft)"><span style="font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-faint);margin-bottom:5px">Company</span><a href="about.html" style-hover="color:var(--ink)">About</a><a href="research.html" style-hover="color:var(--ink)">Research</a><a href="open-source.html" style-hover="color:var(--ink)">Open source</a><a href="careers.html" style-hover="color:var(--ink)">Careers</a><a href="https://www.linkedin.com/company/unboundcompute" style-hover="color:var(--ink)">LinkedIn</a><a href="https://github.com/UnboundCompute" style-hover="color:var(--ink)">GitHub</a></div>
+      <div style="display:flex;flex-direction:column;gap:11px;font-size:13.5px;color:var(--ink-soft)"><span style="font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-faint);margin-bottom:5px">Legal</span><a href="trust.html" style-hover="color:var(--ink)">Trust center</a><a href="privacy.html" style-hover="color:var(--ink)">Privacy</a><a href="terms.html" style-hover="color:var(--ink)">Terms</a></div>
+    </div>
+    <div class="footer-meta" style="position:relative;z-index:1;max-width:var(--maxw);margin:0 auto;padding:22px 32px 28px;display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--ink-faint);flex-wrap:wrap;gap:10px">
+      <span>&copy; 2026 UnboundCompute</span><span>the boundary held, until it didn't</span>
+    </div>
+    <div class="uc-word-wrap footer-word" aria-hidden="true"><span class="uc-word"><span class="b">Unbound</span>Compute<span class="d">.</span></span></div>
+  </footer>
+
+  <!-- Google Analytics 4 / Google Ads / Microsoft Clarity (deferred) -->
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){ dataLayer.push(arguments); }
+    (function () {
+      var loaded = false;
+      function loadAnalytics() {
+        if (loaded) return; loaded = true;
+        gtag('js', new Date());
+        gtag('config', 'G-XCEPB67XE6');
+        gtag('config', 'AW-16469698408');
+        var g = document.createElement('script');
+        g.src = 'https://www.googletagmanager.com/gtag/js?id=G-XCEPB67XE6';
+        g.async = true;
+        document.head.appendChild(g);
+        (function (c, l, a, r, i, t, y) {
+          c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments) };
+          t = l.createElement(r); t.async = 1; t.src = "https://www.clarity.ms/tag/" + i;
+          y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
+        })(window, document, "clarity", "script", "vlzp6fvarw");
+      }
+      if ('requestIdleCallback' in window) requestIdleCallback(loadAnalytics, { timeout: 3000 });
+      else setTimeout(loadAnalytics, 2000);
+    })();
+  </script>
+<script src="brand-bg.js" defer></script></body>
+</html>

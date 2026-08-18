@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lachesis &middot; code property graph | UnboundCompute</title>
+<meta name="description" content="Lachesis is a compiler-precise code property graph you can ask questions about: how data moves, who calls what, and what reaches a sink. Parses C, Python, TypeScript and JavaScript with real compilers and serves the graph over MCP. Open source, AGPL-3.0.">
+<meta name="theme-color" content="#0a0a0b">
+<link rel="canonical" href="https://unboundcompute.com/lachesis.html">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Lachesis &middot; code property graph | UnboundCompute">
+<meta property="og:description" content="A compiler-precise code property graph you can ask questions about: how data moves, who calls what, what reaches a sink. C, Python, TypeScript and JavaScript, served over MCP.">
+<meta property="og:url" content="https://unboundcompute.com/lachesis.html">
+<meta property="og:image" content="https://unboundcompute.com/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600&family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,300;1,6..72,400&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0a0b;--bg-2:#070708;--panel:#0e0e10;--ink:#f4f2ec;--ink-hi:#fbf9f3;--ink-soft:#9b988f;--ink-faint:#5e5b54;--line:rgba(244,242,236,.13);--line-2:rgba(244,242,236,.07);--accent:#fb5b46;--accent-line:rgba(251,91,70,.42);--accent-wash:rgba(251,91,70,.12);--on-accent:#1a0c09;--serif:'Newsreader',Georgia,serif;--mono:'JetBrains Mono',ui-monospace,monospace;--sans:'Inter',system-ui,sans-serif;--maxw:880px}
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;line-height:1.62}
+  ::selection{background:var(--accent);color:var(--on-accent)}
+  a{color:inherit;text-decoration:none}
+  nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);background:rgba(10,10,11,.72);border-bottom:1px solid var(--line-2)}
+  .nav-in{max-width:1180px;margin:0 auto;height:66px;padding:0 32px;display:flex;align-items:center;justify-content:space-between}
+  .brand{display:flex;align-items:center;gap:11px;font-family:var(--mono);font-weight:600;font-size:15px}
+  .brand span{width:27px;height:27px;border-radius:7px;border:1px solid var(--accent-line);display:grid;place-items:center}
+  .back{font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);transition:color .15s}
+  .back:hover{color:var(--ink)}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 32px}
+  .head{padding:84px 0 56px;border-bottom:1px solid var(--line)}
+  .eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:24px}
+  h1{font-family:var(--serif);font-weight:300;font-size:clamp(40px,6vw,66px);line-height:1.0;letter-spacing:-.03em;color:var(--ink-hi)}
+  h1 em{font-style:italic;color:var(--accent)}
+  .lede{font-size:19px;color:var(--ink-soft);max-width:60ch;margin-top:26px;line-height:1.55}
+  .lede a{color:var(--ink);border-bottom:1px solid var(--accent-line);transition:border-color .15s}
+  .lede a:hover{border-color:var(--accent)}
+  .body{padding:64px 0 96px}
+  .body h2{font-family:var(--serif);font-weight:400;font-size:28px;letter-spacing:-.015em;color:var(--ink-hi);margin:0 0 8px}
+  .body p{font-size:17px;color:var(--ink-soft);max-width:64ch;margin-bottom:18px}
+  .body p b{color:var(--ink);font-weight:600}
+  .body em{font-style:normal;color:var(--accent)}
+  .body code{font-family:var(--mono);font-size:.86em;color:var(--ink);background:var(--accent-wash);border-radius:5px;padding:1px 6px}
+  .section-note{font-size:16px;color:var(--ink-soft);max-width:60ch;margin:0 0 24px}
+
+  /* hero fact badges + CTAs */
+  .facts{display:flex;flex-wrap:wrap;gap:9px;margin:28px 0 0}
+  .badge{font-family:var(--mono);font-size:11px;letter-spacing:.03em;color:var(--ink-soft);border:1px solid var(--line);border-radius:20px;padding:5px 12px;display:inline-flex;align-items:center;gap:6px}
+  .badge b{color:var(--ink);font-weight:600}
+  .cta-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:30px}
+  .btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:13px 22px;border-radius:9px;transition:filter .15s,border-color .15s,background .15s,color .15s}
+  .btn.primary{background:var(--accent);color:var(--on-accent)}
+  .btn.primary:hover{filter:brightness(1.08)}
+  .btn.ghost{border:1px solid var(--line);color:var(--ink-soft)}
+  .btn.ghost:hover{border-color:var(--accent-line);color:var(--ink)}
+
+  /* capability grid */
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:6px 0 0}
+  @media(max-width:640px){.grid{grid-template-columns:1fr}}
+  .feature{border:1px solid var(--line);border-radius:13px;background:var(--panel);padding:22px 24px}
+  .feature h3{font-family:var(--mono);font-size:12.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-hi);margin:0 0 9px}
+  .feature p{font-size:14.5px;color:var(--ink-soft);margin:0;line-height:1.55;max-width:none}
+
+  /* code + output */
+  .qs-pre{font-family:var(--mono);font-size:12.5px;line-height:1.8;color:var(--ink);background:var(--bg-2);border:1px solid var(--line);border-radius:13px;padding:22px 24px;overflow-x:auto;margin:0;white-space:pre}
+  .qs-c{color:var(--ink-faint)}
+  .out-pre{font-family:var(--mono);font-size:12.5px;line-height:1.75;color:var(--ink-soft);background:var(--panel);border:1px solid var(--line-2);border-radius:13px;padding:18px 22px;overflow-x:auto;margin:12px 0 0;white-space:pre}
+  .example-note{font-size:16px;color:var(--ink-soft);max-width:64ch;margin:0 0 8px}
+
+  .rule{height:1px;background:var(--line);margin:52px 0 40px}
+  .soon{margin-top:48px;border:1px dashed var(--line);border-radius:13px;background:var(--panel);padding:30px 28px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap}
+  .soon p{margin:0;max-width:52ch;font-size:16px;color:var(--ink-soft)}
+  .cta-link{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:13px 22px;border-radius:9px;background:var(--accent);color:var(--on-accent);white-space:nowrap}
+
+  .uc-word-wrap{position:absolute;left:0;right:0;bottom:0;z-index:0;overflow:hidden;pointer-events:none}
+  .uc-word{display:block;max-width:1180px;margin:0 auto -.16em;padding:0 32px;font-family:var(--serif);font-weight:400;font-size:clamp(42px,11.05vw,130px);line-height:1;letter-spacing:-.015em;color:var(--ink-faint);opacity:.28;white-space:nowrap;user-select:none}
+  .uc-word .b{color:var(--ink-soft)}
+  .uc-word .d{color:var(--accent);font-style:italic;opacity:.82}
+  footer{border-top:1px solid var(--line);position:relative;overflow:hidden}
+</style>
+<link href="brand-core.css" rel="stylesheet">
+<link href="lp-footer-fix.css" rel="stylesheet">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "name": "Lachesis",
+      "url": "https://unboundcompute.com/lachesis.html",
+      "description": "A compiler-precise code property graph you can ask questions about: how data moves, who calls what, and what reaches a sink.",
+      "isPartOf": { "@id": "https://unboundcompute.com/#website" }
+    },
+    {
+      "@type": "SoftwareSourceCode",
+      "name": "Lachesis",
+      "description": "A compiler-precise code property graph with an embedded columnar graph store and a navigation layer built for security reasoning over source code. Parses C, Python, TypeScript and JavaScript with real compilers and serves the graph over MCP.",
+      "codeRepository": "https://github.com/UnboundCompute/lachesis",
+      "programmingLanguage": ["Python", "C", "TypeScript", "JavaScript"],
+      "license": "https://www.gnu.org/licenses/agpl-3.0.html",
+      "author": {
+        "@type": "Organization",
+        "@id": "https://unboundcompute.com/#organization",
+        "name": "UnboundCompute",
+        "url": "https://unboundcompute.com/",
+        "sameAs": [
+          "https://www.linkedin.com/company/unboundcompute",
+          "https://github.com/UnboundCompute",
+          "https://www.crunchbase.com/organization/unboundcompute",
+          "https://x.com/unboundcompute"
+        ]
+      }
+    }
+  ]
+}
+</script>
+</head>
+<body>
+  <nav class="site-nav"><div class="site-nav-in">
+    <a class="site-nav-brand" href="index.html"><span><svg viewBox="0 0 24 24" fill="none" style="width:15px;height:15px"><line x1="12" y1="3" x2="12" y2="21" stroke="var(--accent)" stroke-width="1.8" stroke-dasharray="2.6 2.6"/><circle cx="12" cy="12" r="3" fill="var(--accent)"/></svg></span>UnboundCompute</a>
+    <div class="site-nav-links">
+      <a href="index.html#capabilities">Capabilities</a>
+      <a href="index.html#proof">Proof</a>
+      <a href="demo/">Demo</a>
+      <a href="tools/">Tools</a>
+      <div class="nav-dd">
+        <button class="nav-dd-t" type="button" aria-haspopup="true" aria-expanded="false">Open source <span class="nav-dd-c">&#9662;</span></button>
+        <div class="nav-dd-menu"><div class="nav-dd-inner">
+          <p class="nav-dd-group">Engine</p>
+          <a href="lachesis.html"><b>Lachesis</b><span>Code property graph</span></a>
+          <a href="atropos.html"><b>Atropos</b><span>Taint-model knowledge base</span></a>
+          <p class="nav-dd-group">Agent security</p>
+          <a href="security-agent-skills.html"><b>Security Agent Skills</b><span>Testing method as agent skills</span></a>
+          <a href="open-source.html#countermand"><b>Countermand</b><span>Action firewall for AI agents</span></a>
+          <a class="nav-dd-all" href="open-source.html">All open source &rarr;</a>
+        </div></div>
+      </div>
+      <a href="about.html">About</a>
+      <a class="site-nav-cta" href="design-partners.html">Become a design partner</a>
+    </div>
+  </div></nav>
+
+  <header class="head"><div class="wrap">
+    <p class="eyebrow">Open source / Lachesis</p>
+    <h1>Lachesis</h1>
+    <p class="lede">A compiler-precise code property graph you can ask questions about: how data moves, who calls what, and what reaches a dangerous sink. It parses C, Python, TypeScript and JavaScript with real compilers, not regexes, and serves the whole graph to you or an AI agent over MCP.</p>
+    <div class="facts">
+      <span class="badge"><b>AGPL-3.0</b></span>
+      <span class="badge">Written in <b>Python</b></span>
+      <span class="badge">Analyzes <b>C &middot; Python &middot; TS &middot; JS</b></span>
+      <span class="badge"><b>MCP</b> server</span>
+      <span class="badge">Installs from source</span>
+    </div>
+    <div class="cta-row">
+      <a class="btn primary" href="https://github.com/UnboundCompute/lachesis" target="_blank" rel="noopener">View on GitHub &rarr;</a>
+      <a class="btn ghost" href="#quickstart">Quickstart &darr;</a>
+    </div>
+  </div></header>
+
+  <main class="body"><div class="wrap">
+    <h2>Why it exists</h2>
+    <p>Most code-graph tools stop at symbols and references. That tells you <em>where a name appears</em>. It cannot tell you <em>how a value moves</em>, and that gap is where the interesting questions live. Does this request parameter reach that SQL call? Which of two near-identical functions checks its input before the lookup, and which one does not? What can flow into this buffer?</p>
+    <p>Lachesis is built around the answer. Its dataflow edges, value-flow, points-to, taint and aliasing, alongside resolved and possible call edges, let a tool reason about reachability and tainted flow instead of pattern-matching text and hoping. And because it parses with the language's own compiler, it answers from the parse, not the spelling.</p>
+
+    <div class="rule"></div>
+
+    <h2>What you can do with it</h2>
+    <p class="section-note">A graph you query, not a report you read.</p>
+    <div class="grid">
+      <div class="feature"><h3>Real compilers, not regexes</h3><p>Parses with the language's own compiler, so it never loses a caller to a rename, an alias, or an import indirection. It answers from the parse, not the spelling.</p></div>
+      <div class="feature"><h3>A full dataflow layer</h3><p>Value-flow, points-to, taint and aliasing edges, so you can ask about reachability and tainted flow, not just where a symbol appears.</p></div>
+      <div class="feature"><h3>One graph, four languages</h3><p>C, Python, TypeScript and JavaScript in a single graph, stored in an embedded columnar database that opens in well under a second.</p></div>
+      <div class="feature"><h3>Built for agents</h3><p>A small navigation API and an MCP server hand the graph to a person or an LLM, so an agent can reason over real source with compiler fidelity.</p></div>
+      <div class="feature"><h3>Confidence on every edge</h3><p>Each edge states how sure it is and where it came from, so you can tell an exact fact from a safe over-approximation.</p></div>
+      <div class="feature"><h3>Security-shaped questions</h3><p>Guard coverage, sibling comparison, and source-to-sink reachability are first-class, the questions a reviewer actually asks.</p></div>
+    </div>
+
+    <div class="rule"></div>
+
+    <h2 id="quickstart">Quickstart</h2>
+    <p class="section-note">Lachesis installs from a clone. Point it at a tree, then query the graph or hand it to your agent over MCP.</p>
+    <pre class="qs-pre">git clone https://github.com/UnboundCompute/lachesis &amp;&amp; cd lachesis
+pip install -e ".[dev]" &amp;&amp; npm install       <span class="qs-c"># build from source</span>
+lachesis-analyze ./my-project graph.kuzu     <span class="qs-c"># parse a tree into a graph</span>
+lachesis-mcp graph.kuzu                       <span class="qs-c"># hand it to your agent over MCP</span></pre>
+
+    <div class="rule"></div>
+
+    <h2>See it work</h2>
+    <p class="example-note">Two sibling functions reach the same database call. One checks the caller's tenant first; the other does not. A symbol index sees both call <code>findById</code> and stops there. Lachesis tells them apart by following the value.</p>
+    <pre class="qs-pre">lachesis-analyze lachesis/frontends/typescript/fixtures/project example.kuzu
+lachesis-query --format text example.kuzu overview</pre>
+    <pre class="out-pre"># overview
+Project: layered-project
+Languages: javascript, typescript
+Canonical graph: 3307 nodes / 6078 edges
+Security paths: 6
+Guard differentials: 1</pre>
+    <p class="example-note" style="margin-top:26px">One guard differential: a pair of siblings reaching the same sink where one authorizes and one does not. Ask about the unguarded one:</p>
+    <pre class="qs-pre">lachesis-query --format text example.kuzu handler-security getDocument</pre>
+    <pre class="out-pre">"status": "UNGUARDED",
+"guard_signal": null,
+"differential_siblings": [ "getInvoice" ]</pre>
+    <p class="example-note" style="margin-top:26px"><code>getDocument</code> reaches <code>findById</code> with no check, and the record names its guarded twin, <code>getInvoice</code>, directly. That is the finding: a fact that lives in how the value moves, not where the name appears.</p>
+
+    <div class="soon">
+      <p>Lachesis is the open code-property-graph engine that powers UnboundCompute, our hosted autonomous security researcher. Use it standalone, or let us run it at scale, tuned and adjudicated.</p>
+      <a class="cta-link" href="index.html">See the researcher &rarr;</a>
+    </div>
+  </div></main>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="site-footer" style="position:relative;overflow:hidden">
+    <div class="footer-links" style="position:relative;z-index:1;max-width:var(--maxw);margin:0 auto;padding:56px 32px 34px;display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px">
+      <div>
+        <a href="index.html#top" style="display:flex;align-items:center;gap:11px;font-family:var(--mono);font-weight:600;font-size:15px;margin-bottom:14px">
+          <span style="width:27px;height:27px;border-radius:7px;border:1px solid var(--accent-line);display:grid;place-items:center"><svg viewBox="0 0 24 24" fill="none" style="width:15px;height:15px"><line x1="12" y1="3" x2="12" y2="21" stroke="var(--accent)" stroke-width="1.8" stroke-dasharray="2.6 2.6"/><circle cx="12" cy="12" r="3" fill="var(--accent)"/></svg></span>UnboundCompute</a>
+        <p style="font-size:13px;color:var(--ink-faint);line-height:1.6;max-width:30ch">An autonomous security researcher that finds the line, crosses it, and proves it.</p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:11px;font-size:13.5px;color:var(--ink-soft)"><span style="font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-faint);margin-bottom:5px">Product</span><a href="index.html#proof" style-hover="color:var(--ink)">Proof</a><a href="index.html#capabilities" style-hover="color:var(--ink)">Capabilities</a><a href="design-partners.html" style-hover="color:var(--ink)">Design partners</a><a href="tools/" style-hover="color:var(--ink)">Tools</a><a href="index.html#cta" style-hover="color:var(--ink)">Become a design partner</a></div>
+      <div style="display:flex;flex-direction:column;gap:11px;font-size:13.5px;color:var(--ink-soft)"><span style="font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-faint);margin-bottom:5px">Company</span><a href="about.html" style-hover="color:var(--ink)">About</a><a href="research.html" style-hover="color:var(--ink)">Research</a><a href="open-source.html" style-hover="color:var(--ink)">Open source</a><a href="careers.html" style-hover="color:var(--ink)">Careers</a><a href="https://www.linkedin.com/company/unboundcompute" style-hover="color:var(--ink)">LinkedIn</a><a href="https://github.com/UnboundCompute" style-hover="color:var(--ink)">GitHub</a></div>
+      <div style="display:flex;flex-direction:column;gap:11px;font-size:13.5px;color:var(--ink-soft)"><span style="font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-faint);margin-bottom:5px">Legal</span><a href="trust.html" style-hover="color:var(--ink)">Trust center</a><a href="privacy.html" style-hover="color:var(--ink)">Privacy</a><a href="terms.html" style-hover="color:var(--ink)">Terms</a></div>
+    </div>
+    <div class="footer-meta" style="position:relative;z-index:1;max-width:var(--maxw);margin:0 auto;padding:22px 32px 28px;display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--ink-faint);flex-wrap:wrap;gap:10px">
+      <span>&copy; 2026 UnboundCompute</span><span>the boundary held, until it didn't</span>
+    </div>
+    <div class="uc-word-wrap footer-word" aria-hidden="true"><span class="uc-word"><span class="b">Unbound</span>Compute<span class="d">.</span></span></div>
+  </footer>
+
+  <!-- Google Analytics 4 / Google Ads / Microsoft Clarity (deferred) -->
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){ dataLayer.push(arguments); }
+    (function () {
+      var loaded = false;
+      function loadAnalytics() {
+        if (loaded) return; loaded = true;
+        gtag('js', new Date());
+        gtag('config', 'G-XCEPB67XE6');
+        gtag('config', 'AW-16469698408');
+        var g = document.createElement('script');
+        g.src = 'https://www.googletagmanager.com/gtag/js?id=G-XCEPB67XE6';
+        g.async = true;
+        document.head.appendChild(g);
+        (function (c, l, a, r, i, t, y) {
+          c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments) };
+          t = l.createElement(r); t.async = 1; t.src = "https://www.clarity.ms/tag/" + i;
+          y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
+        })(window, document, "clarity", "script", "vlzp6fvarw");
+      }
+      if ('requestIdleCallback' in window) requestIdleCallback(loadAnalytics, { timeout: 3000 });
+      else setTimeout(loadAnalytics, 2000);
+    })();
+  </script>
+<script src="brand-bg.js" defer></script></body>
+</html>
