@@ -159,6 +159,7 @@
     <div class="cta-row">
       <a class="btn primary" href="https://github.com/UnboundCompute/lachesis" target="_blank" rel="noopener">View on GitHub &rarr;</a>
       <a class="btn ghost" href="#quickstart">Quickstart &darr;</a>
+      <a class="btn ghost" href="#ci">Run in CI &darr;</a>
     </div>
   </div></header>
 
@@ -207,6 +208,25 @@ Guard differentials: 1</pre>
 "guard_signal": null,
 "differential_siblings": [ "getInvoice" ]</pre>
     <p class="example-note" style="margin-top:26px"><code>getDocument</code> reaches <code>findById</code> with no check, and the record names its guarded twin, <code>getInvoice</code>, directly. That is the finding: a fact that lives in how the value moves, not where the name appears.</p>
+
+    <div class="rule"></div>
+
+    <h2 id="ci">Run it in your CI</h2>
+    <p class="section-note">The same analysis on every pull request. <a href="https://github.com/UnboundCompute/lachesis-action" target="_blank" rel="noopener" style="color:var(--ink);border-bottom:1px solid var(--accent-line)">lachesis-action</a> builds the graph on your own runner, with no external service or API key, and writes findings straight into GitHub code scanning as inline annotations.</p>
+    <pre class="qs-pre"><span class="qs-c"># .github/workflows/lachesis.yml</span>
+name: Lachesis
+on: [pull_request]
+permissions:
+  security-events: write      <span class="qs-c"># upload findings to code scanning</span>
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: UnboundCompute/lachesis-action@v1
+        with:
+          source: "."</pre>
+    <p class="example-note" style="margin-top:26px">Findings come back at three levels, the same distinctions the graph draws: <em>errors</em> for guard differentials, where one function authorizes a caller and a sibling reaching the same sink does not; <em>warnings</em> for unguarded sinks; and <em>notes</em> for guarded paths. It emits SARIF, so results land in the Security tab and as annotations on the diff. MIT licensed.</p>
 
     <div class="soon">
       <p>Lachesis is the open code-property-graph engine that powers UnboundCompute, our hosted autonomous security researcher. Use it standalone, or let us run it at scale, tuned and adjudicated.</p>
