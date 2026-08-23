@@ -163,6 +163,19 @@
     </div>
   </div></header>
 
+  <section class="demo-reel" style="max-width:var(--maxw);margin:0 auto;padding:4px 32px 8px">
+    <div style="border:1px solid rgba(255,255,255,.09);border-radius:16px;overflow:hidden;background:#080A0F;box-shadow:0 30px 80px rgba(0,0,0,.45)">
+      <video autoplay muted loop playsinline preload="metadata" poster="lachesis-demo-poster.png" style="display:block;width:100%;height:auto">
+        <source src="lachesis-demo.mp4" type="video/mp4">
+      </video>
+    </div>
+    <p class="example-note" style="margin-top:18px;text-align:center;max-width:760px;margin-left:auto;margin-right:auto">
+      A 55-second walkthrough: a Flask control plane where three handlers reach the same SQL call unguarded while two sibling handlers authorize first. Lachesis follows the value, flags the three, and names their guarded twins &mdash; posted inline on the pull request.
+      <br>
+      <a href="https://github.com/UnboundCompute/lachesis-action-demo/pull/5" target="_blank" rel="noopener" style="color:var(--ink);border-bottom:1px solid var(--accent-line)">See it live on the pull request &rarr;</a>
+    </p>
+  </section>
+
   <main class="body"><div class="wrap">
     <h2>Why it exists</h2>
     <p>Most code-graph tools stop at symbols and references. That tells you <em>where a name appears</em>. It cannot tell you <em>how a value moves</em>, and that gap is where the interesting questions live. Does this request parameter reach that SQL call? Which of two near-identical functions checks its input before the lookup, and which one does not? What can flow into this buffer?</p>
@@ -227,6 +240,7 @@ jobs:
         with:
           source: "."</pre>
     <p class="example-note" style="margin-top:26px">Findings come back at three levels, the same distinctions the graph draws: <em>errors</em> for guard differentials, where one function authorizes a caller and a sibling reaching the same sink does not; <em>warnings</em> for unguarded sinks; and <em>notes</em> for guarded paths. It emits SARIF, so results land in the Security tab and as annotations on the diff. MIT licensed.</p>
+    <p class="example-note" style="margin-top:22px">See it on a real pull request: <a href="https://github.com/UnboundCompute/lachesis-action-demo/pull/5" target="_blank" rel="noopener" style="color:var(--ink);border-bottom:1px solid var(--accent-line)">five inline findings on a Flask control plane &rarr;</a> &mdash; three guard-differential errors and two guarded notes, posted straight onto the diff.</p>
 
     <div class="soon">
       <p>Lachesis is the open code-property-graph engine that powers UnboundCompute, our hosted autonomous security researcher. Use it standalone, or let us run it at scale, tuned and adjudicated.</p>
