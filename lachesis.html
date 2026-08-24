@@ -170,7 +170,7 @@
       </video>
     </div>
     <p class="example-note" style="margin-top:18px;text-align:center;max-width:760px;margin-left:auto;margin-right:auto">
-      A 55-second walkthrough: a Flask control plane where three handlers reach the same SQL call unguarded while two sibling handlers authorize first. Lachesis follows the value, flags the three, and names their guarded twins &mdash; posted inline on the pull request.
+      A 55-second walkthrough: a Flask control plane where three handlers reach the same SQL call unguarded while two sibling handlers authorize first. Lachesis follows the value, flags the three, and names their guarded twins, posted inline on the pull request.
       <br>
       <a href="https://github.com/UnboundCompute/lachesis-action-demo/pull/5" target="_blank" rel="noopener" style="color:var(--ink);border-bottom:1px solid var(--accent-line)">See it live on the pull request &rarr;</a>
     </p>
@@ -197,21 +197,21 @@
     <div class="rule"></div>
 
     <h2 id="quickstart">Quickstart</h2>
-    <p class="section-note">Lachesis installs from a clone. Point it at a tree, then query the graph or hand it to your agent over MCP.</p>
-    <pre class="qs-pre">git clone --depth 1 --branch v0.1.7 https://github.com/UnboundCompute/lachesis
-git clone --depth 1 --branch v1.7.1 https://github.com/UnboundCompute/atropos
-cd lachesis
-pip install -e ".[dev]" &amp;&amp; npm install       <span class="qs-c"># build from source</span>
-export ATROPOS_ROOT="../atropos"              <span class="qs-c"># load the reviewed model catalog</span>
-lachesis-analyze ./my-project graph.kuzu     <span class="qs-c"># parse a tree into a graph</span>
-lachesis-mcp graph.kuzu                       <span class="qs-c"># hand it to your agent over MCP</span></pre>
+    <p class="section-note">Use the complete installer for the model-backed local stack, or install the headless package when you only need CLI/MCP access. Both paths run locally and need no account.</p>
+    <pre class="qs-pre">git clone https://github.com/UnboundCompute/lachesis-ui
+cd lachesis-ui
+./scripts/install.sh
+export PATH="$HOME/.lachesis/bin:$PATH"
+~/.lachesis/build-graph.sh ./my-project     <span class="qs-c"># build with the reviewed engine + catalog</span>
+lachesis-ui                                   <span class="qs-c"># explore the graph</span></pre>
+    <p class="example-note" style="margin-top:18px">For a headless install, use <code>pip install lachesis-cpg</code> and point <code>ATROPOS_ROOT</code> at a reviewed Atropos checkout or installed model pack. The <a href="https://github.com/UnboundCompute/lachesis-ui#install" target="_blank" rel="noopener" style="color:var(--ink);border-bottom:1px solid var(--accent-line)">TUI installer</a> is the shortest complete path.</p>
 
     <div class="rule"></div>
 
     <h2>See it work</h2>
     <p class="example-note">Two sibling functions reach the same database call. One checks the caller's tenant first; the other does not. A symbol index sees both call <code>findById</code> and stops there. Lachesis tells them apart by following the value.</p>
-    <pre class="qs-pre">lachesis-analyze lachesis/frontends/typescript/fixtures/project example.kuzu
-lachesis-query --format text example.kuzu overview</pre>
+    <pre class="qs-pre">~/.lachesis/venv/bin/lachesis-analyze lachesis/frontends/typescript/fixtures/project example.kuzu
+~/.lachesis/venv/bin/lachesis-query --format text example.kuzu overview</pre>
     <pre class="out-pre"># overview
 Project: layered-project
 Languages: javascript, typescript
