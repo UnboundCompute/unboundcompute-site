@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Open source | UnboundCompute</title>
-<meta name="description" content="Lachesis and Atropos: the open code property graph and taint model anyone can build on, and the open foundation under UnboundCompute's autonomous security researcher. Plus Countermand, our open action firewall for AI agents, and security-agent-skills, our security-testing method as portable agent skills. All on GitHub.">
+<meta name="description" content="Install Lachesis, the compiler-precise code graph, and Atropos, its validated taint catalog. Run locally, in MCP, or in GitHub Actions. Open source from UnboundCompute.">
 <meta name="theme-color" content="#0a0a0b">
 <link rel="canonical" href="https://unboundcompute.com/open-source.html">
 <link rel="icon" href="/favicon.ico" sizes="any">
@@ -166,12 +166,50 @@
   <header class="head"><div class="wrap">
     <p class="eyebrow">Company / Open source</p>
     <h1>Built in the <em>open.</em></h1>
-    <p class="lede">The foundation our researcher reads code with is open, and you can use it too. Lachesis, the code graph, and Atropos, the taint model, are free to build on, the same reader that powers our hosted product. What we offer commercially is the layer on top: the orchestration, judgment, and scale that turn the graph into proven findings. It all lives on <a href="https://github.com/UnboundCompute" rel="me">GitHub</a>.</p>
+    <p class="lede">The foundation our researcher reads code with is open, and you can use it directly. Install Lachesis locally, run it in CI or expose the graph to an agent over MCP; Atropos is the versioned model catalog underneath. The engine, models, Action, and TUI are useful without an account. It all lives on <a href="https://github.com/UnboundCompute" rel="me">GitHub</a>.</p>
   </div></header>
 
   <main class="body"><div class="wrap">
+    <div class="soon" style="margin-top:0;margin-bottom:52px;align-items:flex-start">
+      <div>
+        <p style="font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:10px">Start here / under ten minutes</p>
+        <p style="font-size:16px;color:var(--ink);margin-bottom:12px;max-width:48ch">Install the complete local stack, scan a repository, then explore the same graph in the TUI or hand it to your agent.</p>
+        <pre class="qs-pre" style="font-size:12px;padding:16px 18px">git clone https://github.com/UnboundCompute/lachesis-ui
+cd lachesis-ui &amp;&amp; ./scripts/install.sh
+export PATH="$HOME/.lachesis/bin:$PATH"
+~/.lachesis/build-graph.sh ./your-repository
+lachesis-ui</pre>
+        <p style="font-size:12px;color:var(--ink-faint);margin-top:12px;max-width:54ch">For headless use, install <code>lachesis-cpg</code> and set <code>ATROPOS_ROOT</code> to a reviewed catalog checkout or pack. Prefer a prebuilt interface? <a href="https://github.com/UnboundCompute/lachesis-ui/releases" target="_blank" rel="noopener" style="color:var(--ink);border-bottom:1px solid var(--accent-line)">Download the TUI release</a>.</p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;align-items:flex-start;padding-top:4px">
+        <a class="cta-link" href="https://github.com/UnboundCompute/lachesis-ui#install" target="_blank" rel="noopener">Install complete stack &rarr;</a>
+        <a class="cta-link" style="background:transparent;color:var(--ink);border:1px solid var(--line)" href="https://github.com/UnboundCompute/lachesis-action#quickstart" target="_blank" rel="noopener">Add the Action &rarr;</a>
+        <a class="cta-link" style="background:transparent;color:var(--ink);border:1px solid var(--line)" href="https://github.com/UnboundCompute/atropos/releases" target="_blank" rel="noopener">Download Atropos packs &rarr;</a>
+        <a href="https://github.com/UnboundCompute/atropos#contributing" target="_blank" rel="noopener" style="font-family:var(--mono);font-size:11px;color:var(--ink-faint)">Contribute a model &rarr;</a>
+      </div>
+    </div>
+    <div class="rule"></div>
+    <h2>Choose the job</h2>
+    <p class="section-note">The same Lachesis evidence can meet you where you work. Pick the smallest surface that gets you to a first result; add the others when the workflow earns them.</p>
+    <div class="grid" style="margin-bottom:48px">
+      <div class="feature">
+        <h3>Explore a repository locally</h3>
+        <p>Use the binary-first complete installer. It provisions the engine, Atropos catalog, graph helper, doctor, and TUI without requiring Go.</p>
+        <a href="https://github.com/UnboundCompute/lachesis-ui#install" target="_blank" rel="noopener" style="color:var(--ink);border-bottom:1px solid var(--accent-line)">Install the local stack &rarr;</a>
+      </div>
+      <div class="feature">
+        <h3>Put evidence in every PR</h3>
+        <p>Run the Action on your own runner and upload SARIF to Code Scanning. It is account-free; hosted inline comments are an explicit optional path.</p>
+        <a href="https://github.com/UnboundCompute/lachesis-action#quickstart" target="_blank" rel="noopener" style="color:var(--ink);border-bottom:1px solid var(--accent-line)">Add account-free SARIF &rarr;</a>
+      </div>
+      <div class="feature">
+        <h3>Give an agent the graph</h3>
+        <p>Connect an MCP-capable editor or agent with the PyPI/uvx package or the GHCR image. Keep source mounted locally and inspect the same witnesses.</p>
+        <a href="https://github.com/UnboundCompute/lachesis#the-lachesis-mcp-server" target="_blank" rel="noopener" style="color:var(--ink);border-bottom:1px solid var(--accent-line)">Connect over MCP &rarr;</a>
+      </div>
+    </div>
     <h2>The projects</h2>
-    <p class="section-note">Two projects make up the open foundation: <b>Lachesis</b> reads the code, <b>Atropos</b> says what is dangerous. Each stands on its own, and each is public. A third project, Countermand, is separate, also open, but a different tool for a different job.</p>
+    <p class="section-note">Two projects make up the open foundation: <b>Lachesis</b> reads the code, <b>Atropos</b> says what is dangerous. The Action turns the same evidence into CI artifacts, and the TUI is the local expert surface. Use the foundation directly, then choose the surface that fits your workflow. Countermand is separate, also open, but a different tool for a different job.</p>
 
     <div class="repos">
 
@@ -235,12 +273,24 @@
 
     </div>
 
+    <div class="soon" style="margin-top:28px;margin-bottom:52px;align-items:flex-start">
+      <div>
+        <p style="font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:10px">Choose your surface</p>
+        <p style="font-size:16px;color:var(--ink);margin-bottom:0;max-width:52ch">One graph, three practical ways to use it: local CLI and MCP for exploration, a keyboard-driven TUI for navigation, or CI artifacts for review and policy.</p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;align-items:flex-start;padding-top:4px">
+        <a class="cta-link" href="https://github.com/UnboundCompute/lachesis-action#quickstart" target="_blank" rel="noopener">Run in GitHub CI &rarr;</a>
+        <a class="cta-link" style="background:transparent;color:var(--ink);border:1px solid var(--line)" href="https://github.com/UnboundCompute/lachesis-ui" target="_blank" rel="noopener">Explore with the TUI &rarr;</a>
+      </div>
+    </div>
+
     <div class="quickstart">
-      <p class="section-note" style="margin-bottom:14px">No install to wait on. Lachesis builds from a clone, then parses a tree into a graph and serves it to your agent over MCP. Full docs in the repo.</p>
-      <pre class="qs-pre">git clone https://github.com/UnboundCompute/lachesis &amp;&amp; cd lachesis
-pip install -e ".[dev]" &amp;&amp; npm install       <span class="qs-c"># build from source</span>
-lachesis-analyze ./my-project graph.kuzu     <span class="qs-c"># parse a tree into a graph</span>
-lachesis-mcp graph.kuzu                       <span class="qs-c"># hand it to your agent over MCP</span></pre>
+      <p class="section-note" style="margin-bottom:14px">The shortest complete path provisions Lachesis, Atropos, and the TUI together. The same stack can then serve a graph to an agent over MCP.</p>
+      <pre class="qs-pre">git clone https://github.com/UnboundCompute/lachesis-ui
+cd lachesis-ui &amp;&amp; ./scripts/install.sh
+export PATH="$HOME/.lachesis/bin:$PATH"
+~/.lachesis/build-graph.sh ./my-project
+lachesis-ui</pre>
     </div>
 
     <div class="rule"></div>

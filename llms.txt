@@ -12,6 +12,16 @@
 - [Trust and security posture](https://unboundcompute.com/trust.html)
 - [Free security tool suite (index)](https://unboundcompute.com/tools/)
 
+## Open source security stack
+
+- [Open source overview](https://unboundcompute.com/open-source.html): installable Lachesis, Atropos, the GitHub Action, and the terminal UI.
+- [Lachesis](https://unboundcompute.com/lachesis.html): compiler-precise code property graph for reachability, data flow, taint analysis, and MCP.
+- [Atropos](https://unboundcompute.com/atropos.html): versioned, validated source/sink/sanitizer model catalog for static analysis.
+- [Lachesis GitHub repository](https://github.com/UnboundCompute/lachesis): install the `lachesis-cpg` package and run the CLI or MCP server locally.
+- [Lachesis Action](https://github.com/UnboundCompute/lachesis-action): run the same analysis in GitHub Actions and publish SARIF or PR findings.
+- [Lachesis UI](https://github.com/UnboundCompute/lachesis-ui): install the complete local engine, catalog, and terminal navigation stack.
+- [Lachesis walkthrough](https://unboundcompute.com/lachesis.html#ci): see a real pull request with guard-differential findings.
+
 ## Free in-browser security tools
 
 Client side only, nothing you paste leaves the page.
