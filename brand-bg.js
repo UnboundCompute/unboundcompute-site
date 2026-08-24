@@ -4,7 +4,42 @@
    page carries the identity. No-ops on the homepage (which draws its own), and
    honors prefers-reduced-motion. Include once per page: <script src="brand-bg.js" defer></script> */
 (function () {
-  if (document.querySelector('[data-uc-bg]')) return; // homepage handles its own field
+  function setupDropdowns() {
+    var dropdowns = document.querySelectorAll('.nav-dd');
+    Array.prototype.forEach.call(dropdowns, function (dropdown, index) {
+      var button = dropdown.querySelector('.nav-dd-t');
+      var menu = dropdown.querySelector('.nav-dd-menu');
+      if (!button || !menu) return;
+      var menuId = menu.id || 'open-source-menu-' + index;
+      menu.id = menuId;
+      button.setAttribute('aria-controls', menuId);
+      function setOpen(open) {
+        dropdown.classList.toggle('open', open);
+        button.setAttribute('aria-expanded', String(open));
+      }
+      button.addEventListener('click', function (event) {
+        event.preventDefault();
+        setOpen(!dropdown.classList.contains('open'));
+      });
+      dropdown.addEventListener('focusout', function (event) {
+        if (!dropdown.contains(event.relatedTarget)) setOpen(false);
+      });
+      menu.addEventListener('click', function (event) {
+        if (event.target.closest('a')) setOpen(false);
+      });
+      document.addEventListener('click', function (event) {
+        if (!dropdown.contains(event.target)) setOpen(false);
+      });
+      document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && dropdown.classList.contains('open')) {
+          setOpen(false);
+          button.focus();
+        }
+      });
+    });
+  }
+
+  if (document.querySelector('[data-uc-bg]')) { setupDropdowns(); return; } // homepage handles its own field
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   function hexA(hex, a) {
@@ -18,6 +53,7 @@
   }
 
   function init() {
+    setupDropdowns();
     var c = document.createElement('canvas');
     c.setAttribute('data-uc-bg', '');
     c.setAttribute('aria-hidden', 'true');

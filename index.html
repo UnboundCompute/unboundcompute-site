@@ -141,7 +141,7 @@
     nav .uc-primary-links{display:none!important}
     .uc-menu-toggle{display:inline-flex!important}
   }
-  .uc-menu-toggle{display:none;align-items:center;gap:8px;border:1px solid var(--line);border-radius:7px;background:transparent;color:var(--ink);padding:9px 11px;font:600 10px var(--mono);letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
+  .uc-menu-toggle{display:none;align-items:center;gap:8px;min-height:44px;border:1px solid var(--line);border-radius:7px;background:transparent;color:var(--ink);padding:9px 11px;font:600 10px var(--mono);letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
   .uc-menu-toggle i{display:block;width:13px;height:1px;background:currentColor;box-shadow:0 4px currentColor,0 -4px currentColor}
   .uc-mobile-menu{display:none;position:absolute;left:0;right:0;top:66px;padding:12px 20px 20px;background:rgba(10,10,11,.97);border-bottom:1px solid var(--line);box-shadow:0 20px 40px rgba(0,0,0,.35)}
   .uc-mobile-menu.open{display:grid;gap:4px}
@@ -151,12 +151,12 @@
 <style>
   /* Open Source nav dropdown */
   .nav-dd{position:relative;display:inline-flex;align-items:center}
-  .nav-dd-t{font-family:var(--sans);font-size:14px;color:var(--ink-soft);background:none;border:0;cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:0;line-height:1;transition:color .15s}
+  .nav-dd-t{font-family:var(--sans);font-size:14px;color:var(--ink-soft);background:none;border:0;cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:10px 2px;line-height:1;transition:color .15s}
   .nav-dd:hover .nav-dd-t,.nav-dd:focus-within .nav-dd-t{color:var(--ink)}
   .nav-dd-c{font-size:9px;line-height:1;transition:transform .2s}
   .nav-dd:hover .nav-dd-c,.nav-dd:focus-within .nav-dd-c{transform:rotate(180deg)}
   .nav-dd-menu{position:absolute;top:100%;right:0;padding-top:16px;min-width:290px;opacity:0;visibility:hidden;transform:translateY(-6px);transition:opacity .16s ease,transform .16s ease,visibility .16s;pointer-events:none}
-  .nav-dd:hover .nav-dd-menu,.nav-dd:focus-within .nav-dd-menu{opacity:1;visibility:visible;transform:translateY(0);pointer-events:auto}
+  .nav-dd:hover .nav-dd-menu,.nav-dd:focus-within .nav-dd-menu,.nav-dd.open .nav-dd-menu{opacity:1;visibility:visible;transform:translateY(0);pointer-events:auto}
   .nav-dd-inner{background:rgba(12,12,14,.98);backdrop-filter:blur(16px);border:1px solid var(--line);border-radius:14px;padding:10px;box-shadow:0 24px 60px rgba(0,0,0,.55)}
   .nav-dd-group{font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-faint);padding:9px 12px 5px;margin:0}
   .nav-dd-menu a{display:flex;flex-direction:column;gap:1px;padding:9px 12px;border-radius:9px;transition:background .14s}
@@ -186,14 +186,14 @@
         <a href="https://trace.unboundcompute.com/" target="_blank" rel="noopener" style="transition:color .15s" style-hover="color:var(--ink)">Casefiles</a>
         <a href="tools/" style="transition:color .15s" style-hover="color:var(--ink)">Tools</a>
         <div class="nav-dd">
-          <button class="nav-dd-t" type="button" aria-haspopup="true" aria-expanded="false">Open source <span class="nav-dd-c">&#9662;</span></button>
-          <div class="nav-dd-menu"><div class="nav-dd-inner">
+          <button class="nav-dd-t" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="open-source-menu">Open source <span class="nav-dd-c">&#9662;</span></button>
+          <div class="nav-dd-menu" id="open-source-menu"><div class="nav-dd-inner">
             <p class="nav-dd-group">Engine</p>
             <a href="lachesis.html"><b>Lachesis</b><span>Code property graph</span></a>
             <a href="atropos.html"><b>Atropos</b><span>Taint-model knowledge base</span></a>
-            <p class="nav-dd-group">Agent security</p>
-            <a href="security-agent-skills.html"><b>Security Agent Skills</b><span>Testing method as agent skills</span></a>
-            <a href="open-source.html#countermand"><b>Countermand</b><span>Action firewall for AI agents</span></a>
+            <p class="nav-dd-group">Supporting tools</p>
+            <a href="security-agent-skills.html"><b>Security Agent Skills</b><span>Open testing method</span></a>
+            <a href="open-source.html#countermand"><b>Countermand</b><span>Agent action firewall</span></a>
             <a class="nav-dd-all" href="open-source.html">All open source &rarr;</a>
           </div></div>
         </div>
@@ -595,6 +595,28 @@ organization: <mark>your organization</mark></pre>
     toggle.addEventListener('click', function(){ setOpen(toggle.getAttribute('aria-expanded') !== 'true'); });
     menu.addEventListener('click', function(event){ if(event.target.closest('a')) setOpen(false); });
     document.addEventListener('keydown', function(event){ if(event.key === 'Escape'){ setOpen(false); toggle.focus(); } });
+  })();
+</script>
+
+<script>
+  (function(){
+    document.querySelectorAll('.nav-dd').forEach(function(dropdown, index){
+      var button = dropdown.querySelector('.nav-dd-t');
+      var menu = dropdown.querySelector('.nav-dd-menu');
+      if(!button || !menu) return;
+      var menuId = menu.id || 'open-source-menu-' + index;
+      menu.id = menuId;
+      button.setAttribute('aria-controls', menuId);
+      function setOpen(open){
+        dropdown.classList.toggle('open', open);
+        button.setAttribute('aria-expanded', String(open));
+      }
+      button.addEventListener('click', function(event){ event.preventDefault(); setOpen(!dropdown.classList.contains('open')); });
+      dropdown.addEventListener('focusout', function(event){ if(!dropdown.contains(event.relatedTarget)) setOpen(false); });
+      menu.addEventListener('click', function(event){ if(event.target.closest('a')) setOpen(false); });
+      document.addEventListener('click', function(event){ if(!dropdown.contains(event.target)) setOpen(false); });
+      document.addEventListener('keydown', function(event){ if(event.key === 'Escape' && dropdown.classList.contains('open')){ setOpen(false); button.focus(); } });
+    });
   })();
 </script>
 
