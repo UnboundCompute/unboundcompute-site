@@ -173,11 +173,13 @@
     <div class="soon" style="margin-top:0;margin-bottom:52px;align-items:flex-start">
       <div>
         <p style="font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:10px">Start here / under ten minutes</p>
-        <p style="font-size:16px;color:var(--ink);margin-bottom:12px;max-width:48ch">Scan a repository locally, then use the same graph in your agent or pull-request workflow.</p>
-        <pre class="qs-pre" style="font-size:12px;padding:16px 18px">python -m pip install lachesis-cpg
-lachesis scan ./your-repository
-lachesis mcp ./your-repository</pre>
-        <p style="font-size:12px;color:var(--ink-faint);margin-top:12px;max-width:54ch">For the complete model-backed stack, use the <a href="https://github.com/UnboundCompute/lachesis-ui#install" target="_blank" rel="noopener" style="color:var(--ink);border-bottom:1px solid var(--accent-line)">TUI installer</a>, which provisions Lachesis and Atropos together. Prefer a prebuilt interface? <a href="https://github.com/UnboundCompute/lachesis-ui/releases" target="_blank" rel="noopener" style="color:var(--ink);border-bottom:1px solid var(--accent-line)">Download the TUI release</a>. The package-only path needs an explicit Atropos catalog root.</p>
+        <p style="font-size:16px;color:var(--ink);margin-bottom:12px;max-width:48ch">Install the complete local stack, scan a repository, then explore the same graph in the TUI or hand it to your agent.</p>
+        <pre class="qs-pre" style="font-size:12px;padding:16px 18px">git clone https://github.com/UnboundCompute/lachesis-ui
+cd lachesis-ui &amp;&amp; ./scripts/install.sh
+export PATH="$HOME/.lachesis/bin:$PATH"
+~/.lachesis/build-graph.sh ./your-repository
+lachesis-ui</pre>
+        <p style="font-size:12px;color:var(--ink-faint);margin-top:12px;max-width:54ch">For headless use, install <code>lachesis-cpg</code> and set <code>ATROPOS_ROOT</code> to a reviewed catalog checkout or pack. Prefer a prebuilt interface? <a href="https://github.com/UnboundCompute/lachesis-ui/releases" target="_blank" rel="noopener" style="color:var(--ink);border-bottom:1px solid var(--accent-line)">Download the TUI release</a>.</p>
       </div>
       <div style="display:flex;flex-direction:column;gap:10px;align-items:flex-start;padding-top:4px">
         <a class="cta-link" href="https://github.com/UnboundCompute/lachesis#install" target="_blank" rel="noopener">Install Lachesis &rarr;</a>
