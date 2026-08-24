@@ -7,7 +7,7 @@
 <!-- Primary SEO -->
 <title>UnboundCompute | Autonomous Security Research for Web Apps and APIs</title>
 <meta name="description" content="UnboundCompute is an autonomous security researcher for the software you ship. It reads your code and probes your running app, learns the boundaries your product trusts, crosses the ones that should not hold, and proves every finding with hard evidence." />
-<meta name="keywords" content="autonomous security, AI security research, AI penetration testing, web application security, API security, trust boundary, broken access control, offensive security, autonomous pentest" />
+<meta name="keywords" content="autonomous security research, application security, API security, trust boundary testing, broken access control, source-aware security testing, replayable evidence" />
 <meta name="robots" content="index, follow" />
 <meta name="author" content="UnboundCompute" />
 <meta name="theme-color" content="#0a0a0b" />
@@ -20,16 +20,17 @@
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="UnboundCompute" />
 <meta property="og:title" content="UnboundCompute | Autonomous Security Research for Web Apps and APIs" />
-<meta property="og:description" content="An autonomous security researcher that reads your code and probes your running app, learns the boundaries your product trusts, crosses the ones that should not hold, and proves every finding with hard evidence." />
+<meta property="og:description" content="Lachesis reads your code, tests your running app inside an authorized scope, and returns evidence engineers can replay." />
 <meta property="og:url" content="https://unboundcompute.com/" />
 <meta property="og:image" content="https://unboundcompute.com/og.png" />
+<meta property="og:image:alt" content="UnboundCompute evidence console showing a proven application boundary failure" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
 
 <!-- Twitter -->
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="UnboundCompute | Autonomous Security Research" />
-<meta name="twitter:description" content="An autonomous security researcher for web apps and APIs. It crosses the line your app trusts, then proves it with hard evidence." />
+<meta name="twitter:description" content="Lachesis reads source, tests authorized runtime boundaries, and returns evidence engineers can replay." />
 <meta name="twitter:image" content="https://unboundcompute.com/og.png" />
 
 <!-- Structured data -->
@@ -137,9 +138,15 @@
   }
   @media (max-width:560px){
     section [style*="grid-template-columns:repeat(3,1fr)"]{grid-template-columns:1fr!important}
-    nav [style*="display:flex;gap:30px"] a:not([style*="background:var(--accent)"]){display:none}
-    nav .nav-dd{display:none}
+    nav .uc-primary-links{display:none!important}
+    .uc-menu-toggle{display:inline-flex!important}
   }
+  .uc-menu-toggle{display:none;align-items:center;gap:8px;border:1px solid var(--line);border-radius:7px;background:transparent;color:var(--ink);padding:9px 11px;font:600 10px var(--mono);letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
+  .uc-menu-toggle i{display:block;width:13px;height:1px;background:currentColor;box-shadow:0 4px currentColor,0 -4px currentColor}
+  .uc-mobile-menu{display:none;position:absolute;left:0;right:0;top:66px;padding:12px 20px 20px;background:rgba(10,10,11,.97);border-bottom:1px solid var(--line);box-shadow:0 20px 40px rgba(0,0,0,.35)}
+  .uc-mobile-menu.open{display:grid;gap:4px}
+  .uc-mobile-menu a{padding:14px 10px;border-bottom:1px solid var(--line-2);color:var(--ink-soft);font-size:14px}
+  .uc-mobile-menu a:last-child{margin-top:8px;border:0;border-radius:7px;background:var(--accent);color:var(--on-accent);font:600 11px var(--mono);letter-spacing:.08em;text-align:center;text-transform:uppercase}
 </style>
 <style>
   /* Open Source nav dropdown */
@@ -173,7 +180,7 @@
         <span style="width:27px;height:27px;border-radius:7px;border:1px solid var(--accent-line);display:grid;place-items:center">
           <svg viewBox="0 0 24 24" fill="none" style="width:15px;height:15px"><line x1="12" y1="3" x2="12" y2="21" stroke="var(--accent)" stroke-width="1.8" stroke-dasharray="2.6 2.6"/><circle cx="12" cy="12" r="3" fill="var(--accent)"/></svg>
         </span>UnboundCompute</a>
-      <div style="display:flex;gap:30px;align-items:center;font-size:14px;color:var(--ink-soft)">
+      <div class="uc-primary-links" style="display:flex;gap:30px;align-items:center;font-size:14px;color:var(--ink-soft)">
         <a href="#capabilities" style="transition:color .15s" style-hover="color:var(--ink)">Capabilities</a>
         <a href="#proof" style="transition:color .15s" style-hover="color:var(--ink)">Proof</a>
         <a href="demo/" style="transition:color .15s" style-hover="color:var(--ink)">Demo</a>
@@ -193,6 +200,16 @@
         <a href="about.html" style="transition:color .15s" style-hover="color:var(--ink)">About</a>
         <a href="design-partners.html" style="font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;background:var(--accent);color:var(--on-accent);padding:10px 17px;border-radius:8px;transition:filter .15s" style-hover="filter:brightness(1.08)">Become a design partner</a>
       </div>
+      <button class="uc-menu-toggle" id="uc-menu-toggle" type="button" aria-expanded="false" aria-controls="uc-mobile-menu"><i aria-hidden="true"></i><span>Menu</span></button>
+    </div>
+    <div class="uc-mobile-menu" id="uc-mobile-menu" aria-label="Mobile navigation">
+      <a href="#capabilities">Capabilities</a>
+      <a href="#proof">Proof</a>
+      <a href="demo/">Console demo</a>
+      <a href="tools/">Free tools</a>
+      <a href="open-source.html">Open source</a>
+      <a href="about.html">About</a>
+      <a href="design-partners.html">Become a design partner</a>
     </div>
   </nav>
 
@@ -203,13 +220,13 @@
         <svg viewBox="0 0 12 12" style="position:absolute;left:-14px;top:-30px;width:11px;height:11px;color:var(--ink-faint)"><path d="M6 0V12M0 6H12" stroke="currentColor" stroke-width="1"/></svg>
         <p style="display:inline-flex;align-items:center;gap:10px;font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:26px">
           <span data-anim style="width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px var(--accent);animation:uc-pulse 2.4s ease-in-out infinite"></span>
-          <span style="color:var(--ink-faint)">[</span> Autonomous offensive security <span style="color:var(--ink-faint)">]</span>
+          <span style="color:var(--ink-faint)">[</span> Authorized application security research <span style="color:var(--ink-faint)">]</span>
         </p>
         <h1 style="font-family:var(--serif);font-weight:400;font-size:clamp(46px,5.8vw,78px);line-height:.98;letter-spacing:-.03em;color:var(--ink-hi);margin-bottom:26px">Thinks like an<br><em style="font-style:italic;color:var(--accent)">attacker.</em><br>Proves like an <em style="font-style:italic;color:var(--ink-hi)">auditor.</em></h1>
         <p style="font-size:18px;color:var(--ink-soft);max-width:47ch;line-height:1.58;margin-bottom:32px">An autonomous security researcher for the software you ship. It reads your code and probes your running app, learns the boundaries your product trusts, crosses the ones that should not hold, and proves every finding with hard evidence.</p>
         <div style="display:flex;gap:13px;margin-bottom:34px;flex-wrap:wrap">
           <a href="design-partners.html" style="font-family:var(--mono);font-size:12.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:14px 22px;border-radius:9px;background:var(--accent);color:var(--on-accent);transition:filter .15s" style-hover="filter:brightness(1.08)">Become a design partner</a>
-          <a href="open-source.html" style="font-family:var(--mono);font-size:12.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:14px 22px;border-radius:9px;border:1px solid var(--accent-line);color:var(--accent);transition:border-color .15s,background .15s" style-hover="border-color:var(--accent);background:var(--accent-wash)">Use the open stack</a>
+          <a href="open-source.html" style="font-family:var(--mono);font-size:12.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:14px 22px;border-radius:9px;border:1px solid var(--accent-line);color:var(--accent);transition:border-color .15s,background .15s" style-hover="border-color:var(--accent);background:var(--accent-wash)">Explore the open stack</a>
           <a href="#proof" style="font-family:var(--mono);font-size:12.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:14px 22px;border-radius:9px;border:1px solid var(--line);color:var(--ink);transition:border-color .15s,background .15s" style-hover="border-color:var(--ink-soft);background:var(--panel)">See the proof</a>
           <a href="demo/" style="font-family:var(--mono);font-size:12.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:14px 22px;border-radius:9px;border:1px solid var(--line);color:var(--ink);transition:border-color .15s,background .15s" style-hover="border-color:var(--ink-soft);background:var(--panel)">Explore the console</a>
         </div>
@@ -290,13 +307,13 @@
           <p class="px-eyebrow">Inside the product</p>
           <h2>Complex research.<br><em>Radical clarity.</em></h2>
         </div>
-        <p>UnboundCompute does the offensive-security work underneath, then gives whoever owns the problem a clear account of what happened, how it knows, and what to do next.</p>
+        <p>UnboundCompute does the security research underneath, then gives whoever owns the problem a clear account of what happened, how it knows, and what to do next.</p>
       </div>
 
       <div class="px-console" data-px-console>
         <div class="px-topbar">
           <div class="px-brand"><span class="px-mark"><i></i></span>UnboundCompute <small>/ console</small></div>
-          <div class="px-location">NORTHSTAR / <b data-px-location>BRIEFING</b></div>
+          <div class="px-location">UNBOUNDCOMPUTE / <b data-px-location>BRIEFING</b></div>
           <div class="px-actions"><span>Menu</span><span>Ask</span><strong>New research</strong></div>
         </div>
 
@@ -319,7 +336,7 @@
             </div>
 
             <div class="px-view" data-px-view="research">
-              <div class="px-research-head"><div><p class="px-state neutral">Independent reproduction</p><h3>Invitation and team-role workflows</h3></div><span class="px-live">researching now</span></div>
+              <div class="px-research-head"><div><p class="px-state neutral">Observation recorded</p><h3>Invitation and team-role workflows</h3></div><span class="px-live">evidence attached</span></div>
               <div class="px-map">
                 <div class="px-node n1"><small>Identity</small><b>Normal member</b></div>
                 <div class="px-node n2"><small>Workflow</small><b>Team invitations</b></div>
@@ -340,7 +357,7 @@ Authorization: Bearer [member_identity]
 X-Workspace-ID: ws_acme
 
 HTTP/2 <em>200 OK</em>
-organization: <mark>Northstar Labs</mark></pre>
+organization: <mark>your organization</mark></pre>
             </div>
 
             <div class="px-view" data-px-view="verify">
@@ -370,7 +387,7 @@ organization: <mark>Northstar Labs</mark></pre>
         <svg viewBox="0 0 12 12" style="position:absolute;left:-2px;top:-34px;width:11px;height:11px;color:var(--ink-faint)"><path d="M6 0V12M0 6H12" stroke="currentColor" stroke-width="1"/></svg>
         <p style="font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:24px">02 / Evidence</p>
         <h2 style="font-family:var(--serif);font-weight:300;font-size:clamp(38px,5vw,60px);line-height:1.0;letter-spacing:-.025em;color:var(--ink-hi);margin-bottom:22px">Every finding,<br><em style="font-style:italic;color:var(--accent)">proven.</em></h2>
-        <p style="font-size:17px;color:var(--ink-soft);line-height:1.6;max-width:42ch;margin-bottom:26px">No guessing at severity, no "likely exploitable." Suspicious behavior stays an observation until it is reproduced against a control. Each proven report includes the recorded request, the response that should never have come back, and a replay your engineers can run themselves.</p>
+        <p style="font-size:17px;color:var(--ink-soft);line-height:1.6;max-width:42ch;margin-bottom:26px">No unverified severity claims. A suspicious behavior stays an observation until Lachesis reproduces it against a control. Each proven report includes the recorded request, the response that should never have come back, and a replay your engineers can run themselves.</p>
         <div style="display:flex;flex-direction:column;gap:14px;font-family:var(--mono);font-size:13px;color:var(--ink)">
           <div style="display:flex;gap:12px;align-items:baseline"><span style="color:var(--accent)">&rarr;</span> Recorded request and response, verbatim</div>
           <div style="display:flex;gap:12px;align-items:baseline"><span style="color:var(--accent)">&rarr;</span> Replayed against an authorized baseline</div>
@@ -401,7 +418,7 @@ organization: <mark>Northstar Labs</mark></pre>
         <svg viewBox="0 0 12 12" style="width:11px;height:11px;color:var(--ink-faint);margin-bottom:20px"><path d="M6 0V12M0 6H12" stroke="currentColor" stroke-width="1"/></svg>
         <p style="font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:20px">Proof in plain sight</p>
         <h2 style="font-family:var(--serif);font-weight:300;font-size:clamp(34px,4.4vw,52px);line-height:1.03;letter-spacing:-.025em;color:var(--ink-hi);margin-bottom:22px">Proof your whole<br>team can act on.</h2>
-        <p style="font-size:17px;color:var(--ink-soft);max-width:44ch;line-height:1.6;margin-bottom:24px">Every finding ships a plain English read, what it is, what an attacker could do, and how to fix it, right next to the hard evidence. Your engineers get the exact request, everyone else gets the point.</p>
+        <p style="font-size:17px;color:var(--ink-soft);max-width:44ch;line-height:1.6;margin-bottom:24px">Every finding pairs a plain-English explanation with the evidence underneath: what happened, what an attacker could do, and what to fix. Engineers get the exact request. Everyone else gets the point.</p>
         <div style="display:flex;gap:26px;font-family:var(--mono);font-size:11.5px;color:var(--ink-faint);letter-spacing:.04em;border-top:1px solid var(--line-2);padding-top:18px;flex-wrap:wrap">
           <span><span style="color:var(--ink-soft)">read by</span> &nbsp;engineers &amp; PMs</span>
           <span><span style="color:var(--ink-soft)">export</span> &nbsp;PoC &middot; ticket &middot; report</span>
@@ -523,7 +540,7 @@ organization: <mark>Northstar Labs</mark></pre>
       <div style="position:relative">
         <p style="font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:26px">Design partner program</p>
         <h2 style="font-family:var(--serif);font-weight:300;font-size:clamp(40px,6vw,74px);line-height:.98;letter-spacing:-.03em;color:var(--ink-hi);margin-bottom:24px">Find the line.<br>Then watch it <em style="font-style:italic;color:var(--accent)">cross.</em></h2>
-        <p style="font-size:18px;color:var(--ink-soft);max-width:48ch;margin:0 auto 22px;line-height:1.55">UnboundCompute is in private access. Connect your repository or point it at a staging environment, and see what it proves before your next release does.</p>
+        <p style="font-size:18px;color:var(--ink-soft);max-width:48ch;margin:0 auto 22px;line-height:1.55">UnboundCompute is in private access. Give Lachesis an authorized staging environment, the identities it should use, and the boundary you want tested. See what it proves before your next release does.</p>
         <p style="font-family:var(--mono);font-size:11.5px;color:var(--ink-faint);letter-spacing:.03em;margin:0 auto 34px">you control the scope &middot; blocked coverage stays visible &middot; evidence is replayable</p>
         <form id="waitlist-form" novalidate>
           <input id="wl-email" type="email" name="email" required placeholder="you@company.com" aria-label="Your work email" autocomplete="email">
@@ -565,6 +582,21 @@ organization: <mark>Northstar Labs</mark></pre>
       el.addEventListener('mouseenter', function(){ el.setAttribute('style', base + ';' + hov); });
       el.addEventListener('mouseleave', function(){ el.setAttribute('style', base); });
     });
+  })();
+</script>
+
+<script>
+  (function(){
+    var toggle = document.getElementById('uc-menu-toggle');
+    var menu = document.getElementById('uc-mobile-menu');
+    if(!toggle || !menu) return;
+    function setOpen(open){
+      toggle.setAttribute('aria-expanded', String(open));
+      menu.classList.toggle('open', open);
+    }
+    toggle.addEventListener('click', function(){ setOpen(toggle.getAttribute('aria-expanded') !== 'true'); });
+    menu.addEventListener('click', function(event){ if(event.target.closest('a')) setOpen(false); });
+    document.addEventListener('keydown', function(event){ if(event.key === 'Escape'){ setOpen(false); toggle.focus(); } });
   })();
 </script>
 
