@@ -236,9 +236,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: UnboundCompute/lachesis-action@v1
+      - uses: UnboundCompute/lachesis-action@v1.0.5
         with:
-          source: "."</pre>
+          source: "."
+          lachesis-ref: "v0.1.7"
+          atropos-ref: "v1.7.1"</pre>
     <p class="example-note" style="margin-top:26px">Findings come back at three levels, the same distinctions the graph draws: <em>errors</em> for guard differentials, where one function authorizes a caller and a sibling reaching the same sink does not; <em>warnings</em> for unguarded sinks; and <em>notes</em> for guarded paths. It emits SARIF, so results land in the Security tab and as annotations on the diff. MIT licensed.</p>
     <p class="example-note" style="margin-top:22px">See it on a real pull request: <a href="https://github.com/UnboundCompute/lachesis-action-demo/pull/5" target="_blank" rel="noopener" style="color:var(--ink);border-bottom:1px solid var(--accent-line)">five inline findings on a Flask control plane &rarr;</a> &mdash; three guard-differential errors and two guarded notes, posted straight onto the diff.</p>
 
