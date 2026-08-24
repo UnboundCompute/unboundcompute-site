@@ -102,7 +102,7 @@
     <div class="site-nav-links">
       <a href="index.html#capabilities">Capabilities</a>
       <a href="index.html#proof">Proof</a>
-      <a href="demo/">Demo</a>
+      <a href="https://trace.unboundcompute.com/" target="_blank" rel="noopener">Casefiles</a>
       <a href="tools/">Tools</a>
       <div class="nav-dd">
         <button class="nav-dd-t" type="button" aria-haspopup="true" aria-expanded="false">Open source <span class="nav-dd-c">&#9662;</span></button>
@@ -122,14 +122,14 @@
   </div></nav>
 
   <header class="head"><div class="wrap">
-    <p class="eyebrow">Company / Research</p>
+    <p class="eyebrow">UnboundCompute / Research</p>
     <h1>Notes from the <em>boundary.</em></h1>
     <p class="lede">We are building an autonomous security researcher, and this is where we write down how the method is changing. The experiments behind it, what worked, what did not, and what each result changed. Notes from inside the build, not a launch feed.</p>
   </div></header>
 
   <main class="body"><div class="wrap">
     <h2>The method we automate</h2>
-    <p>UnboundCompute runs the loop a strong human tester uses, continuously and without supervision. It reads your source and probes your running app, and each step exists to turn an assumption about the system into a <em>provable</em> contradiction.</p>
+    <p>UnboundCompute runs the loop a strong human tester uses across authorized research runs. It reads your source and probes your running app, and each step exists to turn an assumption about the system into a <em>provable</em> contradiction.</p>
 
     <div class="steps">
       <div class="step"><div class="k"><span class="num">01</span><span class="name">Understand</span></div><p>Read the source and explore the running app the way a person would: features, roles, objects, workflows, state, and the trust boundaries between them.</p></div>
@@ -144,7 +144,7 @@
 
     <div class="steps">
       <div class="step"><div class="k"><span class="num">01</span><span class="name">One analysis never covers it</span></div><p>We expected our dataflow and taint layer to carry most of memory-safety analysis. It does not. A whole class of bug, an integer that wraps and then narrows into a smaller signed type, is a <em>local</em> property: the dangerous value is computed and used inside one function, with nothing flowing in from outside. Taint, reachability, and points-to add nothing there. The lesson we keep relearning is that no single technique covers memory safety, and the honest move is to add a model for the class you are missing, not to stretch the one you have.</p></div>
-      <div class="step"><div class="k"><span class="num">02</span><span class="name">Proving code safe is a result</span></div><p>We optimize for precision, not coverage. A finding only ships with repeatable evidence, and anything ambiguous is suppressed with a written reason instead of surfaced as a maybe. Most of the engine's work is proving code <em>safe</em>, ruling out the cases that cannot matter so a person only ever looks at the few that can. Five findings you can ground beat a hundred you have to triage. A tool that cries wolf gets turned off in a week.</p></div>
+      <div class="step"><div class="k"><span class="num">02</span><span class="name">Proving code safe is a result</span></div><p>We optimize for precision, not coverage. A finding only ships with repeatable evidence, and anything ambiguous is suppressed with a written reason instead of presented as a finding. Much of the engine's work is proving code <em>safe</em>, ruling out cases that cannot matter so a person only looks at the few that can. Five findings you can ground beat a hundred you have to triage. A tool that cries wolf gets turned off in a week.</p></div>
       <div class="step"><div class="k"><span class="num">03</span><span class="name">Measuring a finder is hard</span></div><p>How do you know the finder is any good? Re-finding a known bug proves little if you told it where to look. Name the function in the prompt and you have measured recall of a hint, not discovery. So we separate the two: rediscovery on public, already-fixed bugs to check the mechanism, and blind runs with no hints to measure real discovery. When a result is not clean, we say so. Most of what we learn comes from the runs that fail.</p></div>
     </div>
 
@@ -159,7 +159,7 @@
       <div>
         <a href="index.html#top" style="display:flex;align-items:center;gap:11px;font-family:var(--mono);font-weight:600;font-size:15px;margin-bottom:14px">
           <span style="width:27px;height:27px;border-radius:7px;border:1px solid var(--accent-line);display:grid;place-items:center"><svg viewBox="0 0 24 24" fill="none" style="width:15px;height:15px"><line x1="12" y1="3" x2="12" y2="21" stroke="var(--accent)" stroke-width="1.8" stroke-dasharray="2.6 2.6"/><circle cx="12" cy="12" r="3" fill="var(--accent)"/></svg></span>UnboundCompute</a>
-        <p style="font-size:13px;color:var(--ink-faint);line-height:1.6;max-width:30ch">An autonomous security researcher that finds the line, crosses it, and proves it.</p>
+        <p style="font-size:13px;color:var(--ink-faint);line-height:1.6;max-width:30ch">UnboundCompute researches the boundary, records the evidence, and shows what held.</p>
       </div>
       <div style="display:flex;flex-direction:column;gap:11px;font-size:13.5px;color:var(--ink-soft)"><span style="font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-faint);margin-bottom:5px">Product</span><a href="index.html#proof" style-hover="color:var(--ink)">Proof</a><a href="index.html#capabilities" style-hover="color:var(--ink)">Capabilities</a><a href="design-partners.html" style-hover="color:var(--ink)">Design partners</a><a href="tools/" style-hover="color:var(--ink)">Tools</a><a href="index.html#cta" style-hover="color:var(--ink)">Become a design partner</a></div>
       <div style="display:flex;flex-direction:column;gap:11px;font-size:13.5px;color:var(--ink-soft)"><span style="font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-faint);margin-bottom:5px">Company</span><a href="about.html" style-hover="color:var(--ink)">About</a><a href="research.html" style-hover="color:var(--ink)">Research</a><a href="open-source.html" style-hover="color:var(--ink)">Open source</a><a href="careers.html" style-hover="color:var(--ink)">Careers</a><a href="https://www.linkedin.com/company/unboundcompute" style-hover="color:var(--ink)">LinkedIn</a><a href="https://github.com/UnboundCompute" style-hover="color:var(--ink)">GitHub</a></div>

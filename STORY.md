@@ -38,3 +38,13 @@ UnboundCompute is an autonomous security researcher that learns how an applicati
 - **Design partners:** make the private-access request concrete, scoped, and low-friction.
 - **Tools:** offer practical client-side utilities as an independent, no-signup entry point.
 - **About, trust, privacy, terms:** provide confidence and operational clarity without making product claims they cannot substantiate.
+
+## Product architecture
+
+- **UnboundCompute:** the hosted product and the customer-facing company. It coordinates authorized source and runtime security research and owns the evidence record.
+- **Lachesis:** the open-source code property graph that gives the researcher compiler-precise understanding of source relationships.
+- **Atropos:** the open-source taint model catalog Lachesis can resolve against the graph. It is data, not a second researcher.
+- **Security Agent Skills:** an open-source methodology library for agents. It describes testing discipline; it is not another hosted product.
+- **Casefiles:** the public trace archive at `trace.unboundcompute.com`. It documents historical CVEs and how Lachesis reconstructed their paths.
+- **Free tools:** independent browser-only utilities published by UnboundCompute. They are an entry point and resource, not the hosted research product.
+- **Sample console:** retained as an internal artifact only. It is not part of the public navigation or sitemap.
