@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Open source | UnboundCompute</title>
-<meta name="description" content="Lachesis and Atropos: the open code property graph and taint model anyone can build on, and the open foundation under UnboundCompute's autonomous security researcher. Plus Countermand, our open action firewall for AI agents, and security-agent-skills, our security-testing method as portable agent skills. All on GitHub.">
+<meta name="description" content="Install Lachesis, the compiler-precise code graph, and Atropos, its validated taint catalog. Run locally, in MCP, or in GitHub Actions. Open source from UnboundCompute.">
 <meta name="theme-color" content="#0a0a0b">
 <link rel="canonical" href="https://unboundcompute.com/open-source.html">
 <link rel="icon" href="/favicon.ico" sizes="any">
@@ -166,10 +166,24 @@
   <header class="head"><div class="wrap">
     <p class="eyebrow">Company / Open source</p>
     <h1>Built in the <em>open.</em></h1>
-    <p class="lede">The foundation our researcher reads code with is open, and you can use it too. Lachesis, the code graph, and Atropos, the taint model, are free to build on, the same reader that powers our hosted product. What we offer commercially is the layer on top: the orchestration, judgment, and scale that turn the graph into proven findings. It all lives on <a href="https://github.com/UnboundCompute" rel="me">GitHub</a>.</p>
+    <p class="lede">The foundation our researcher reads code with is open, and you can use it directly. Install Lachesis locally, run it in CI or expose the graph to an agent over MCP; Atropos is the versioned model catalog underneath. The engine, models, Action, and TUI are useful without an account. It all lives on <a href="https://github.com/UnboundCompute" rel="me">GitHub</a>.</p>
   </div></header>
 
   <main class="body"><div class="wrap">
+    <div class="soon" style="margin-top:0;margin-bottom:52px;align-items:flex-start">
+      <div>
+        <p style="font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:10px">Start here / under ten minutes</p>
+        <p style="font-size:16px;color:var(--ink);margin-bottom:12px;max-width:48ch">Scan a repository locally, then use the same graph in your agent or pull-request workflow.</p>
+        <pre class="qs-pre" style="font-size:12px;padding:16px 18px">python -m pip install lachesis-cpg
+lachesis scan ./your-repository
+lachesis mcp ./your-repository</pre>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;align-items:flex-start;padding-top:4px">
+        <a class="cta-link" href="https://github.com/UnboundCompute/lachesis#install" target="_blank" rel="noopener">Install Lachesis &rarr;</a>
+        <a class="cta-link" style="background:transparent;color:var(--ink);border:1px solid var(--line)" href="https://github.com/UnboundCompute/lachesis-action#quickstart" target="_blank" rel="noopener">Add the Action &rarr;</a>
+        <a href="https://github.com/UnboundCompute/atropos#contributing" target="_blank" rel="noopener" style="font-family:var(--mono);font-size:11px;color:var(--ink-faint)">Contribute a model &rarr;</a>
+      </div>
+    </div>
     <h2>The projects</h2>
     <p class="section-note">Two projects make up the open foundation: <b>Lachesis</b> reads the code, <b>Atropos</b> says what is dangerous. Each stands on its own, and each is public. A third project, Countermand, is separate, also open, but a different tool for a different job.</p>
 
