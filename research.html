@@ -54,6 +54,16 @@
   .step .num{font-family:var(--serif);font-style:italic;font-size:26px;color:var(--accent);line-height:1}
   .step .name{font-family:var(--mono);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
   .step p{margin:0;font-size:15.5px}
+  .evidence-route{margin-top:68px;padding:28px 0 4px;border-top:1px solid var(--line)}
+  .evidence-route h2{margin-top:0}
+  .evidence-route>p{max-width:60ch}
+  .evidence-route-links{margin-top:28px;border-top:1px solid var(--line)}
+  .evidence-route-links a{display:grid;grid-template-columns:200px 1fr auto;align-items:center;gap:24px;padding:18px 0;border-bottom:1px solid var(--line);color:var(--ink);text-decoration:none}
+  .evidence-route-links a:hover,.evidence-route-links a:focus-visible{color:var(--accent)}
+  .evidence-route-links span{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint)}
+  .evidence-route-links strong{font-family:var(--serif);font-size:22px;font-weight:400;color:inherit}
+  .evidence-route-links i{font-family:var(--mono);font-size:17px;font-style:normal;color:var(--accent)}
+  @media(max-width:640px){.evidence-route-links a{grid-template-columns:1fr auto;gap:6px 16px}.evidence-route-links span{grid-column:1 / -1}.evidence-route-links strong{font-size:20px}}
   .soon{margin-top:40px;border:1px dashed var(--line);border-radius:13px;background:var(--panel);padding:30px 28px}
   .soon p{margin:0 0 14px}
   .cta-link{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:13px 22px;border-radius:9px;background:var(--accent);color:var(--on-accent)}
@@ -156,6 +166,17 @@
       <div class="step"><div class="k"><span class="num">02</span><span class="name">Proving code safe is a result</span></div><p>We optimize for precision, not coverage. A finding only ships with repeatable evidence, and anything ambiguous is suppressed with a written reason instead of presented as a finding. Much of the engine's work is proving code <em>safe</em>, ruling out cases that cannot matter so a person only looks at the few that can. Five findings you can ground beat a hundred you have to triage. A tool that cries wolf gets turned off in a week.</p></div>
       <div class="step"><div class="k"><span class="num">03</span><span class="name">Measuring a finder is hard</span></div><p>How do you know the finder is any good? Re-finding a known bug proves little if you told it where to look. Name the function in the prompt and you have measured recall of a hint, not discovery. So we separate the two: rediscovery on public, already-fixed bugs to check the mechanism, and blind runs with no hints to measure real discovery. When a result is not clean, we say so. Most of what we learn comes from the runs that fail.</p></div>
     </div>
+
+    <section class="evidence-route" aria-labelledby="evidence-route-title">
+      <h2 id="evidence-route-title">Follow one result through the stack</h2>
+      <p>A research note explains the method. These public surfaces hold the evidence at each altitude: architecture, semantic meaning, exact source paths, and recorded cases.</p>
+      <nav class="evidence-route-links" aria-label="Evidence stack">
+        <a href="https://map.unboundcompute.com/" target="_blank" rel="noopener"><span>01 · Map</span><strong>Orient in the repository</strong><i aria-hidden="true">↗</i></a>
+        <a href="https://atropos.unboundcompute.com/" target="_blank" rel="noopener"><span>02 · Atropos</span><strong>Read the semantic fact</strong><i aria-hidden="true">↗</i></a>
+        <a href="https://lachesis.unboundcompute.com/" target="_blank" rel="noopener"><span>03 · Lachesis</span><strong>Trace the exact source path</strong><i aria-hidden="true">↗</i></a>
+        <a href="https://trace.unboundcompute.com/" target="_blank" rel="noopener"><span>04 · Casefiles</span><strong>Read a recorded witness</strong><i aria-hidden="true">↗</i></a>
+      </nav>
+    </section>
 
     <div class="soon">
       <p>Want the first posts when they land? The fastest way in is the access list.</p>
