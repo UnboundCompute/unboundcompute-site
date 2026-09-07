@@ -77,6 +77,15 @@ def main() -> int:
         if url not in research:
             fail(f"research.html: missing {product} journey link", failures)
 
+    homepage = (ROOT / "index.html").read_text(encoding="utf-8")
+    artifact = ROOT / "uc-evidence-card-linkedin.png"
+    if not artifact.is_file():
+        fail("index.html: referenced open-stack evidence artifact is missing", failures)
+    if 'src="uc-evidence-card-linkedin.png"' not in homepage:
+        fail("index.html: open-stack evidence artifact is not referenced", failures)
+    if "Captured Lachesis evidence card" not in homepage:
+        fail("index.html: open-stack evidence artifact is missing meaningful alt text", failures)
+
     if failures:
         print("Site contract failed:")
         for failure in failures:
