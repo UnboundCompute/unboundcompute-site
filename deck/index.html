@@ -3,21 +3,27 @@
 <head>
 <meta charset="UTF-8" />
 <title>UnboundCompute Deck</title>
+<meta name="description" content="An overview of UnboundCompute: source-aware, authorized security research with evidence engineers can replay.">
+<meta property="og:title" content="UnboundCompute Deck">
+<link rel="canonical" href="https://unboundcompute.com/deck/">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600;700&family=JetBrains+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet" />
 <style>
   :root {
-    --paper: #14120e;
-    --paper-2: #100e0b;
-    --card: #1d1a14;
-    --ink: #ece7da;
-    --ink-soft: #a39a87;
-    --ink-faint: #726b5b;
-    --line: rgba(236, 231, 218, 0.12);
-    --line-soft: rgba(236, 231, 218, 0.06);
-    --accent: #7c93ff;
-    --clay: #e08f55;
+    --paper: #0a0a0b;
+    --paper-2: #070708;
+    --card: #0e0e10;
+    --ink: #f4f2ec;
+    --ink-soft: #9b988f;
+    --ink-faint: #5e5b54;
+    --line: rgba(244, 242, 236, 0.13);
+    --line-soft: rgba(244, 242, 236, 0.07);
+    --accent: #fb5b46;
+    --clay: #9b988f;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { background: #000; }
@@ -116,7 +122,7 @@
   <section class="slide cover">
     <div class="wash"></div>
     <div style="position:relative;">
-      <span class="eyebrow"><span class="dot"></span> Autonomous offensive security</span>
+      <span class="eyebrow"><span class="dot"></span> Authorized application security research</span>
       <div class="wordmark"><span class="mark">U</span><span class="name">UnboundCompute</span></div>
       <h1 class="title">An autonomous security <em>researcher.</em></h1>
       <p class="lead">It learns how an application is meant to work, finds where its own rules break, and proves it, for modern web apps and APIs.</p>
@@ -135,7 +141,7 @@
       <ul class="pts">
         <li><b>Scanners test a fixed list of known vulnerability types.</b> <span>They have no idea what the application is actually supposed to do.</span></li>
         <li><b>The most damaging issues live in that gap</b> <span>, like broken access control, business logic abuse, and privilege escalation. They depend entirely on context.</span></li>
-        <li><b>Finding them means human researchers</b> <span>, scarce, expensive, and impossible to run continuously across everything you ship.</span></li>
+        <li><b>Finding them means human researchers</b> <span>, scarce, expensive, and difficult to apply to every change you ship.</span></li>
       </ul>
     </div>
     <div class="foot"><span class="brand"><span class="mark">U</span> UnboundCompute</span><span>02</span></div>
@@ -147,7 +153,7 @@
       <p class="kicker">The idea</p>
       <h2>Test the <em>assumptions</em>, not the payloads.</h2>
       <p class="lead">A strong researcher models how an application is meant to behave, then designs the one experiment that should be forbidden, and watches what happens.</p>
-      <p class="lead" style="margin-top:18px;">We are building an autonomous agent that works the same way: understand the app, form the assumptions it makes, try to break each one, and verify the result.</p>
+        <p class="lead" style="margin-top:18px;">We are building an autonomous researcher that works the same way: understand the app, form the assumptions it makes, test each one inside an authorized scope, and verify the result.</p>
     </div>
     <div class="foot"><span class="brand"><span class="mark">U</span> UnboundCompute</span><span>03</span></div>
   </section>
@@ -171,7 +177,7 @@
           <text class="lp-label" x="154" y="312" text-anchor="middle">verify</text>
           <circle class="lp-node" cx="107" cy="141" r="7" />
           <text class="lp-label" x="88" y="146" text-anchor="end">chain</text>
-          <text class="lp-core" x="230" y="178" text-anchor="middle">CONTINUOUS</text>
+          <text class="lp-core" x="230" y="178" text-anchor="middle">REPEATABLE</text>
           <text class="lp-core" x="230" y="196" text-anchor="middle">RESEARCH LOOP</text>
         </svg>
       </div>
@@ -207,7 +213,7 @@
       <p class="kicker">Early signal</p>
       <h2>An early run gave us reason to <em>keep going.</em></h2>
       <ul class="pts">
-        <li><b>A frontier model drove the full methodology autonomously,</b> <span>with no human in the loop.</span></li>
+        <li><b>The research loop is designed to be attributable,</b> <span>with scope, identities, controls, and evidence attached to every result.</span></li>
         <li><b>It identified and verified real access control and injection issues</b> <span>in test applications it had not seen before.</span></li>
       </ul>
       <p class="note">This is an early, encouraging indication of the approach, not a benchmark. Validation at scale is still ahead of us.</p>
@@ -223,7 +229,7 @@
       <div class="tile accent">
         <div class="lbl">Built and working</div>
         <h3>The loop runs end to end</h3>
-        <p>An autonomous research loop runs against live test applications today, understanding, experimenting, and verifying on its own, across web apps and APIs.</p>
+        <p>An autonomous research loop runs against authorized test applications, understanding, experimenting, and verifying across web apps and APIs.</p>
       </div>
       <div class="tile dim">
         <div class="lbl">Not yet</div>
@@ -231,7 +237,7 @@
         <p>Early stage, small team. No external benchmark or third party validation yet. The deterministic verification layer and chaining across runs are being expanded.</p>
       </div>
     </div>
-    <p class="note" style="margin-top:36px;">Current focus: making the autonomous loop reliable, measurable, and consistent before opening it up.</p>
+    <p class="note" style="margin-top:36px;">Current focus: making the research loop reliable, measurable, and consistent before widening access.</p>
     <div class="foot"><span class="brand"><span class="mark">U</span> UnboundCompute</span><span>07</span></div>
   </section>
 
@@ -243,7 +249,7 @@
       <ul class="pts">
         <li><b>Models can finally reason and use tools</b> <span>across many steps, enough to carry a real research method, not just answer a prompt.</span></li>
         <li><b>Demand far outpaces supply</b> <span>of skilled security researchers, and every team ships faster than it can be tested.</span></li>
-        <li><b>The market is shifting to continuous, verified testing</b> <span>, away from point in time scans toward proof that holds over time.</span></li>
+        <li><b>The market is shifting to repeatable, verified testing</b> <span>, away from point-in-time scans toward proof that can be checked again.</span></li>
       </ul>
     </div>
     <div class="foot"><span class="brand"><span class="mark">U</span> UnboundCompute</span><span>08</span></div>
@@ -252,7 +258,7 @@
   <!-- 9 · ROADMAP -->
   <section class="slide">
     <p class="kicker">Roadmap</p>
-    <h2>From a reliable loop to <em>continuous</em> assurance.</h2>
+    <h2>From a reliable loop to <em>repeatable</em> assurance.</h2>
     <div class="road">
       <div class="col">
         <div class="when">Now</div>
@@ -266,7 +272,7 @@
       </div>
       <div class="col">
         <div class="when">Later</div>
-        <h3>Continuous testing</h3>
+        <h3>Repeatable testing</h3>
         <p>Test again on every change and turn each finding into a regression check wired into the release pipeline.</p>
       </div>
     </div>
@@ -279,7 +285,7 @@
     <div style="position:relative;">
       <p class="kicker">Where we're headed</p>
       <h1 class="title" style="font-size:60px;">Point it at an app.<br/><em>Trust the findings.</em></h1>
-      <p class="lead">We're building toward an autonomous researcher you can run continuously and rely on. We're looking for early design partners to shape it with us.</p>
+      <p class="lead">We are building toward an autonomous researcher teams can run inside boundaries they control and rely on for evidence. We are looking for early design partners to shape it with us.</p>
       <p class="lead" style="margin-top:22px; color:var(--ink);">unboundcompute.com</p>
     </div>
     <div class="foot">
@@ -294,7 +300,7 @@
       <div>
         <a href="../index.html#top" style="display:flex;align-items:center;gap:11px;font-family:var(--mono);font-weight:600;font-size:15px;margin-bottom:14px">
           <span style="width:27px;height:27px;border-radius:7px;border:1px solid var(--accent-line);display:grid;place-items:center"><svg viewBox="0 0 24 24" fill="none" style="width:15px;height:15px"><line x1="12" y1="3" x2="12" y2="21" stroke="var(--accent)" stroke-width="1.8" stroke-dasharray="2.6 2.6"/><circle cx="12" cy="12" r="3" fill="var(--accent)"/></svg></span>UnboundCompute</a>
-        <p style="font-size:13px;color:var(--ink-faint);line-height:1.6;max-width:30ch">An autonomous security researcher that finds the line, crosses it, and proves it.</p>
+        <p style="font-size:13px;color:var(--ink-faint);line-height:1.6;max-width:30ch">UnboundCompute researches the boundary, records the evidence, and shows what held.</p>
       </div>
       <div style="display:flex;flex-direction:column;gap:11px;font-size:13.5px;color:var(--ink-soft)"><span style="font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-faint);margin-bottom:5px">Product</span><a href="../index.html#proof" style-hover="color:var(--ink)">Proof</a><a href="../index.html#capabilities" style-hover="color:var(--ink)">Capabilities</a><a href="../design-partners.html" style-hover="color:var(--ink)">Design partners</a><a href="../tools/" style-hover="color:var(--ink)">Tools</a><a href="../index.html#cta" style-hover="color:var(--ink)">Become a design partner</a></div>
       <div style="display:flex;flex-direction:column;gap:11px;font-size:13.5px;color:var(--ink-soft)"><span style="font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-faint);margin-bottom:5px">Company</span><a href="../about.html" style-hover="color:var(--ink)">About</a><a href="../research.html" style-hover="color:var(--ink)">Research</a><a href="../open-source.html" style-hover="color:var(--ink)">Open source</a><a href="../careers.html" style-hover="color:var(--ink)">Careers</a><a href="https://www.linkedin.com/company/unboundcompute" style-hover="color:var(--ink)">LinkedIn</a><a href="https://github.com/UnboundCompute" style-hover="color:var(--ink)">GitHub</a></div>

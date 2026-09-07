@@ -26,7 +26,7 @@ about.html            trust.html       research.html
 careers.html          privacy.html     terms.html
 design-partners.html
 tools/                26 tools plus an index
-demo/                 product walkthrough
+demo/                 internal sample console (not linked from the public site)
 deck/                 overview deck
 *.css, *.js           brand and landing page styles, loaded directly
 robots.txt            sitemap.xml      llms.txt
