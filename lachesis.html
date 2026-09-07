@@ -227,6 +227,7 @@ Guard differentials: 1</pre>
 
     <h2 id="ci">Run it in your CI</h2>
     <p class="section-note">The same analysis on every pull request. <a href="https://github.com/UnboundCompute/lachesis-action" target="_blank" rel="noopener" style="color:var(--ink);border-bottom:1px solid var(--accent-line)">lachesis-action</a> builds the graph on your own runner, with no external service or API key, and writes findings straight into GitHub code scanning as inline annotations.</p>
+    <p class="example-note" style="margin-top:18px">The workflow below uses the current reviewed public release tuple. Development defaults may advance independently; pin these refs (or a reviewed commit) when reproducibility matters.</p>
     <pre class="qs-pre"><span class="qs-c"># .github/workflows/lachesis.yml</span>
 name: Lachesis
 on: [pull_request]
